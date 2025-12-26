@@ -104,3 +104,10 @@ body { margin: 0; display: flex; height: 100vh; font-family: 'Plus Jakarta Sans'
     color: #3b82f6;
     margin-right: 10px;
 }
+.preview-area-1200 {
+    width: 100%; max-width: 1200px;
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-bottom: 40px; min-height: 100px;
+    display: flex; align-items: center; justify-content: center;
+}

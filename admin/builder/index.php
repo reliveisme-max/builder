@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'config.php';
 require_once ROOT_DIR . '/admin/modules/module-manager.php';
 $blocks = get_registered_blocks();
@@ -23,10 +23,10 @@ $blocks = get_registered_blocks();
         <div class="sidebar-scroll">
             <div id="block-library">
                 <?php foreach ($blocks as $id => $info): ?>
-                <div class="block-card" data-id="<?php echo $id; ?>">
-                    <div class="icon-box"><i class="<?php echo $info['icon']; ?>"></i></div>
-                    <span><?php echo $info['title']; ?></span>
-                </div>
+                    <div class="block-card" data-id="<?php echo $id; ?>">
+                        <div class="icon-box"><i class="<?php echo $info['icon']; ?>"></i></div>
+                        <span><?php echo $info['title']; ?></span>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -34,6 +34,9 @@ $blocks = get_registered_blocks();
 
     <main id="builder-main">
         <div class="workspace-scroll">
+            <div id="header-render-target" class="preview-area-1200">
+                <div class="preview-placeholder">Live Preview Header</div>
+            </div>
             <div class="builder-1200">
                 <div class="builder-row" data-label="Top Bar">
                     <div class="slot drop-zone" data-pos="left"></div>
@@ -48,6 +51,12 @@ $blocks = get_registered_blocks();
             </div>
         </div>
     </main>
+    <aside id="sidebar-right">
+        <div class="prop-header">PROPERTIES</div>
+        <div id="property-editor">
+            <div class="prop-empty">Chọn một linh kiện để thiết lập</div>
+        </div>
+    </aside>
 
     <script src="../../assets/js/builder-logic.js"></script>
 </body>

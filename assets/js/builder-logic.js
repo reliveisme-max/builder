@@ -11,10 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
             group: 'shared',
             animation: 150,
             onAdd: function (evt) {
-                const blockId = evt.item.getAttribute('data-id');
-                // Thay thế icon bằng khối linh kiện có thể tương tác
-                evt.item.innerHTML = `<div class="node-dropped" onclick="openProperties('${blockId}', this)">${blockId.toUpperCase()}</div>`;
-            }
+    const blockId = evt.item.getAttribute('data-id');
+    // Thay thế icon bằng khối linh kiện
+    evt.item.innerHTML = `<div class="node-dropped" onclick="openProperties('${blockId}', this)">${blockId.toUpperCase()}</div>`;
+    
+    // PHẢI GỌI HÀM NÀY ĐỂ PREVIEW CẬP NHẬT
+    updateLivePreview(); 
+}
         });
     });
 });
@@ -53,35 +56,57 @@ function openProperties(type, element) {
 }
 
 /*==========================================================================
-   # HÀM ĐỒNG BỘ LIVE PREVIEW (CẬP NHẬT MỚI)
+   # HÀM RENDER LIVE PREVIEW THỰC TẾ (Nâng cấp)
 ==========================================================================*/
-function updateLivePreview() {
-    // 1. Lấy vùng đích trên Preview
+async function updateLivePreview() {
     const targetHeader = document.getElementById('header-render-target');
     if (!targetHeader) return;
 
-    // 2. Thu thập dữ liệu từ các hàng Skeleton (Top, Main, Bottom)
-    let rowsData = {};
-    document.querySelectorAll('.header-row').forEach(row => {
-        const rowType = row.getAttribute('data-label'); // Ví dụ: "Top Bar"
-        rowsData[rowType] = [];
+    // Tạo cấu trúc chứa các hàng render
+    targetHeader.innerHTML = '<div class="preview-loading">Đang cập nhật...</div>';
 
-        // Lấy tất cả linh kiện trong các slot của hàng này
-        row.querySelectorAll('.node-dropped').forEach(node => {
-            rowsData[rowType].push(node.getAttribute('data-id'));
-        });
-    });
+    let finalHtml = `<div class="real-header-preview">`;
 
-    // 3. Gửi dữ liệu về Server để lấy HTML render thật
-    // Lưu ý: Tạm thời chúng ta sẽ render đơn giản, sau này có thể làm AJAX phức tạp hơn
-    let previewHtml = `<div class="preview-header-wrapper">`;
+    // Duyệt qua từng hàng Skeleton (Top, Main, Bottom)
+    const rows = document.querySelectorAll('.builder-row');
     
-    for (const [rowName, blocks] of Object.entries(rowsData)) {
-        if (blocks.length > 0) {
-            previewHtml += `<div class="preview-row-item"><strong>${rowName}:</strong> ${blocks.join(' | ')}</div>`;
+    for (const row of rows) {
+        const rowLabel = row.getAttribute('data-label');
+        const nodes = row.querySelectorAll('.node-dropped');
+        
+        if (nodes.length > 0) {
+            finalHtml += `<div class="preview-row" data-row="${rowLabel}">
+                            <div class="preview-row-inner" style="display:flex; justify-content:space-between; width:100%; max-width:1200px; margin:0 auto; padding:10px 0;">`;
+            
+            // Render 3 vị trí: Trái - Giữa - Phải
+            const positions = ['left', 'center', 'right'];
+            for (const pos of positions) {
+                const slot = row.querySelector(`.slot[data-pos="${pos}"]`);
+                const blockInSlot = slot.querySelector('.node-dropped');
+                
+                finalHtml += `<div class="preview-col-${pos}" style="flex:1; display:flex; align-items:center; justify-content:${pos === 'center' ? 'center' : (pos === 'right' ? 'flex-end' : 'flex-start')}">`;
+                
+                if (blockInSlot) {
+                    const blockId = blockInSlot.getAttribute('data-id');
+                    // Gọi server để lấy HTML thật của linh kiện
+                    const response = await fetch('get-block.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'block_id=' + blockId
+                    });
+                    const blockHtml = await response.text();
+                    finalHtml += blockHtml;
+                }
+                
+                finalHtml += `</div>`;
+            }
+            
+            finalHtml += `</div></div>`;
         }
     }
-    
-    previewHtml += `</div>`;
-    targetHeader.innerHTML = previewHtml;
+
+    finalHtml += `</div>`;
+    targetHeader.innerHTML = finalHtml;
 }
+
+// Đảm bảo trong hàm onAdd của Sortable có gọi updateLivePreview()
