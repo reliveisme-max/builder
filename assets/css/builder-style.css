@@ -1,71 +1,106 @@
 /*==========================================================================
-   # UI REFINEMENT - Gọn gàng & Sạch sẽ
+   # UI BAKERY REPLICA - FINAL STABLE VERSION
 ==========================================================================*/
 :root {
-    --bg-sidebar: #1a1c1e;
-    --bg-workspace: #f1f5f9; /* Nền phẳng, không chấm */
-    --primary: #3b82f6;
-    --border: #e2e8f0;
+    --bg-dark: #1a1c1e; --bg-workspace: #f8fafc; --primary: #3b82f6;
+    --border: #e2e8f0; --text-muted: #94a3b8;
 }
+* { box-sizing: border-box; }
+body { margin: 0; display: flex; height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-workspace); overflow: hidden; }
 
-body { margin: 0; display: flex; height: 100vh; font-family: 'Inter', sans-serif; background: var(--bg-workspace); }
+/* SIDEBAR: Ép khít linh kiện */
+#sidebar-left { width: 220px; background: var(--bg-dark); border-right: 1px solid #000; display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-header { padding: 20px; color: #fff; font-weight: 700; font-size: 13px; border-bottom: 1px solid #2d3139; }
 
-/* SIDEBAR: Thu hẹp độ rộng và khoảng cách */
-#sidebar-left { 
-    width: 240px; /* Thu hẹp từ 280px xuống 240px */
-    background: var(--bg-sidebar); 
-    display: flex; flex-direction: column; 
-    border-right: 1px solid #000;
-}
-
-.sidebar-header { padding: 20px; color: #fff; font-size: 16px; font-weight: 700; border-bottom: 1px solid #2d3139; }
-
-/* Grid 3 cột sát nhau */
 #block-library { 
     display: grid; 
-    grid-template-columns: repeat(3, 1fr); /* 3 cột để icon sát nhau hơn */
-    gap: 8px; /* Giảm khoảng cách giữa các ô */
-    padding: 15px; 
+    grid-template-columns: repeat(3, 50px); /* Ép cột 50px cố định để icon sát nhau */
+    justify-content: center; 
+    gap: 15px 10px; 
+    padding: 20px 0; 
 }
-
-.block-card { 
-    display: flex; flex-direction: column; align-items: center; 
-    cursor: grab; transition: 0.2s; 
-}
-
-/* Thu nhỏ Icon Box để bớt "hở" */
+.block-card { display: flex; flex-direction: column; align-items: center; cursor: grab; }
 .icon-box { 
-    background: #25282c; 
-    width: 44px; height: 44px; /* Thu nhỏ từ 56px xuống 44px */
-    border-radius: 8px; 
-    display: flex; align-items: center; justify-content: center; 
-    margin-bottom: 4px; 
-    border: 1px solid #333; 
+    background: #25282c; width: 42px; height: 42px; border-radius: 10px; 
+    display: flex; align-items: center; justify-content: center; border: 1px solid #333; margin-bottom: 5px; 
 }
-
 .block-card:hover .icon-box { border-color: var(--primary); background: #2a2e35; }
-.block-card i { font-size: 20px; color: #fff; opacity: 0.7; }
-.block-card span { font-size: 10px; color: #94a3b8; font-weight: 500; text-align: center; }
+.block-card i { font-size: 20px; color: #fff; }
+.block-card span { font-size: 9px; color: var(--text-muted); font-weight: 600; text-align: center; }
 
-/* WORKSPACE: XÓA CHẤM CANVAS */
-#workspace-viewport { 
-    flex: 1; 
-    padding: 30px; 
-    background: var(--bg-workspace); /* Chỉ dùng màu phẳng */
-    background-image: none !important; /* Xóa bỏ hoàn toàn dot grid */
-    display: flex; flex-direction: column; align-items: center; 
-    overflow-y: auto;
+/* WORKSPACE: Cố định 1200px */
+#builder-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.workspace-scroll { flex: 1; overflow-y: auto; padding: 40px 0; display: flex; flex-direction: column; align-items: center; }
+
+/* SKELETON BUILDER (FLATSOME STYLE) */
+.builder-1200 { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 20px; }
+.builder-row { 
+    width: 100%; display: flex; background: #fff; border: 1px solid var(--border); 
+    border-radius: 8px; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.builder-row::before { 
+    content: attr(data-label); position: absolute; top: -10px; left: 15px; 
+    background: var(--primary); color: #fff; font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; 
 }
 
-/* HEADER CARD: Thanh mảnh & Nổi bật */
-#header-floating-card {
-    width: 100%; max-width: 1100px; 
-    background: #fff; border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Đổ bóng nhẹ hơn */
-    border: 1px solid var(--border);
-    overflow: hidden;
+/* SLOT: CHỐNG TRÀN */
+.slot { 
+    flex: 1; min-height: 60px; border-right: 1px dashed var(--border); 
+    display: flex; align-items: center; justify-content: center; /* Căn giữa linh kiện */
+    padding: 10px; overflow: hidden; /* QUAN TRỌNG: Không cho linh kiện tràn ra */
+}
+.slot:last-child { border-right: none; }
+.main-row .slot { min-height: 100px; }
+
+/* Linh kiện khi nằm trong Slot */
+.node-dropped {
+    background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe;
+    padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+/*==========================================================================
+   # PROPERTIES PANEL REFINEMENT
+==========================================================================*/
+#sidebar-right { 
+    width: 300px; background: #fff; border-left: 1px solid var(--border); 
+    display: flex; flex-direction: column; flex-shrink: 0;
 }
 
-.header-row { display: flex; border-bottom: 1px solid #f8fafc; min-height: 40px; }
-.row-main .slot { min-height: 80px; }
-.slot { flex: 1; border-right: 1px solid #f8fafc; display: flex; align-items: center; padding: 0 15px; }
+.prop-group { padding: 20px; border-bottom: 1px solid #f1f5f9; }
+.prop-label { 
+    display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); 
+    margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* Input & Select chuyên nghiệp */
+.prop-control {
+    width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+    font-size: 13px; font-family: inherit; color: var(--text-dark); outline: none;
+    transition: 0.2s; background: #f8fafc;
+}
+.prop-control:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+/* Dropped Node - Hiệu ứng khi được chọn */
+.node-dropped {
+    cursor: pointer; transition: 0.2s;
+    border: 1px solid transparent;
+}
+.node-dropped.is-active {
+    border-color: var(--primary); background: #eff6ff;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+/* --- STYLE CHO VÙNG LIVE PREVIEW RENDER --- */
+.preview-header-wrapper {
+    padding: 20px;
+    width: 100%;
+}
+.preview-row-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    color: #475569;
+}
+.preview-row-item strong {
+    color: #3b82f6;
+    margin-right: 10px;
+}
