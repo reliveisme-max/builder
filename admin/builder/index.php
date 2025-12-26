@@ -33,6 +33,14 @@ $blocks = get_registered_blocks();
     </aside>
 
     <main id="builder-main">
+        <nav class="top-toolbar">
+            <div class="toolbar-left">Editor / <span>Header Builder</span></div>
+            <div class="toolbar-center">1200 px <i class="ph ph-caret-down"></i></div>
+            <div class="toolbar-right">
+                <button class="btn preview">Preview</button>
+                <button class="btn finish">Finish editing</button>
+            </div>
+        </nav>
         <div class="workspace-scroll">
             <div id="header-render-target" class="preview-area-1200">
                 <div class="preview-placeholder">Live Preview Header</div>

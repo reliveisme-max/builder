@@ -1,152 +1,191 @@
 /*==========================================================================
-   # UI BAKERY REPLICA - FINAL STABLE VERSION
+   # 1. BIẾN VÀ THIẾT LẬP CHUNG (CORE VARIABLES)
 ==========================================================================*/
 :root {
-    --bg-dark: #1a1c1e; --bg-workspace: #f8fafc; --primary: #3b82f6;
-    --border: #e2e8f0; --text-muted: #94a3b8;
+    --bg-dark: #1a1c1e;         /* Màu nền Sidebar trái */
+    --bg-workspace: #f1f5f9;    /* Màu nền Workspace giữa */
+    --primary: #3b82f6;         /* Màu xanh thương hiệu */
+    --border: #e2e8f0;          /* Màu đường kẻ */
+    --text-dark: #1e293b;
+    --text-muted: #94a3b8;
+    --white: #ffffff;
+    --header-h: 48px;           /* Độ cao chuẩn cho tất cả Header */
 }
+
 * { box-sizing: border-box; }
-body { margin: 0; display: flex; height: 100vh; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-workspace); overflow: hidden; }
 
-/* SIDEBAR: Ép khít linh kiện */
-#sidebar-left { width: 220px; background: var(--bg-dark); border-right: 1px solid #000; display: flex; flex-direction: column; flex-shrink: 0; }
-.sidebar-header { height: 48px; padding: 20px; color: #fff; font-weight: 700; font-size: 13px; border-bottom: 1px solid #2d3139; }
-.prop-header { 
-    height: 48px; /* Phải bằng tuyệt đối với sidebar-header và top-toolbar */
-    padding: 0 20px; 
+body { 
+    margin: 0; 
     display: flex; 
-    align-items: center; 
-    font-size: 11px; 
-    font-weight: 800; 
-    color: var(--text-muted); 
-    border-bottom: 1px solid #f1f5f9; 
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    height: 100vh; 
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+    background: var(--bg-workspace); 
+    overflow: hidden; 
 }
 
-/* Toolbar chính ở giữa (Nếu chưa có, hãy bổ sung class này) */
+/*==========================================================================
+   # 2. ĐỒNG BỘ HEADER (FIX LỆCH PROPERTIES)
+==========================================================================*/
+/* Thống nhất chiều cao và căn chỉnh cho 3 cột */
+.sidebar-header, 
+.prop-header, 
 .top-toolbar {
-    height: 48px;
-    background: #fff;
-    border-bottom: 1px solid var(--border);
+    height: var(--header-h);
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0 20px;
     flex-shrink: 0;
 }
 
+.sidebar-header { 
+    background: var(--bg-dark); 
+    color: #fff; 
+    font-weight: 700; 
+    font-size: 14px; 
+    border-bottom: 1px solid #2d3139; 
+}
+
+.prop-header { 
+    background: var(--white);
+    font-size: 11px; 
+    font-weight: 800; 
+    color: var(--text-muted); 
+    border-bottom: 1px solid #f1f5f9; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+}
+
+.top-toolbar { 
+    background: var(--white); 
+    border-bottom: 1px solid var(--border); 
+    justify-content: space-between; 
+    font-size: 12px; 
+}
+
+/*==========================================================================
+   # 3. SIDEBAR TRÁI - LINH KIỆN (SIÊU GỌN)
+==========================================================================*/
+#sidebar-left { 
+    width: 240px; 
+    background: var(--bg-dark); 
+    border-right: 1px solid #000; 
+    display: flex; 
+    flex-direction: column; 
+    flex-shrink: 0; 
+}
+
+.sidebar-search { padding: 12px; }
+.sidebar-search input { 
+    width: 100%; background: #222529; border: 1px solid #333; 
+    border-radius: 6px; padding: 8px; color: #fff; font-size: 12px; outline: none; 
+}
+
+.sidebar-scroll { flex: 1; overflow-y: auto; padding: 0 10px; }
+.section-label { 
+    color: var(--text-muted); font-size: 10px; font-weight: 800; 
+    text-transform: uppercase; margin: 15px 0 10px 4px; 
+}
+
+/* Grid ép khít linh kiện sát nhau */
 #block-library { 
     display: grid; 
-    grid-template-columns: repeat(3, 50px); /* Ép cột 50px cố định để icon sát nhau */
-    justify-content: center; 
-    gap: 15px 10px; 
-    padding: 20px 0; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 8px; 
+    padding: 5px; 
 }
-.block-card { display: flex; flex-direction: column; align-items: center; cursor: grab; }
+
+.block-card { display: flex; flex-direction: column; align-items: center; cursor: grab; padding-bottom: 10px; }
 .icon-box { 
-    background: #25282c; width: 42px; height: 42px; border-radius: 10px; 
-    display: flex; align-items: center; justify-content: center; border: 1px solid #333; margin-bottom: 5px; 
+    background: #25282c; width: 44px; height: 44px; border-radius: 10px; 
+    display: flex; align-items: center; justify-content: center; 
+    border: 1px solid #333; margin-bottom: 5px; transition: 0.2s; 
 }
-.block-card:hover .icon-box { border-color: var(--primary); background: #2a2e35; }
-.block-card i { font-size: 20px; color: #fff; }
+.block-card:hover .icon-box { border-color: var(--primary); background: #2a2e35; transform: translateY(-2px); }
+.block-card i { font-size: 20px; color: #fff; opacity: 0.8; }
 .block-card span { font-size: 9px; color: var(--text-muted); font-weight: 600; text-align: center; }
 
-/* WORKSPACE: Cố định 1200px */
+/*==========================================================================
+   # 4. WORKSPACE TRUNG TÂM (1200PX)
+==========================================================================*/
 #builder-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-.workspace-scroll { flex: 1; overflow-y: auto; padding: 40px 0; display: flex; flex-direction: column; align-items: center; }
 
-/* SKELETON BUILDER (FLATSOME STYLE) */
-.builder-1200 { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 20px; }
+.workspace-scroll { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 40px 0; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
+
+/* Vùng Live Preview Header */
+.preview-area-1200 {
+    width: 100%; max-width: 1200px;
+    background: var(--white); border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin-bottom: 40px; min-height: 100px;
+    display: flex; flex-direction: column; align-items: stretch;
+}
+
+/* Hệ thống Skeleton Builder (Flatsome Style) */
+.builder-1200 { width: 100%; max-width: 1200px; display: flex; flex-direction: column; gap: 20px; padding-bottom: 100px; }
 .builder-row { 
-    width: 100%; display: flex; background: #fff; border: 1px solid var(--border); 
+    width: 100%; display: flex; background: var(--white); border: 1px solid var(--border); 
     border-radius: 8px; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
+
 .builder-row::before { 
     content: attr(data-label); position: absolute; top: -10px; left: 15px; 
-    background: var(--primary); color: #fff; font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; 
+    background: var(--primary); color: #fff; font-size: 9px; padding: 2px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase; z-index: 10;
 }
 
-/* SLOT: CHỐNG TRÀN */
 .slot { 
     flex: 1; min-height: 60px; border-right: 1px dashed var(--border); 
-    display: flex; align-items: center; justify-content: center; /* Căn giữa linh kiện */
-    padding: 10px; overflow: hidden; /* QUAN TRỌNG: Không cho linh kiện tràn ra */
+    display: flex; align-items: center; padding: 0 15px; 
 }
 .slot:last-child { border-right: none; }
 .main-row .slot { min-height: 100px; }
 
-/* Linh kiện khi nằm trong Slot */
-.node-dropped {
-    background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe;
-    padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
-}
 /*==========================================================================
-   # PROPERTIES PANEL REFINEMENT
+   # 5. LINH KIỆN KHI ĐƯỢC THẢ (DROPPED NODE)
 ==========================================================================*/
-#sidebar-right { 
-    width: 300px; background: #fff; border-left: 1px solid var(--border); 
-    display: flex; flex-direction: column; flex-shrink: 0;
-}
-
-.prop-group { padding: 20px; border-bottom: 1px solid #f1f5f9; }
-.prop-label { 
-    display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); 
-    margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-}
-
-/* Input & Select chuyên nghiệp */
-.prop-control {
-    width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;
-    font-size: 13px; font-family: inherit; color: var(--text-dark); outline: none;
-    transition: 0.2s; background: #f8fafc;
-}
-.prop-control:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
-
-/* Dropped Node - Hiệu ứng khi được chọn */
+/* Gộp các đoạn khai báo trùng lặp */
 .node-dropped {
-    cursor: pointer; transition: 0.2s;
-    border: 1px solid transparent;
+    background: #eff6ff; 
+    color: #3b82f6; 
+    border: 1px solid #bfdbfe;
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    font-size: 11px; 
+    font-weight: 700;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    max-width: 100%;
+    cursor: pointer; 
+    transition: 0.2s;
 }
+
+.node-dropped:hover { background: #dbeafe; }
+
 .node-dropped.is-active {
-    border-color: var(--primary); background: #eff6ff;
+    border-color: var(--primary); 
+    background: #dbeafe;
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
-/* --- STYLE CHO VÙNG LIVE PREVIEW RENDER --- */
-.preview-header-wrapper {
-    padding: 20px;
-    width: 100%;
-}
-.preview-row-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 13px;
-    color: #475569;
-}
-.preview-row-item strong {
-    color: #3b82f6;
-    margin-right: 10px;
-}
-.preview-area-1200 {
-    width: 100%; max-width: 1200px;
-    background: #fff; border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    margin-bottom: 40px; min-height: 100px;
-    display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start;
-}
-/*==========================================================================
-   # SIDEBAR CONTENT REFINEMENT
-==========================================================================*/
 
-/* Tối ưu lại khu vực Search Sidebar */
-.sidebar-search { padding: 12px; }
-.search-input-wrap {
-    background: #222529;
-    border: 1px solid #333;
-    border-radius: 6px;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/*==========================================================================
+   # 6. SIDEBAR PHẢI (PROPERTIES)
+==========================================================================*/
+#sidebar-right { width: 300px; background: var(--white); border-left: 1px solid var(--border); flex-shrink: 0; }
+
+.prop-group { padding: 20px; border-bottom: 1px solid #f1f5f9; }
+.prop-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; }
+
+.prop-control {
+    width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;
+    font-size: 13px; color: var(--text-dark); outline: none; background: #f8fafc;
 }
+.prop-control:focus { border-color: var(--primary); background: #fff; }
+
+.prop-empty { text-align: center; margin-top: 100px; color: #cbd5e1; font-size: 13px; }

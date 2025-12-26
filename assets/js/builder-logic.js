@@ -21,36 +21,63 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-/**
- * Hàm mở bảng thuộc tính bên phải
+// Đối tượng lưu trữ cấu hình cho từng linh kiện đã thả
+let blockSettings = {};
+
+* Hàm mở bảng thuộc tính linh hoạt theo loại linh kiện
  */
 function openProperties(type, element) {
-    // Xóa trạng thái active cũ
     document.querySelectorAll('.node-dropped').forEach(el => el.classList.remove('is-active'));
     element.classList.add('is-active');
 
-    const panel = document.getElementById('property-editor'); // ID từ index.php của bạn
+    // Lấy ID duy nhất của node này (có thể dùng timestamp nếu bạn kéo nhiều cái cùng loại)
+    const nodeId = element.getAttribute('data-node-id') || Date.now();
+    element.setAttribute('data-node-id', nodeId);
     
-    // Tạo giao diện cài đặt dựa trên loại linh kiện
-    let html = `
-        <div class="prop-group">
-            <label class="prop-label">Tên linh kiện</label>
-            <input type="text" class="prop-control" value="${type.toUpperCase()}" readonly>
-        </div>
-        <div class="prop-group">
-            <label class="prop-label">Màu sắc chủ đạo</label>
-            <input type="color" class="prop-control" style="height:40px; padding:2px;" onchange="updatePreviewColor(this.value)">
-        </div>
-        <div class="prop-group">
-            <label class="prop-label">Căn chỉnh</label>
-            <select class="prop-control">
-                <option>Trái</option>
-                <option>Giữa</option>
-                <option>Phải</option>
-            </select>
-        </div>
-    `;
-    
+    if (!blockSettings[nodeId]) blockSettings[nodeId] = { type: type };
+
+    const panel = document.getElementById('property-editor');
+    let html = `<div class="prop-group"><label class="prop-label">Linh kiện: ${type.toUpperCase()}</label></div>`;
+
+    // Phân loại linh kiện để hiện thị controls đúng
+    switch(type) {
+        case 'logo':
+            html += `
+                <div class="prop-group">
+                    <label class="prop-label">Kiểu Logo</label>
+                    <select class="prop-control" onchange="updateBlockData('${nodeId}', 'logoType', this.value)">
+                        <option value="text">Dạng chữ (Text)</option>
+                        <option value="image">Dạng ảnh (Image)</option>
+                    </select>
+                </div>
+                <div id="logo-text-settings">
+                    <div class="prop-group">
+                        <label class="prop-label">Nội dung Logo</label>
+                        <input type="text" class="prop-control" value="STUDIOLOGO" oninput="updateBlockData('${nodeId}', 'text', this.value)">
+                    </div>
+                    <div class="prop-group">
+                        <label class="prop-label">Màu chữ</label>
+                        <input type="color" class="prop-control" value="#1a1c1e" onchange="updateBlockData('${nodeId}', 'color', this.value)">
+                    </div>
+                </div>`;
+            break;
+
+        case 'search':
+            html += `
+                <div class="prop-group">
+                    <label class="prop-label">Lời nhắc (Placeholder)</label>
+                    <input type="text" class="prop-control" value="Tìm kiếm..." oninput="updateBlockData('${nodeId}', 'placeholder', this.value)">
+                </div>
+                <div class="prop-group">
+                    <label class="prop-label">Màu nút bấm</label>
+                    <input type="color" class="prop-control" value="#333333" onchange="updateBlockData('${nodeId}', 'btnColor', this.value)">
+                </div>`;
+            break;
+
+        default:
+            html += `<div class="prop-empty">Linh kiện này chưa có tùy chỉnh chuyên sâu</div>`;
+    }
+
     panel.innerHTML = html;
 }
 
@@ -108,4 +135,23 @@ async function updateLivePreview() {
     targetHeader.innerHTML = finalHtml;
 }
 
-// Đảm bảo trong hàm onAdd của Sortable có gọi updateLivePreview()
+/**
+ * Hàm đổi màu linh kiện đang chọn (Demo tính năng chỉnh sửa)
+ */
+function updatePreviewColor(color) {
+    const activeNode = document.querySelector('.node-dropped.is-active');
+    if (activeNode) {
+        activeNode.style.backgroundColor = color;
+        // Sau này sẽ bổ sung logic đổi màu trên cả Live Preview
+    }
+}
+/**
+ * Hàm cập nhật dữ liệu và render lại Preview ngay lập tức
+ */
+function updateBlockData(nodeId, key, value) {
+    if (!blockSettings[nodeId]) blockSettings[nodeId] = {};
+    blockSettings[nodeId][key] = value;
+
+    // Gọi hàm render lại preview để thấy thay đổi ngay lập tức
+    updateLivePreview();
+}
