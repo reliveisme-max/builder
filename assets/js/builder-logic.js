@@ -12,10 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
             animation: 150,
             onAdd: function (evt) {
     const blockId = evt.item.getAttribute('data-id');
-    // Thay thế icon bằng khối linh kiện
-    evt.item.innerHTML = `<div class="node-dropped" onclick="openProperties('${blockId}', this)">${blockId.toUpperCase()}</div>`;
+    // BỔ SUNG: data-id="${blockId}" vào thẻ div bên dưới
+    evt.item.innerHTML = `<div class="node-dropped" data-id="${blockId}" onclick="openProperties('${blockId}', this)">${blockId.toUpperCase()}</div>`;
     
-    // PHẢI GỌI HÀM NÀY ĐỂ PREVIEW CẬP NHẬT
     updateLivePreview(); 
 }
         });

@@ -23,10 +23,10 @@ $blocks = get_registered_blocks();
         <div class="sidebar-scroll">
             <div id="block-library">
                 <?php foreach ($blocks as $id => $info): ?>
-                    <div class="block-card" data-id="<?php echo $id; ?>">
-                        <div class="icon-box"><i class="<?php echo $info['icon']; ?>"></i></div>
-                        <span><?php echo $info['title']; ?></span>
-                    </div>
+                <div class="block-card" data-id="<?php echo $id; ?>">
+                    <div class="icon-box"><i class="<?php echo $info['icon']; ?>"></i></div>
+                    <span><?php echo $info['title']; ?></span>
+                </div>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -44,6 +44,11 @@ $blocks = get_registered_blocks();
                     <div class="slot drop-zone" data-pos="right"></div>
                 </div>
                 <div class="builder-row main-row" data-label="Main Header">
+                    <div class="slot drop-zone" data-pos="left"></div>
+                    <div class="slot drop-zone" data-pos="center"></div>
+                    <div class="slot drop-zone" data-pos="right"></div>
+                </div>
+                <div class="builder-row" data-label="Bottom Bar">
                     <div class="slot drop-zone" data-pos="left"></div>
                     <div class="slot drop-zone" data-pos="center"></div>
                     <div class="slot drop-zone" data-pos="right"></div>

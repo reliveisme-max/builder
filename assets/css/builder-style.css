@@ -10,7 +10,31 @@ body { margin: 0; display: flex; height: 100vh; font-family: 'Plus Jakarta Sans'
 
 /* SIDEBAR: Ép khít linh kiện */
 #sidebar-left { width: 220px; background: var(--bg-dark); border-right: 1px solid #000; display: flex; flex-direction: column; flex-shrink: 0; }
-.sidebar-header { padding: 20px; color: #fff; font-weight: 700; font-size: 13px; border-bottom: 1px solid #2d3139; }
+.sidebar-header { height: 48px; padding: 20px; color: #fff; font-weight: 700; font-size: 13px; border-bottom: 1px solid #2d3139; }
+.prop-header { 
+    height: 48px; /* Phải bằng tuyệt đối với sidebar-header và top-toolbar */
+    padding: 0 20px; 
+    display: flex; 
+    align-items: center; 
+    font-size: 11px; 
+    font-weight: 800; 
+    color: var(--text-muted); 
+    border-bottom: 1px solid #f1f5f9; 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Toolbar chính ở giữa (Nếu chưa có, hãy bổ sung class này) */
+.top-toolbar {
+    height: 48px;
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+}
 
 #block-library { 
     display: grid; 
@@ -109,5 +133,20 @@ body { margin: 0; display: flex; height: 100vh; font-family: 'Plus Jakarta Sans'
     background: #fff; border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     margin-bottom: 40px; min-height: 100px;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start;
+}
+/*==========================================================================
+   # SIDEBAR CONTENT REFINEMENT
+==========================================================================*/
+
+/* Tối ưu lại khu vực Search Sidebar */
+.sidebar-search { padding: 12px; }
+.search-input-wrap {
+    background: #222529;
+    border: 1px solid #333;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
