@@ -1,19 +1,12 @@
 <?php
 function get_registered_blocks()
 {
-    // Sử dụng hằng số ROOT_DIR đã định nghĩa ở config.php
     $path = ROOT_DIR . DIRECTORY_SEPARATOR . 'blocks' . DIRECTORY_SEPARATOR;
-
     return [
-        'header-main' => [
-            'title' => 'Main Header',
-            'icon'  => 'fa-window-maximize',
-            'file'  => $path . 'header-main.php'
-        ],
-        'hero-slider' => [
-            'title' => 'Hero Slider',
-            'icon'  => 'fa-images',
-            'file'  => $path . 'hero-slider.php'
-        ]
+        'logo'    => ['title' => 'Logo', 'icon' => 'ph-fill ph-text-aa', 'file' => $path . 'logo.php'],
+        'search'  => ['title' => 'Search', 'icon' => 'ph-fill ph-magnifying-glass', 'file' => $path . 'search.php'],
+        'menu'    => ['title' => 'Menu', 'icon' => 'ph-fill ph-list', 'file' => $path . 'menu.php'],
+        'cart'    => ['title' => 'Cart', 'icon' => 'ph-fill ph-shopping-cart-simple', 'file' => $path . 'cart.php'],
+        'button'  => ['title' => 'Button', 'icon' => 'ph-fill ph-rectangle', 'file' => $path . 'button.php'],
     ];
 }

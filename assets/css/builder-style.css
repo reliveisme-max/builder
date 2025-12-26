@@ -1,37 +1,71 @@
 /*==========================================================================
-   # VARIABLES - Mã màu chủ đạo
+   # UI REFINEMENT - Gọn gàng & Sạch sẽ
 ==========================================================================*/
 :root {
-    --primary-red: #cb1c22;
-    --canvas-bg: #f4f6f9;
+    --bg-sidebar: #1a1c1e;
+    --bg-workspace: #f1f5f9; /* Nền phẳng, không chấm */
+    --primary: #3b82f6;
+    --border: #e2e8f0;
 }
 
-/*==========================================================================
-   # SIDEBAR - Layout cột trái
-==========================================================================*/
-#builder-sidebar {
-    width: 280px; background: #1e1e1e; color: #fff;
-    padding: 20px; position: fixed; height: 100vh;
-}
-.sidebar-title { color: #00d1ff; font-size: 18px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-.block-item { background: #333; padding: 15px; margin-bottom: 10px; cursor: move; border-radius: 4px; }
+body { margin: 0; display: flex; height: 100vh; font-family: 'Inter', sans-serif; background: var(--bg-workspace); }
 
-/*==========================================================================
-   # CANVAS - Viewport tràn viền sát mép
-==========================================================================*/
-#builder-viewport {
-    margin-left: 280px; padding: 0; background: var(--canvas-bg);
-}
-#drop-canvas {
-    background: #fff; min-height: 100vh; width: 100%; border: none;
+/* SIDEBAR: Thu hẹp độ rộng và khoảng cách */
+#sidebar-left { 
+    width: 240px; /* Thu hẹp từ 280px xuống 240px */
+    background: var(--bg-sidebar); 
+    display: flex; flex-direction: column; 
+    border-right: 1px solid #000;
 }
 
-/*==========================================================================
-   # MAIN HEADER - Giao diện Header thực tế
-==========================================================================*/
-.main-header { background: var(--primary-red); color: #fff; width: 100%; }
-.header-inner { 
-    max-width: 1200px; margin: 0 auto; height: 70px;
-    display: flex; align-items: center; justify-content: space-between; padding: 0 15px;
+.sidebar-header { padding: 20px; color: #fff; font-size: 16px; font-weight: 700; border-bottom: 1px solid #2d3139; }
+
+/* Grid 3 cột sát nhau */
+#block-library { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); /* 3 cột để icon sát nhau hơn */
+    gap: 8px; /* Giảm khoảng cách giữa các ô */
+    padding: 15px; 
 }
-.search-bar input { width: 450px; padding: 10px; border-radius: 4px; border: none; outline: none; }
+
+.block-card { 
+    display: flex; flex-direction: column; align-items: center; 
+    cursor: grab; transition: 0.2s; 
+}
+
+/* Thu nhỏ Icon Box để bớt "hở" */
+.icon-box { 
+    background: #25282c; 
+    width: 44px; height: 44px; /* Thu nhỏ từ 56px xuống 44px */
+    border-radius: 8px; 
+    display: flex; align-items: center; justify-content: center; 
+    margin-bottom: 4px; 
+    border: 1px solid #333; 
+}
+
+.block-card:hover .icon-box { border-color: var(--primary); background: #2a2e35; }
+.block-card i { font-size: 20px; color: #fff; opacity: 0.7; }
+.block-card span { font-size: 10px; color: #94a3b8; font-weight: 500; text-align: center; }
+
+/* WORKSPACE: XÓA CHẤM CANVAS */
+#workspace-viewport { 
+    flex: 1; 
+    padding: 30px; 
+    background: var(--bg-workspace); /* Chỉ dùng màu phẳng */
+    background-image: none !important; /* Xóa bỏ hoàn toàn dot grid */
+    display: flex; flex-direction: column; align-items: center; 
+    overflow-y: auto;
+}
+
+/* HEADER CARD: Thanh mảnh & Nổi bật */
+#header-floating-card {
+    width: 100%; max-width: 1100px; 
+    background: #fff; border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Đổ bóng nhẹ hơn */
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.header-row { display: flex; border-bottom: 1px solid #f8fafc; min-height: 40px; }
+.row-main .slot { min-height: 80px; }
+.slot { flex: 1; border-right: 1px solid #f8fafc; display: flex; align-items: center; padding: 0 15px; }
