@@ -10,106 +10,107 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Link CSS gốc -->
     <link rel="stylesheet" href="assets/css/builder.css">
 
     <style>
-    body {
-        font-family: 'Inter', sans-serif;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
 
-    /* --- 1. GENERAL UI --- */
-    .workspace-bg {
-        background-color: #f3f4f6;
-        /* Nền xám sáng */
-    }
+        /* --- 1. GENERAL UI --- */
+        .workspace-bg {
+            background-color: #f3f4f6;
+            /* Nền xám sáng */
+        }
 
-    ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-    }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
 
-    ::-webkit-scrollbar-thumb {
-        background: #d1d5db;
-        border-radius: 3px;
-    }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
 
-    ::-webkit-scrollbar-track {
-        background: transparent;
-    }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-    /* --- 2. DROP ZONES --- */
-    .drop-zone {
-        transition: all 0.2s ease;
-        position: relative;
-        min-height: 100%;
-    }
+        /* --- 2. DROP ZONES --- */
+        .drop-zone {
+            transition: all 0.2s ease;
+            position: relative;
+            min-height: 100%;
+        }
 
-    /* Viền mặc định: Nét đứt mờ */
-    .drop-zone:empty,
-    .drop-zone:has(.empty-placeholder) {
-        border: 1px dashed #e5e7eb;
-    }
+        /* Viền mặc định: Nét đứt mờ */
+        .drop-zone:empty,
+        .drop-zone:has(.empty-placeholder) {
+            border: 1px dashed #e5e7eb;
+        }
 
-    /* Hover vào dòng thì viền rõ hơn */
-    .builder-row:hover .drop-zone:empty {
-        border-color: #d1d5db;
-    }
+        /* Hover vào dòng thì viền rõ hơn */
+        .builder-row:hover .drop-zone:empty {
+            border-color: #d1d5db;
+        }
 
-    /* Khi kéo item đè lên: Sáng màu */
-    .drop-zone.drag-over {
-        background-color: #eff6ff !important;
-        border: 1px dashed #3b82f6 !important;
-        z-index: 10;
-    }
+        /* Khi kéo item đè lên: Sáng màu */
+        .drop-zone.drag-over {
+            background-color: #eff6ff !important;
+            border: 1px dashed #3b82f6 !important;
+            z-index: 10;
+        }
 
-    /* --- 3. PLACEHOLDER --- */
-    .empty-placeholder {
-        color: #9ca3af;
-        font-size: 11px;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 4px;
-        height: 100%;
-        min-height: 32px;
-        border-radius: 4px;
-        user-select: none;
-        cursor: default;
-    }
+        /* --- 3. PLACEHOLDER --- */
+        .empty-placeholder {
+            color: #9ca3af;
+            font-size: 11px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 100%;
+            min-height: 32px;
+            border-radius: 4px;
+            user-select: none;
+            cursor: default;
+        }
 
-    .empty-placeholder:hover {
-        color: #6b7280;
-        background: rgba(0, 0, 0, 0.02);
-    }
+        .empty-placeholder:hover {
+            color: #6b7280;
+            background: rgba(0, 0, 0, 0.02);
+        }
 
-    .empty-placeholder::before {
-        content: '+';
-        font-size: 14px;
-        color: #d1d5db;
-    }
+        .empty-placeholder::before {
+            content: '+';
+            font-size: 14px;
+            color: #d1d5db;
+        }
 
-    /* --- 4. ROW LABELS (Nhãn tên dòng bên trái) --- */
-    .row-label {
-        position: absolute;
-        left: -80px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 10px;
-        color: #9ca3af;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        opacity: 0;
-        transition: opacity 0.2s;
-        pointer-events: none;
-        text-align: right;
-        width: 70px;
-    }
+        /* --- 4. ROW LABELS --- */
+        .row-label {
+            position: absolute;
+            left: -80px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: #9ca3af;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            text-align: right;
+            width: 70px;
+        }
 
-    #canvas-frame:hover .row-label {
-        opacity: 1;
-    }
+        #canvas-frame:hover .row-label {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -128,19 +129,19 @@
                 <div class="text-[10px] font-bold text-gray-500 uppercase mb-3 tracking-widest">Blocks</div>
                 <div class="grid grid-cols-2 gap-2">
                     <?php if (!empty($components)): ?>
-                    <?php foreach ($components as $comp): ?>
-                    <div class="draggable-item bg-[#27272a] hover:bg-[#323236] hover:text-white p-3 rounded-md cursor-grab border border-transparent hover:border-gray-600 transition flex flex-col items-center gap-2 group shadow-sm"
-                        draggable="true" data-class="<?php echo $comp['class']; ?>">
-                        <i
-                            class="ph <?php echo $comp['icon']; ?> text-2xl text-gray-400 group-hover:text-blue-400 transition transform group-hover:scale-110 duration-200"></i>
-                        <span
-                            class="text-xs font-medium text-gray-400 group-hover:text-white text-center"><?php echo $comp['name']; ?></span>
-                    </div>
-                    <?php endforeach; ?>
+                        <?php foreach ($components as $comp): ?>
+                            <div class="draggable-item bg-[#27272a] hover:bg-[#323236] hover:text-white p-3 rounded-md cursor-grab border border-transparent hover:border-gray-600 transition flex flex-col items-center gap-2 group shadow-sm"
+                                draggable="true" data-class="<?php echo $comp['class']; ?>">
+                                <i
+                                    class="ph <?php echo $comp['icon']; ?> text-2xl text-gray-400 group-hover:text-blue-400 transition transform group-hover:scale-110 duration-200"></i>
+                                <span
+                                    class="text-xs font-medium text-gray-400 group-hover:text-white text-center"><?php echo $comp['name']; ?></span>
+                            </div>
+                        <?php endforeach; ?>
                     <?php else: ?>
-                    <div
-                        class="col-span-2 text-center py-4 border border-dashed border-gray-700 rounded text-gray-500 text-xs">
-                        Empty</div>
+                        <div
+                            class="col-span-2 text-center py-4 border border-dashed border-gray-700 rounded text-gray-500 text-xs">
+                            Empty</div>
                     <?php endif; ?>
                 </div>
             </div>

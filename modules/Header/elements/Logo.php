@@ -30,4 +30,37 @@ class Logo extends Block
             </div>
         ';
     }
+
+    public function getForm()
+    {
+        return '
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">Kích thước (Width)</label>
+                    <input type="range" data-style="width" min="50" max="300" value="150" class="prop-input w-full accent-indigo-500">
+                </div>
+
+                <div>
+                    <label class="text-xs text-gray-400 block mb-2">Căn chỉnh (Alignment)</label>
+                    <div class="flex bg-gray-800 rounded p-1 border border-gray-700">
+                        <button type="button" class="flex-1 p-1 hover:bg-gray-700 rounded text-gray-400" onclick="triggerAlign(this, \'flex-start\')"><i class="ph ph-text-align-left"></i></button>
+                        <button type="button" class="flex-1 p-1 hover:bg-gray-700 rounded text-gray-400" onclick="triggerAlign(this, \'center\')"><i class="ph ph-text-align-center"></i></button>
+                        <button type="button" class="flex-1 p-1 hover:bg-gray-700 rounded text-gray-400" onclick="triggerAlign(this, \'flex-end\')"><i class="ph ph-text-align-right"></i></button>
+                    </div>
+                    <!-- Input ẩn để hứng giá trị -->
+                    <input type="hidden" data-style="justify-content" class="prop-input" id="align-input">
+                    
+                    <script>
+                        function triggerAlign(btn, val) {
+                            document.getElementById(\'align-input\').value = val;
+                            document.getElementById(\'align-input\').dispatchEvent(new Event(\'input\'));
+                            // Reset style btns
+                            btn.parentElement.querySelectorAll(\'button\').forEach(b => b.classList.remove(\'bg-indigo-600\', \'text-white\'));
+                            btn.classList.add(\'bg-indigo-600\', \'text-white\');
+                        }
+                    </script>
+                </div>
+            </div>
+        ';
+    }
 }
