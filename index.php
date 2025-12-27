@@ -1,6 +1,10 @@
-<aside id="builder-sidebar">
-    <div class="block-item" data-id="header-main">Main Header</div>
-</aside>
+<?php
+// Entry Point
+require_once 'config/app.php';
+require_once 'core/Autoload.php';
 
-<main id="builder-canvas" style="min-height: 500px; background: #f4f4f4; border: 2px dashed #ccc;">
-</main>
+use Modules\Builder\BuilderModule;
+
+// Khởi tạo Module Builder và hiển thị
+$app = new BuilderModule();
+$app->index();
