@@ -11,158 +11,158 @@
     <link rel="stylesheet" href="assets/css/builder.css">
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+    body {
+        font-family: 'Inter', sans-serif;
+    }
 
-        .workspace-bg {
-            background-color: #f3f4f6;
-        }
+    .workspace-bg {
+        background-color: #f3f4f6;
+    }
 
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
 
-        ::-webkit-scrollbar-thumb {
-            background: #d1d5db;
-            border-radius: 3px;
-        }
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
-        /* --- UI BUILDER --- */
-        .drop-zone {
-            transition: all 0.2s ease;
-            position: relative;
-            min-height: 100%;
-        }
+    /* --- UI BUILDER --- */
+    .drop-zone {
+        transition: all 0.2s ease;
+        position: relative;
+        min-height: 100%;
+    }
 
-        .drop-zone:empty,
-        .drop-zone:has(.empty-placeholder) {
-            border: 1px dashed #e5e7eb;
-        }
+    .drop-zone:empty,
+    .drop-zone:has(.empty-placeholder) {
+        border: 1px dashed #e5e7eb;
+    }
 
-        .builder-row:hover .drop-zone:empty {
-            border-color: #d1d5db;
-        }
+    .builder-row:hover .drop-zone:empty {
+        border-color: #d1d5db;
+    }
 
-        .drop-zone.drag-over {
-            background-color: #eff6ff !important;
-            border: 1px dashed #3b82f6 !important;
-            z-index: 10;
-        }
+    .drop-zone.drag-over {
+        background-color: #eff6ff !important;
+        border: 1px dashed #3b82f6 !important;
+        z-index: 10;
+    }
 
-        .empty-placeholder {
-            color: #9ca3af;
-            font-size: 11px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            min-height: 32px;
-            user-select: none;
-            cursor: default;
-        }
+    .empty-placeholder {
+        color: #9ca3af;
+        font-size: 11px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        min-height: 32px;
+        user-select: none;
+        cursor: default;
+    }
 
-        .empty-placeholder::before {
-            content: '+';
-            font-size: 14px;
-            margin-right: 4px;
-            color: #d1d5db;
-        }
+    .empty-placeholder::before {
+        content: '+';
+        font-size: 14px;
+        margin-right: 4px;
+        color: #d1d5db;
+    }
 
-        /* --- FIX: HANDLE NÚT CÀI ĐẶT (Gọn lại để không bị che) --- */
-        .row-handle {
-            position: absolute;
-            left: -36px;
-            /* Thu gọn khoảng cách */
-            top: 0;
-            bottom: 0;
-            width: 36px;
-            /* Thu nhỏ vùng hover */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            /* Căn giữa icon */
-            opacity: 0;
-            transition: all 0.2s ease;
-            pointer-events: none;
-            z-index: 50;
-        }
+    /* --- FIX: HANDLE NÚT CÀI ĐẶT (Gọn lại để không bị che) --- */
+    .row-handle {
+        position: absolute;
+        left: -36px;
+        /* Thu gọn khoảng cách */
+        top: 0;
+        bottom: 0;
+        width: 36px;
+        /* Thu nhỏ vùng hover */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Căn giữa icon */
+        opacity: 0;
+        transition: all 0.2s ease;
+        pointer-events: none;
+        z-index: 50;
+    }
 
-        .builder-row:hover .row-handle,
-        .row-handle:hover {
-            opacity: 1;
-            pointer-events: auto;
-        }
+    .builder-row:hover .row-handle,
+    .row-handle:hover {
+        opacity: 1;
+        pointer-events: auto;
+    }
 
-        .handle-btn {
-            background-color: #3b82f6;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
-            /* Bo tròn đều */
-            font-size: 0;
-            /* Ẩn chữ đi cho gọn */
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: translateX(5px);
-            transition: all 0.2s;
-            position: relative;
-        }
+    .handle-btn {
+        background-color: #3b82f6;
+        color: white;
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+        /* Bo tròn đều */
+        font-size: 0;
+        /* Ẩn chữ đi cho gọn */
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: translateX(5px);
+        transition: all 0.2s;
+        position: relative;
+    }
 
-        /* Hiển thị Icon */
-        .handle-btn i {
-            font-size: 16px;
-        }
+    /* Hiển thị Icon */
+    .handle-btn i {
+        font-size: 16px;
+    }
 
-        /* Tooltip tên dòng khi hover */
-        .handle-btn::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            left: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #1f2937;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            white-space: nowrap;
-            margin-left: 8px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            z-index: 60;
-        }
+    /* Tooltip tên dòng khi hover */
+    .handle-btn::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #1f2937;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        white-space: nowrap;
+        margin-left: 8px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+        z-index: 60;
+    }
 
-        .handle-btn:hover::after {
-            opacity: 1;
-        }
+    .handle-btn:hover::after {
+        opacity: 1;
+    }
 
-        .builder-row:hover .handle-btn {
-            transform: translateX(0);
-        }
+    .builder-row:hover .handle-btn {
+        transform: translateX(0);
+    }
 
-        .handle-btn:hover {
-            background-color: #2563eb;
-        }
+    .handle-btn:hover {
+        background-color: #2563eb;
+    }
 
-        .builder-row.is-selected .row-handle {
-            opacity: 1;
-        }
+    .builder-row.is-selected .row-handle {
+        opacity: 1;
+    }
 
-        .builder-row.is-selected .handle-btn {
-            background-color: #4f46e5;
-        }
+    .builder-row.is-selected .handle-btn {
+        background-color: #4f46e5;
+    }
     </style>
 </head>
 
@@ -180,19 +180,19 @@
                 <div class="text-[10px] font-bold text-gray-500 uppercase mb-3 tracking-widest">Blocks</div>
                 <div class="grid grid-cols-2 gap-2">
                     <?php if (!empty($components)): ?>
-                        <?php foreach ($components as $comp): ?>
-                            <div class="draggable-item bg-[#27272a] hover:bg-[#323236] hover:text-white p-3 rounded-md cursor-grab border border-transparent hover:border-gray-600 transition flex flex-col items-center gap-2 group shadow-sm"
-                                draggable="true" data-class="<?php echo $comp['class']; ?>">
-                                <i
-                                    class="ph <?php echo $comp['icon']; ?> text-2xl text-gray-400 group-hover:text-blue-400 transition transform group-hover:scale-110 duration-200"></i>
-                                <span
-                                    class="text-xs font-medium text-gray-400 group-hover:text-white text-center"><?php echo $comp['name']; ?></span>
-                            </div>
-                        <?php endforeach; ?>
+                    <?php foreach ($components as $comp): ?>
+                    <div class="draggable-item bg-[#27272a] hover:bg-[#323236] hover:text-white p-3 rounded-md cursor-grab border border-transparent hover:border-gray-600 transition flex flex-col items-center gap-2 group shadow-sm"
+                        draggable="true" data-class="<?php echo $comp['class']; ?>">
+                        <i
+                            class="ph <?php echo $comp['icon']; ?> text-2xl text-gray-400 group-hover:text-blue-400 transition transform group-hover:scale-110 duration-200"></i>
+                        <span
+                            class="text-xs font-medium text-gray-400 group-hover:text-white text-center"><?php echo $comp['name']; ?></span>
+                    </div>
+                    <?php endforeach; ?>
                     <?php else: ?>
-                        <div
-                            class="col-span-2 text-center py-4 border border-dashed border-gray-700 rounded text-gray-500 text-xs">
-                            Empty</div>
+                    <div
+                        class="col-span-2 text-center py-4 border border-dashed border-gray-700 rounded text-gray-500 text-xs">
+                        Empty</div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -260,60 +260,72 @@
                 <div
                     class="bg-white shadow-2xl rounded-b-lg overflow-visible border border-[#d1d5db] flex-1 flex flex-col relative">
                     <!-- 1. TOP BAR -->
-                    <div class="builder-row group min-h-[40px] bg-[#f8f9fa] flex items-stretch border-b border-gray-100 relative"
+                    <div class="builder-row group min-h-[40px] bg-[#f8f9fa] border-b border-gray-100 relative"
                         data-label="Top Bar">
                         <div class="row-handle">
-                            <!-- Handle gọn gàng có tooltip -->
                             <div class="handle-btn" data-tooltip="Top Bar"><i class="ph ph-gear-six"></i></div>
                         </div>
-                        <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
-                            data-zone="top_left">
-                            <div class="empty-placeholder">Left</div>
-                        </div>
-                        <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
-                            data-zone="top_center">
-                            <div class="empty-placeholder">Center</div>
-                        </div>
-                        <div class="drop-zone flex-1 p-2 flex items-center justify-end" data-zone="top_right">
-                            <div class="empty-placeholder">Right</div>
+
+                        <!-- THÊM CLASS NÀY: Wrapper chịu trách nhiệm Width -->
+                        <div class="hb-inner-content flex items-stretch h-full w-full mx-auto">
+                            <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
+                                data-zone="top_left">
+                                <div class="empty-placeholder">Left</div>
+                            </div>
+                            <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
+                                data-zone="top_center">
+                                <div class="empty-placeholder">Center</div>
+                            </div>
+                            <div class="drop-zone flex-1 p-2 flex items-center justify-end" data-zone="top_right">
+                                <div class="empty-placeholder">Right</div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- 2. MAIN HEADER -->
-                    <div class="builder-row group min-h-[90px] bg-white flex items-stretch border-b border-gray-100 shadow-sm z-10 relative"
+                    <div class="builder-row group min-h-[90px] bg-white border-b border-gray-100 shadow-sm z-10 relative"
                         data-label="Main Header">
                         <div class="row-handle">
                             <div class="handle-btn" data-tooltip="Main Header"><i class="ph ph-gear-six"></i></div>
                         </div>
-                        <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
-                            data-zone="main_left">
-                            <div class="empty-placeholder">Logo</div>
-                        </div>
-                        <div class="drop-zone flex-[2] border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
-                            data-zone="main_center">
-                            <div class="empty-placeholder">Search</div>
-                        </div>
-                        <div class="drop-zone flex-1 p-2 flex items-center justify-end gap-2" data-zone="main_right">
-                            <div class="empty-placeholder">Actions</div>
+
+                        <!-- THÊM CLASS NÀY -->
+                        <div class="hb-inner-content flex items-stretch h-full w-full mx-auto">
+                            <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
+                                data-zone="main_left">
+                                <div class="empty-placeholder">Logo</div>
+                            </div>
+                            <div class="drop-zone flex-[2] border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
+                                data-zone="main_center">
+                                <div class="empty-placeholder">Search</div>
+                            </div>
+                            <div class="drop-zone flex-1 p-2 flex items-center justify-end gap-2"
+                                data-zone="main_right">
+                                <div class="empty-placeholder">Actions</div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- 3. BOTTOM HEADER -->
-                    <div class="builder-row group min-h-[50px] bg-white flex items-stretch border-b border-gray-100 relative"
+                    <div class="builder-row group min-h-[50px] bg-white border-b border-gray-100 relative"
                         data-label="Bottom Header">
                         <div class="row-handle">
                             <div class="handle-btn" data-tooltip="Bottom Header"><i class="ph ph-gear-six"></i></div>
                         </div>
-                        <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
-                            data-zone="bottom_left">
-                            <div class="empty-placeholder">Left</div>
-                        </div>
-                        <div class="drop-zone flex-[3] border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
-                            data-zone="bottom_center">
-                            <div class="empty-placeholder">Menu</div>
-                        </div>
-                        <div class="drop-zone flex-1 p-2 flex items-center justify-end" data-zone="bottom_right">
-                            <div class="empty-placeholder">Right</div>
+
+                        <!-- THÊM CLASS NÀY -->
+                        <div class="hb-inner-content flex items-stretch h-full w-full mx-auto">
+                            <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
+                                data-zone="bottom_left">
+                                <div class="empty-placeholder">Left</div>
+                            </div>
+                            <div class="drop-zone flex-[3] border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
+                                data-zone="bottom_center">
+                                <div class="empty-placeholder">Menu</div>
+                            </div>
+                            <div class="drop-zone flex-1 p-2 flex items-center justify-end" data-zone="bottom_right">
+                                <div class="empty-placeholder">Right</div>
+                            </div>
                         </div>
                     </div>
 
@@ -353,7 +365,7 @@
     </aside>
 
     <script>
-        window.savedData = <?php echo $savedData ? $savedData : '[]'; ?>;
+    window.savedData = <?php echo $savedData ? $savedData : '[]'; ?>;
     </script>
     <script src="assets/js/builder.js"></script>
     <script src="assets/js/ajax.js"></script>

@@ -58,3 +58,11 @@ body { font-family: 'Inter', sans-serif; }
 .is-selected { outline: 2px solid #6366f1 !important; outline-offset: -2px; z-index: 100; }
 .builder-row.is-selected .row-handle { opacity: 1; }
 .builder-row.is-selected .handle-btn { background-color: #4f46e5; font-weight: bold; }
+/* --- FIX LAYOUT CONTAINER --- */
+.hb-inner-content {
+    width: 100%; /* Bắt buộc chiếm hết chiều ngang */
+    margin-left: auto;
+    margin-right: auto;
+    display: flex; /* Giữ cấu trúc chia cột */
+    align-items: stretch;
+}
