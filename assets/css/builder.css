@@ -1,118 +1,60 @@
-/* assets/css/builder.css */
+body { font-family: 'Inter', sans-serif; }
 
-/* 1. Tùy chỉnh Scrollbar (Mảnh & Tối màu) */
+/* 1. GENERAL UI */
+.workspace-bg { background-color: #f3f4f6; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
-/* 2. Builder Canvas Frame (Khung mô phỏng trình duyệt) */
-#canvas-frame {
-    transform: scale(0.95);
-    transform-origin: top center;
-    transition: all 0.3s ease;
-    border: 1px solid #e5e7eb;
-}
+/* 2. DROP ZONES */
+.drop-zone { transition: all 0.2s ease; position: relative; min-height: 100%; }
+.drop-zone:empty, .drop-zone:has(.empty-placeholder) { border: 1px dashed #e5e7eb; }
+.builder-row:hover .drop-zone:empty { border-color: #d1d5db; }
+.drop-zone.drag-over { background-color: #eff6ff !important; border: 1px dashed #3b82f6 !important; z-index: 10; }
 
-/* 3. ROW Styles (Các dòng Header) */
-.builder-row {
-    position: relative;
-    border-bottom: 1px solid #f3f4f6;
-    transition: all 0.2s;
-}
-/* Hiển thị nhãn tên dòng khi hover (giống Flatsome) */
-.builder-row::before {
-    content: attr(data-label);
+/* 3. PLACEHOLDER */
+.empty-placeholder { color: #9ca3af; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; height: 100%; min-height: 32px; user-select: none; cursor: default; }
+.empty-placeholder::before { content: '+'; font-size: 14px; margin-right: 4px; color: #d1d5db; }
+
+/* 4. ROW HANDLE (TAB BÊN NGOÀI) */
+.row-handle {
     position: absolute;
-    top: 0; left: 0;
-    background: #3b82f6; /* Xanh dương */
-    color: white;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    text-transform: uppercase;
-    opacity: 0;
+    left: -120px;
+    top: 0;
+    bottom: 0;
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    opacity: 0; 
+    transition: all 0.2s ease;
     pointer-events: none;
-    transition: opacity 0.2s;
-    z-index: 10;
+    z-index: 50;
 }
-.builder-row:hover {
-    box-shadow: inset 0 0 0 1px #3b82f6; /* Viền xanh khi rê chuột vào dòng */
-}
-.builder-row:hover::before {
-    opacity: 1;
-}
+.builder-row:hover .row-handle, .row-handle:hover { opacity: 1; pointer-events: auto; }
 
-/* 4. DROP ZONE (Vùng thả quan trọng nhất) */
-.drop-zone {
-    min-height: 100%;
-    display: flex;
-    align-items: center;
-    padding: 4px;
-    transition: all 0.2s;
-    border: 1px dashed transparent; /* Mặc định ẩn viền */
-    position: relative;
-}
-
-/* Luôn hiện viền mờ để người dùng biết chỗ thả */
-.drop-zone:empty, 
-.drop-zone:has(.empty-placeholder) {
-    border-color: #e5e7eb;
-    background-color: #f9fafb;
-}
-
-/* Khi đang kéo element đè lên */
-.drop-zone.drag-over {
-    background-color: #eff6ff !important; /* Xanh nhạt */
-    border-color: #3b82f6 !important;
-    transform: scale(1.02);
-    z-index: 5;
-}
-
-/* Placeholder text (Dòng chữ "Top Left" mờ mờ) */
-.empty-placeholder {
-    width: 100%;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #9ca3af;
+.handle-btn {
+    background-color: #3b82f6;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px 0 0 4px;
     font-size: 11px;
-    border-radius: 4px;
-    user-select: none;
-    pointer-events: none;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
     gap: 6px;
+    transform: translateX(5px);
+    transition: transform 0.2s;
 }
-.empty-placeholder::before {
-    content: '+';
-    font-size: 16px;
-    font-weight: bold;
-}
+.builder-row:hover .handle-btn { transform: translateX(0); }
+.handle-btn:hover { background-color: #2563eb; }
 
-/* 5. ITEM ĐÃ THẢ VÀO (Element) */
-.builder-item {
-    cursor: grab;
-    position: relative;
-    border: 1px solid transparent;
-}
-.builder-item:hover {
-    outline: 1px solid #3b82f6;
-    z-index: 10;
-}
-.builder-item:hover::after {
-    content: 'Click to edit';
-    position: absolute;
-    top: -20px; right: 0;
-    background: #3b82f6;
-    color: white;
-    font-size: 9px;
-    padding: 2px 4px;
-    border-radius: 2px;
-    white-space: nowrap;
-}
-/* Class dùng để Highlight phần tử đang chọn (Thay cho style inline) */
-.is-selected {
-    outline: 2px solid #6366f1 !important; /* Màu xanh tím */
-    outline-offset: -2px;
-    z-index: 100;
-}
+/* Active State */
+.is-selected { outline: 2px solid #6366f1 !important; outline-offset: -2px; z-index: 100; }
+.builder-row.is-selected .row-handle { opacity: 1; }
+.builder-row.is-selected .handle-btn { background-color: #4f46e5; font-weight: bold; }
