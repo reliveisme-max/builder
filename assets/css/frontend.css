@@ -1,0 +1,54 @@
+/* assets/css/frontend.css */
+
+/* 1. MOBILE DRAWER (Menu trượt) */
+#mobile-drawer {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 280px;
+    background: white;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+#mobile-drawer.open {
+    transform: translateX(0);
+}
+.drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+.drawer-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* 2. SEARCH MODAL (Popup tìm kiếm) */
+#search-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+#search-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+.search-modal-close {
+    position: absolute;
+    top: 20px; right: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #333;
+}

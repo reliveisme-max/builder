@@ -37,41 +37,57 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 
     <hr class="border-gray-800">
 
-    <!-- 2. KÍCH THƯỚC (Height & Border) -->
+    <!-- 2. KÍCH THƯỚC & LAYOUT (Nâng cấp) -->
     <div class="space-y-4">
-        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Kích thước</label>
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Layout & Kích thước</label>
+
+        <!-- Chọn kiểu Layout -->
+        <div>
+            <label class="text-xs text-gray-400 block mb-1">Kiểu bao bao (Container)</label>
+            <select id="sel-width-mode" data-style="width-mode" onchange="toggleContainerWidth(this.value)"
+                class="prop-input w-full bg-gray-800 text-white text-xs p-2 rounded border border-gray-700">
+                <option value="container">Giới hạn (Container)</option>
+                <option value="full">Toàn màn hình (Full Width)</option>
+            </select>
+        </div>
+
+        <!-- Chỉnh độ rộng (Chỉ hiện khi chọn Container) -->
+        <div id="container-width-control">
+            <label class="text-xs text-gray-400 block mb-1">Độ rộng (Max Width)</label>
+            <div class="flex items-center gap-2">
+                <input type="range" id="input-width" data-style="container-width" min="1000" max="1920" step="10"
+                    value="1200" class="prop-input flex-1 accent-indigo-500"
+                    oninput="document.getElementById('display-width').innerText = this.value + 'px'">
+                <span id="display-width" class="text-xs text-gray-500 w-10 text-right">1200px</span>
+            </div>
+        </div>
+
+        <hr class="border-gray-800 border-dashed">
 
         <div>
-            <label class="text-xs text-gray-400 block mb-1">Chiều cao tối thiểu (Min Height)</label>
+            <label class="text-xs text-gray-400 block mb-1">Chiều cao tối thiểu</label>
             <div class="flex items-center gap-2">
-                <!-- Đã thêm ID và sự kiện oninput -->
                 <input type="range" id="input-height" data-style="min-height" min="30" max="150" value="50"
                     class="prop-input flex-1 accent-indigo-500"
                     oninput="document.getElementById('display-height').innerText = this.value + 'px'">
-
-                <!-- Đã thêm ID display-height -->
-                <span id="display-height" class="text-xs text-gray-500 w-8 text-right">50px</span>
+                <span id="display-height" class="text-xs text-gray-500 w-10 text-right">50px</span>
             </div>
         </div>
 
-        <div>
-            <label class="text-xs text-gray-400 block mb-1">Đường viền dưới (Border Bottom)</label>
-            <div class="flex items-center gap-2">
-                <input type="color" data-style="border-bottom-color"
-                    class="prop-input w-8 h-8 bg-transparent border border-gray-700 rounded p-0">
-                <select data-style="border-bottom-width"
-                    class="prop-input flex-1 bg-gray-800 text-white text-xs p-1.5 rounded border border-gray-700">
-                    <option value="0px">None</option>
-                    <option value="1px">1px</option>
-                    <option value="2px">2px</option>
-                    <option value="4px">4px</option>
-                </select>
-            </div>
-        </div>
+        <!-- Script ẩn hiện thanh kéo width -->
+        <script>
+            function toggleContainerWidth(val) {
+                const el = document.getElementById('container-width-control');
+                if (val === 'full') el.style.display = 'none';
+                else el.style.display = 'block';
+            }
+            // Tự động chạy lần đầu
+            setTimeout(() => {
+                const val = document.getElementById('sel-width-mode').value;
+                toggleContainerWidth(val);
+            }, 100);
+        </script>
     </div>
-
-    <hr class="border-gray-800">
-
     <!-- 3. HIỆU ỨNG (Sticky, Shadow) -->
     <div class="space-y-4">
         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Hiệu ứng</label>

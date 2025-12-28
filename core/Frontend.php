@@ -26,30 +26,44 @@ class Frontend
         foreach ($structure as $rowData) {
             if (!isset($rowData['columns'])) continue;
 
+            // 1. Lấy Style của Row (Background, Height...)
             $style = $rowData['style'] ?? '';
-            // Fix sticky
+
+            // Xử lý Sticky
             if (strpos($style, 'sticky') !== false && strpos($style, 'top:') === false) {
                 $style .= '; top: 0;';
             }
 
-            // ROW: Flex để căn giữa dọc
-            echo "<div class='header-row relative border-b border-transparent flex items-center' style='{$style}'>";
+            // 2. Xử lý Container Width (Giống Flatsome)
+            $widthMode = $rowData['width_mode'] ?? 'container';
+            $containerWidth = $rowData['container_width'] ?? '1200px';
 
-            // CONTAINER: Thêm h-full để nó cao bằng Row
-            echo "<div class='container mx-auto px-4 w-full h-full'>";
+            $innerClass = 'flex items-center justify-between h-full px-4'; // Mặc định có padding 2 bên
+            $innerStyle = '';
 
-            // INNER WRAPPER: Thêm h-full để nó cao bằng Container
-            echo "<div class='flex items-center justify-between w-full h-full'>";
+            if ($widthMode === 'full') {
+                $innerClass .= ' w-full'; // Full màn hình
+            } else {
+                $innerClass .= ' mx-auto'; // Căn giữa
+                $innerStyle = "max-width: {$containerWidth}; width: 100%;";
+            }
 
+            // RENDER HTML
+            // Lớp Ngoài: Chịu trách nhiệm Background + Sticky
+            echo "<div class='header-row relative border-b border-transparent overflow-hidden' style='{$style}'>";
+
+            // Lớp Trong: Chịu trách nhiệm Width + Flexbox
+            echo "<div class='{$innerClass}' style='{$innerStyle}'>";
+
+            // Render Zones
             echo self::renderZone($rowData['columns'], 'left');
             echo self::renderZone($rowData['columns'], 'center');
             echo self::renderZone($rowData['columns'], 'right');
 
-            echo "</div></div></div>";
+            echo "</div></div>"; // Đóng Inner và Outer
         }
         echo '</header>';
     }
-
     private static function renderZone($columns, $position)
     {
         $targetData = [];
