@@ -11,7 +11,7 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 
 <div class="px-4 pb-20 space-y-6">
 
-    <!-- 1. GIAO DIỆN (Background & Text) -->
+    <!-- 1. GIAO DIỆN -->
     <div class="space-y-4">
         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Giao diện</label>
 
@@ -37,11 +37,10 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 
     <hr class="border-gray-800">
 
-    <!-- 2. KÍCH THƯỚC & LAYOUT (Nâng cấp) -->
+    <!-- 2. KÍCH THƯỚC & LAYOUT -->
     <div class="space-y-4">
         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Layout & Kích thước</label>
 
-        <!-- Chọn kiểu Layout -->
         <div>
             <label class="text-xs text-gray-400 block mb-1">Kiểu bao bao (Container)</label>
             <select id="sel-width-mode" data-style="width-mode" onchange="toggleContainerWidth(this.value)"
@@ -51,7 +50,6 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
             </select>
         </div>
 
-        <!-- Chỉnh độ rộng (Chỉ hiện khi chọn Container) -->
         <div id="container-width-control">
             <label class="text-xs text-gray-400 block mb-1">Độ rộng (Max Width)</label>
             <div class="flex items-center gap-2">
@@ -67,28 +65,28 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
         <div>
             <label class="text-xs text-gray-400 block mb-1">Chiều cao tối thiểu</label>
             <div class="flex items-center gap-2">
-                <input type="range" id="input-height" data-style="min-height" min="30" max="150" value="50"
+                <!-- ĐÃ SỬA: min="40" để đồng bộ với Builder -->
+                <input type="range" id="input-height" data-style="min-height" min="40" max="150" value="50"
                     class="prop-input flex-1 accent-indigo-500"
                     oninput="document.getElementById('display-height').innerText = this.value + 'px'">
                 <span id="display-height" class="text-xs text-gray-500 w-10 text-right">50px</span>
             </div>
         </div>
 
-        <!-- Script ẩn hiện thanh kéo width -->
         <script>
             function toggleContainerWidth(val) {
                 const el = document.getElementById('container-width-control');
                 if (val === 'full') el.style.display = 'none';
                 else el.style.display = 'block';
             }
-            // Tự động chạy lần đầu
             setTimeout(() => {
                 const val = document.getElementById('sel-width-mode').value;
                 toggleContainerWidth(val);
             }, 100);
         </script>
     </div>
-    <!-- 3. HIỆU ỨNG (Sticky, Shadow) -->
+
+    <!-- 3. HIỆU ỨNG -->
     <div class="space-y-4">
         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Hiệu ứng</label>
 
@@ -112,7 +110,6 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 </div>
 
 <script>
-    // 1. Hàm xử lý Sticky
     function toggleSticky(cb) {
         if (!window.activeElement) return;
         if (cb.checked) {
@@ -125,10 +122,8 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
         }
     }
 
-    // 2. Tự động lấy giá trị hiện tại của Row đưa vào Form
     (function syncCurrentValues() {
         if (!window.activeElement) return;
-
         const style = window.getComputedStyle(window.activeElement);
 
         // Sync Height
@@ -137,12 +132,12 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
             const range = document.getElementById('input-height');
             const display = document.getElementById('display-height');
             if (range && display) {
-                range.value = h;
-                display.innerText = h + 'px';
+                // Đảm bảo giá trị hiển thị không nhỏ hơn min
+                range.value = Math.max(h, 40);
+                display.innerText = range.value + 'px';
             }
         }
 
-        // Sync Sticky Checkbox
         const pos = style.position;
         if (pos === 'sticky') {
             document.getElementById('chk-sticky').checked = true;
