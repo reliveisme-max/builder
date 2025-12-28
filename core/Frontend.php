@@ -2,98 +2,96 @@
 
 namespace Core;
 
+use Core\Database;
+
 class Frontend
 {
-
-    // Hàm chính: Render Header ra ngoài Frontend
     public static function renderHeader()
     {
-        // 1. Kết nối DB lấy dữ liệu JSON đã lưu
-        $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT data_json FROM settings WHERE section_key = 'header'");
-        $stmt->execute();
-        $row = $stmt->fetch();
-
-        if (!$row) return ''; // Chưa có dữ liệu thì không hiện gì
-
-        $structure = json_decode($row['data_json'], true);
-        if (!$structure) return '';
-
-        $html = '<header id="site-header" class="w-full relative bg-white shadow-sm">';
-
-        // 2. Duyệt qua từng dòng (Row: Top, Main, Bottom)
-        foreach ($structure as $rowIndex => $rowData) {
-
-            // Style của dòng (Màu nền, height, sticky...)
-            $rowStyle = $rowData['style'] ?? '';
-
-            // Bọc dòng trong thẻ div
-            $html .= "<div class='header-row relative' style='{$rowStyle}'>";
-            $html .= "<div class='container mx-auto px-4 h-full flex items-center justify-between'>";
-
-            // 3. Render 3 cột (Left, Center, Right) cho mỗi dòng
-            // Hàm helper để render vùng (Zone)
-            $html .= self::renderZone($rowData['columns'], 'left');
-            $html .= self::renderZone($rowData['columns'], 'center');
-            $html .= self::renderZone($rowData['columns'], 'right');
-
-            $html .= "</div></div>";
+        // ... (Đoạn kết nối DB giữ nguyên) ...
+        try {
+            $db = Database::getInstance()->getConnection();
+            $stmt = $db->prepare("SELECT data_json FROM settings WHERE section_key = 'header'");
+            $stmt->execute();
+            $row = $stmt->fetch();
+        } catch (\Exception $e) {
+            return;
         }
 
-        $html .= '</header>';
-        echo $html;
+        if (!$row) return;
+        $structure = json_decode($row['data_json'], true);
+        if (!$structure) return;
+
+        echo '<header id="site-header" class="w-full relative bg-white shadow-sm font-sans text-sm z-50">';
+
+        foreach ($structure as $rowData) {
+            if (!isset($rowData['columns'])) continue;
+
+            $style = $rowData['style'] ?? '';
+            // Fix sticky
+            if (strpos($style, 'sticky') !== false && strpos($style, 'top:') === false) {
+                $style .= '; top: 0;';
+            }
+
+            echo "<div class='header-row relative' style='{$style}'>";
+            echo "<div class='container mx-auto px-4 h-full flex items-center'>";
+
+            echo self::renderZone($rowData['columns'], 'left');
+            echo self::renderZone($rowData['columns'], 'center');
+            echo self::renderZone($rowData['columns'], 'right');
+
+            echo "</div></div>";
+        }
+        echo '</header>';
     }
 
-    // Hàm phụ: Render từng vùng (Zone)
     private static function renderZone($columns, $position)
     {
-        $zoneKey = '';
-        $justifyClass = '';
-
-        // Xác định key trong JSON (ví dụ: main_left, top_center...)
-        // Cách này hơi thủ công nhưng chính xác với cấu trúc JS đã lưu
+        $targetData = [];
         foreach ($columns as $key => $elements) {
             if (strpos($key, $position) !== false) {
-                $zoneKey = $key;
+                $targetData = $elements;
                 break;
             }
         }
 
-        // CSS Tailwind để căn lề
-        if ($position === 'left') $justifyClass = 'justify-start';
-        if ($position === 'center') $justifyClass = 'justify-center flex-[2]'; // Cột giữa rộng gấp đôi
-        if ($position === 'right') $justifyClass = 'justify-end';
-
-        $html = "<div class='header-col flex items-center gap-4 flex-1 {$justifyClass}'>";
-
-        // Nếu tìm thấy dữ liệu cột
-        if ($zoneKey && !empty($columns[$zoneKey])) {
-            foreach ($columns[$zoneKey] as $item) {
-                $html .= self::renderElement($item);
-            }
+        $justify = 'justify-start';
+        $flex = 'flex-1';
+        if ($position === 'center') {
+            $justify = 'justify-center';
+            $flex = 'flex-[2]';
+        }
+        if ($position === 'right') {
+            $justify = 'justify-end';
         }
 
-        $html .= "</div>";
-        return $html;
+        echo "<div class='header-col {$flex} flex items-center gap-4 {$justify} h-full'>";
+
+        if (!empty($targetData)) {
+            foreach ($targetData as $item) {
+                echo self::renderElement($item);
+            }
+        }
+        echo "</div>";
     }
 
-    // Hàm phụ: Khởi tạo Class Element và lấy HTML
-    private static function renderElement($itemData)
+    private static function renderElement($item)
     {
-        $className = $itemData['class'];
-
-        // Dữ liệu settings gộp từ Style và Content đã lưu
-        $settings = $itemData['content'] ?? [];
-        $style = $itemData['style'] ?? '';
+        $className = $item['class'];
+        // Lấy style đã lưu (ví dụ: width: 200px; color: red;)
+        $style = $item['style'] ?? '';
+        // Lấy content (src, text...)
+        $content = $item['content'] ?? [];
 
         if (class_exists($className)) {
             $element = new $className();
 
-            // Gọi hàm render() của từng Block (Logo, Menu...)
-            // Bọc thêm 1 div ở ngoài để áp dụng các Style tùy chỉnh (Màu, Font, Margin)
-            return "<div class='header-element' style='{$style}'>" .
-                $element->render($settings) .
-                "</div>";
+            // QUAN TRỌNG: Truyền content vào hàm render của Element
+            $rawHtml = $element->render($content);
+
+            // Bọc wrapper và áp dụng style vào wrapper này
+            // display:flex để nội dung bên trong ăn theo align-items
+            return "<div class='header-item-wrapper flex items-center' style='{$style}'>{$rawHtml}</div>";
         }
         return "";
     }

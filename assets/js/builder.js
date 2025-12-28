@@ -230,3 +230,121 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<div class="builder-element relative group cursor-pointer hover:bg-blue-50/50 p-2 rounded transition border border-transparent hover:border-blue-300 ${extraClass}" data-class="${className}">${content}<div class="btn-delete absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-sm z-50 hover:scale-110 hover:bg-red-600"><i class="ph ph-x text-xs font-bold"></i></div></div>`;
     }
 });
+// assets/js/ajax.js
+
+document.addEventListener('DOMContentLoaded', () => {
+    const saveBtn = document.getElementById('btn-save');
+
+    if (!saveBtn) {
+        console.error("LỖI: Không tìm thấy nút có ID là 'btn-save'. Kiểm tra lại file editor.php");
+        return;
+    }
+
+    console.log("Ajax Save Script Loaded. Nút Save đã sẵn sàng.");
+
+    saveBtn.addEventListener('click', function() {
+        console.log("Đã click nút Save...");
+        
+        const btn = this;
+        const originalText = btn.innerHTML;
+        
+        // 1. Hiệu ứng Loading
+        btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Saving...';
+        btn.disabled = true;
+        btn.classList.add('opacity-75');
+
+        // 2. QUÉT DỮ LIỆU TỪ CANVAS
+        const structure = [];
+        const rows = document.querySelectorAll('#canvas-frame .builder-row');
+
+        rows.forEach(row => {
+            const rowData = {
+                label: row.getAttribute('data-label'),
+                style: row.getAttribute('style') || '',
+                columns: {}
+            };
+
+            const zones = row.querySelectorAll('.drop-zone');
+            zones.forEach(zone => {
+                const zoneName = zone.getAttribute('data-zone');
+                const elements = [];
+
+                zone.querySelectorAll('.builder-element').forEach(el => {
+                    const elData = {
+                        class: el.getAttribute('data-class'),
+                        style: el.getAttribute('style') || '',
+                        content: {} 
+                    };
+
+                    // Lấy nội dung đè (Src ảnh, Text...)
+                    const img = el.querySelector('img');
+                    if (img) elData.content.src = img.src;
+
+                    const text = el.querySelector('.text-content'); // Text
+                    if (text) elData.content.text = text.innerText;
+                    
+                    const btnLink = el.querySelector('a, button'); // Button
+                    if (btnLink) elData.content.text = btnLink.innerText;
+                    
+                    // Lấy justify-content nếu có (Logo alignment)
+                    if (el.style.justifyContent) {
+                         elData.content['justify-content'] = el.style.justifyContent;
+                    }
+
+                    elements.push(elData);
+                });
+
+                rowData.columns[zoneName] = elements;
+            });
+
+            structure.push(rowData);
+        });
+
+        console.log("Dữ liệu chuẩn bị gửi:", structure);
+
+        // 3. GỬI VỀ SERVER
+        fetch('api/save.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ structure: structure })
+        })
+        .then(response => {
+            // Kiểm tra nếu server trả về lỗi 500 hoặc 404
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text) });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Server phản hồi:", data);
+            
+            if (data.status === 'success') {
+                btn.innerHTML = '<i class="ph ph-check"></i> Saved!';
+                btn.classList.remove('bg-[#111827]', 'bg-indigo-600'); 
+                btn.classList.add('bg-green-600'); // Đổi màu xanh
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-75', 'bg-green-600');
+                    btn.classList.add('bg-[#111827]'); // Trả về màu gốc
+                }, 2000);
+            } else {
+                alert('Lỗi logic: ' + data.message);
+                resetBtn(btn, originalText);
+            }
+        })
+        .catch(error => {
+            console.error('Lỗi mạng hoặc Server:', error);
+            // Hiển thị lỗi chi tiết ra alert để dễ sửa
+            alert('Có lỗi xảy ra!\nXem Console (F12) để biết chi tiết.\n' + error.message.substring(0, 100) + '...');
+            resetBtn(btn, originalText);
+        });
+    });
+
+    function resetBtn(btn, text) {
+        btn.innerHTML = text;
+        btn.disabled = false;
+        btn.classList.remove('opacity-75');
+    }
+});
