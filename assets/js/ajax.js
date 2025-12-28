@@ -13,15 +13,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Scan Data
         const structure = [];
-        const rows = document.querySelectorAll('#canvas-frame .builder-row');
+        const rows = document.querySelectorAll('.builder-row');
 
         rows.forEach(row => {
             const rowData = {
                 label: row.getAttribute('data-label'),
+                // Lưu style của Row (bao gồm min-height, background-color...)
                 style: row.getAttribute('style') || '',
-                // LƯU CẤU HÌNH CONTAINER/FULL WIDTH
+                
+                // Lưu cấu hình Container
                 width_mode: row.getAttribute('data-width-mode') || 'container',
                 container_width: row.getAttribute('data-container-width') || '1200px',
+                
+                // Lưu trạng thái Ẩn/Hiện
+                row_hidden: row.getAttribute('data-row-hidden') || 'false',
+                
                 columns: {}
             };
 
@@ -33,9 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const cls = el.getAttribute('data-class');
                     let savedStyle = el.getAttribute('style') || '';
                     
-                    // A. LẤY STYLE
+                    // A. LẤY STYLE TỪ CÁC ELEMENT CON
                     let child = null;
-                    if (cls.includes('Button') || cls.includes('CategoryBtn')) child = el.querySelector('a, button, .inner-box');
+                    if (cls.includes('Button') || cls.includes('CategoryBtn')) child = el.querySelector('.inner-box');
                     else if (cls.includes('Search')) child = el.querySelector('.search-box, .search-icon-only');
                     else if (cls.includes('Menu') || cls.includes('Socials')) child = el.querySelector('nav, .social-group');
                     else if (cls.includes('Text')) child = el.querySelector('.text-content');
@@ -45,18 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         const stylesToSave = [
                             'background-color', 'color', 'border-radius', 
                             'padding-left', 'padding-right', 'font-size', 
-                            'font-weight', 'text-transform', 'gap', 'width', 
+                            'font-weight', 'text-transform', 'gap', 'width', 'height', // <--- QUAN TRỌNG: Lưu height
                             'text-align', 'border-color', 'border-width', 'border-style',
                             'line-height'
                         ];
+                        // Copy style từ con vào JSON
                         stylesToSave.forEach(prop => {
                             if (child.style[prop]) savedStyle += `${prop}: ${child.style[prop]}; `;
                         });
                     }
 
-                    // B. LẤY CONTENT
+                    // B. LẤY CONTENT & SETTINGS
                     const content = {};
                     
+                    // Lấy text/link cơ bản
                     if (!cls.includes('Menu') && !cls.includes('Socials')) {
                         const txt = el.querySelector('.text-content, button, a, .inner-text'); 
                         if (txt) content.text = txt.innerText;
@@ -70,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     const img = el.querySelector('img');
-                    if (img) content.src = img.src;
+                    if (img) content.src = img.getAttribute('src'); // Dùng getAttribute để lấy src gốc
 
                     // Repeater Configs
                     const nav = el.querySelector('nav'); 
@@ -93,9 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Text HTML Content
                     const txtContent = el.querySelector('.text-content'); if (txtContent) content['text_content'] = txtContent.innerText;
 
-                    // --- QUAN TRỌNG: LƯU CÁC OPTION ĐẶC BIỆT (Layout, Shape...) ---
-                    // Đây là chỗ quyết định F5 có giữ được layout Icon Only hay không
-                    const specialSettings = ['layout', 'shape', 'icon_type', 'hover_style', 'text-transform'];
+                    // --- QUAN TRỌNG: LƯU CÁC SETTING ĐẶC BIỆT ---
+                    // Thêm 'height' và 'width' vào đây để nó được lưu vào biến $settings của PHP
+                    const specialSettings = ['layout', 'shape', 'icon_type', 'hover_style', 'text-transform', 'height', 'width', 'font-size', 'color', 'background-color'];
+                    
                     specialSettings.forEach(key => {
                         if (el.hasAttribute('data-setting-' + key)) {
                             content[key] = el.getAttribute('data-setting-' + key);

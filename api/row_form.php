@@ -11,10 +11,17 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 
 <div class="px-4 pb-20 space-y-6">
 
+    <!-- THÊM: Ẩn/Hiện dòng -->
+    <div class="flex items-center justify-between bg-red-900/20 border border-red-900/50 p-3 rounded">
+        <label class="text-xs text-red-200 font-bold">Ẩn dòng này (Hide)</label>
+        <input type="checkbox" data-style="row_hidden"
+            class="prop-input w-4 h-4 rounded bg-gray-900 border-gray-600 accent-red-500 cursor-pointer">
+    </div>
+
     <!-- 1. GIAO DIỆN -->
     <div class="space-y-4">
+        <!-- (Giữ nguyên code cũ) -->
         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Giao diện</label>
-
         <div>
             <label class="text-xs text-gray-400 block mb-1">Màu nền (Background)</label>
             <div class="flex gap-2">
@@ -24,7 +31,6 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
                     class="flex-1 bg-gray-800 text-white text-xs px-2 rounded border border-gray-700">
             </div>
         </div>
-
         <div>
             <label class="text-xs text-gray-400 block mb-1">Màu chữ mặc định</label>
             <div class="flex gap-2">
@@ -37,10 +43,9 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 
     <hr class="border-gray-800">
 
-    <!-- 2. KÍCH THƯỚC & LAYOUT -->
+    <!-- 2. KÍCH THƯỚC (Giữ nguyên) -->
     <div class="space-y-4">
         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Layout & Kích thước</label>
-
         <div>
             <label class="text-xs text-gray-400 block mb-1">Kiểu bao bao (Container)</label>
             <select id="sel-width-mode" data-style="width-mode" onchange="toggleContainerWidth(this.value)"
@@ -49,7 +54,6 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
                 <option value="full">Toàn màn hình (Full Width)</option>
             </select>
         </div>
-
         <div id="container-width-control">
             <label class="text-xs text-gray-400 block mb-1">Độ rộng (Max Width)</label>
             <div class="flex items-center gap-2">
@@ -59,20 +63,16 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
                 <span id="display-width" class="text-xs text-gray-500 w-10 text-right">1200px</span>
             </div>
         </div>
-
         <hr class="border-gray-800 border-dashed">
-
         <div>
             <label class="text-xs text-gray-400 block mb-1">Chiều cao tối thiểu</label>
             <div class="flex items-center gap-2">
-                <!-- ĐÃ SỬA: min="40" để đồng bộ với Builder -->
                 <input type="range" id="input-height" data-style="min-height" min="40" max="150" value="50"
                     class="prop-input flex-1 accent-indigo-500"
                     oninput="document.getElementById('display-height').innerText = this.value + 'px'">
                 <span id="display-height" class="text-xs text-gray-500 w-10 text-right">50px</span>
             </div>
         </div>
-
         <script>
             function toggleContainerWidth(val) {
                 const el = document.getElementById('container-width-control');
@@ -86,16 +86,14 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
         </script>
     </div>
 
-    <!-- 3. HIỆU ỨNG -->
+    <!-- 3. HIỆU ỨNG (Giữ nguyên) -->
     <div class="space-y-4">
         <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Hiệu ứng</label>
-
         <div class="flex items-center justify-between bg-gray-800 p-2 rounded border border-gray-700">
             <label class="text-xs text-gray-300">Sticky (Ghim khi cuộn)</label>
             <input type="checkbox" id="chk-sticky" onchange="toggleSticky(this)"
                 class="w-4 h-4 rounded bg-gray-700 border-gray-600 accent-indigo-500 cursor-pointer">
         </div>
-
         <div>
             <label class="text-xs text-gray-400 block mb-1">Đổ bóng (Box Shadow)</label>
             <select data-style="box-shadow"
@@ -121,26 +119,19 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
             window.activeElement.style.top = 'auto';
         }
     }
-
     (function syncCurrentValues() {
         if (!window.activeElement) return;
         const style = window.getComputedStyle(window.activeElement);
-
-        // Sync Height
         const h = parseInt(style.minHeight);
         if (!isNaN(h)) {
             const range = document.getElementById('input-height');
             const display = document.getElementById('display-height');
             if (range && display) {
-                // Đảm bảo giá trị hiển thị không nhỏ hơn min
                 range.value = Math.max(h, 40);
                 display.innerText = range.value + 'px';
             }
         }
-
         const pos = style.position;
-        if (pos === 'sticky') {
-            document.getElementById('chk-sticky').checked = true;
-        }
+        if (pos === 'sticky') document.getElementById('chk-sticky').checked = true;
     })();
 </script>

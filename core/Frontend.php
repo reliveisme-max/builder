@@ -21,51 +21,40 @@ class Frontend
         $structure = json_decode($row['data_json'], true);
         if (!$structure) return;
 
-        // Header Wrapper
         echo '<header id="site-header" class="w-full relative bg-white shadow-sm font-sans text-sm z-50">';
 
         foreach ($structure as $rowData) {
             if (!isset($rowData['columns'])) continue;
 
-            // 1. STYLE CỦA ROW (Màu nền, Chiều cao...)
+            if (isset($rowData['row_hidden']) && $rowData['row_hidden'] === 'true') {
+                continue;
+            }
+
             $style = $rowData['style'] ?? '';
-            // Fix: Xóa width/max-width trong style cũ để tránh xung đột
             $style = preg_replace('/(max-)?width\s*:[^;]+;/', '', $style);
 
-            // Xử lý Sticky
             if (strpos($style, 'sticky') !== false && strpos($style, 'top:') === false) {
                 $style .= '; top: 0;';
             }
 
-            // 2. XỬ LÝ CONTAINER
             $widthMode = $rowData['width_mode'] ?? 'container';
             $containerWidth = $rowData['container_width'] ?? '1200px';
 
-            // Class cho Inner: 
-            // - flex: để chia cột
-            // - h-full: chiếm hết chiều cao row
-            // - items-center: CĂN GIỮA DỌC (Khắc phục lỗi bị lệch lên trên)
-            $innerClass = 'hb-inner-content flex items-center justify-between h-full px-4';
+            $innerClass = 'hb-inner-content flex items-stretch h-full px-4 mx-auto';
             $innerStyle = '';
 
             if ($widthMode === 'full') {
-                $innerClass .= ' w-full';
+                $innerStyle = "width: 100%; max-width: 100%;";
             } else {
-                $innerClass .= ' mx-auto';
-                $innerStyle = "max-width: {$containerWidth}; width: 100%;";
+                $innerStyle = "width: 100%; max-width: {$containerWidth};";
             }
 
-            // 3. RENDER HTML
-            // Row cha: Thêm 'flex items-center' để đảm bảo inner luôn ở giữa dọc nếu row có min-height lớn
-            echo "<div class='header-row w-full relative border-b border-transparent overflow-hidden flex items-center' style='{$style}'>";
-
-            // Inner content
+            echo "<div class='header-row w-full relative border-b border-transparent overflow-hidden flex flex-col justify-center' style='{$style}'>";
             echo "<div class='{$innerClass}' style='{$innerStyle}'>";
 
-            // Render 3 Zone
-            echo self::renderZone($rowData['columns'], 'left');
-            echo self::renderZone($rowData['columns'], 'center');
-            echo self::renderZone($rowData['columns'], 'right');
+            self::renderZone($rowData['columns'], 'left');
+            self::renderZone($rowData['columns'], 'center');
+            self::renderZone($rowData['columns'], 'right');
 
             echo "</div></div>";
         }
@@ -83,18 +72,20 @@ class Frontend
         }
 
         $justify = 'justify-start';
-        $flex = 'flex-1';
+        // --- LOGIC MỚI: CO GIÃN TỰ ĐỘNG ---
+        // Left/Right: Co lại vừa khít
+        $flexStyle = 'flex: 0 0 auto; width: auto;';
 
         if ($position === 'center') {
             $justify = 'justify-center';
-            if (count($targetData) > 0) $flex = 'flex-[2]'; // Ưu tiên center rộng hơn chút
+            // Center: Chiếm hết chỗ thừa
+            $flexStyle = 'flex: 1 1 auto; width: auto;';
         }
         if ($position === 'right') {
             $justify = 'justify-end';
         }
 
-        // Cột: Thêm 'items-center' để các element con (Logo, Menu) căn giữa dòng
-        echo "<div class='header-col {$flex} flex items-center gap-4 {$justify} h-full'>";
+        echo "<div class='header-col flex items-center h-full {$justify} gap-4' style='{$flexStyle}'>";
 
         if (!empty($targetData)) {
             foreach ($targetData as $item) {
@@ -111,7 +102,6 @@ class Frontend
         $content = $item['content'] ?? [];
 
         if (!class_exists($className)) {
-            // Fix namespace nếu lưu thiếu
             if (strpos($className, '\\') === false) {
                 $className = 'Modules\\Header\\Elements\\' . $className;
             }
@@ -125,12 +115,10 @@ class Frontend
         $html = $element->render($mergedSettings);
 
         $wrapperStyle = "";
-        // Fix chiều rộng cho Logo và Search để không bị co rúm
         if (isset($styles['width']) && (strpos($className, 'Logo') !== false || strpos($className, 'Search') !== false)) {
             $wrapperStyle .= "width: {$styles['width']};";
         }
 
-        // Wrapper item: flex items-center để icon và text không bị lệch
         return "<div class='header-item-wrapper flex items-center h-full' style='{$wrapperStyle}'>{$html}</div>";
     }
 
