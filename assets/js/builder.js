@@ -16,29 +16,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const rowEl = document.querySelector(`.builder-row[data-label="${rowData.label}"]`);
             if (!rowEl) return;
             
-            // 1. Restore Row Style
+            // Restore Row Style
             if (rowData.style) rowEl.style.cssText = rowData.style;
             rowEl.style.outline = '';
 
-            // 2. RESTORE CONTAINER / FULL WIDTH SETTINGS (MỚI)
+            // RESTORE CONTAINER SETTINGS
             if (rowData.width_mode) {
                 rowEl.setAttribute('data-width-mode', rowData.width_mode);
                 if (rowData.width_mode === 'full') {
-                    rowEl.style.maxWidth = '100%';
-                    rowEl.style.marginLeft = '0';
-                    rowEl.style.marginRight = '0';
+                    rowEl.style.maxWidth = '100%'; rowEl.style.margin = '0';
                 }
             }
             if (rowData.container_width) {
                 rowEl.setAttribute('data-container-width', rowData.container_width);
                 if (rowData.width_mode !== 'full') {
-                    rowEl.style.maxWidth = rowData.container_width;
-                    rowEl.style.marginLeft = 'auto';
-                    rowEl.style.marginRight = 'auto';
+                    rowEl.style.maxWidth = rowData.container_width; rowEl.style.marginLeft = 'auto'; rowEl.style.marginRight = 'auto';
                 }
             }
 
-            // 3. Restore Columns & Elements
             for (const [zoneName, elements] of Object.entries(rowData.columns)) {
                 const zone = rowEl.querySelector(`.drop-zone[data-zone="${zoneName}"]`);
                 if (!zone) continue;
@@ -50,9 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     const div = document.createElement('div'); div.innerHTML = html;
                     const newEl = div.firstElementChild;
 
-                    // Restore Content
                     if (elData.content) {
                         const c = elData.content;
+                        // Restore special attributes so they are saved next time
+                        const settingsKeys = ['layout', 'shape', 'icon_type', 'hover_style', 'text-transform'];
+                        settingsKeys.forEach(key => { if (c[key]) newEl.setAttribute('data-setting-' + key, c[key]); });
+
+                        // Restore Data
                         if(c.menu_config) { const nav=newEl.querySelector('nav'); if(nav) nav.setAttribute('data-menu-config', c.menu_config); }
                         if(c.social_items) { const grp=newEl.querySelector('.social-group'); if(grp) grp.setAttribute('data-social-items', c.social_items); }
                         
@@ -67,15 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         if(c.hover_bg) newEl.querySelector('a').setAttribute('data-hover-bg', c.hover_bg);
                         if(c.hover_color) newEl.querySelector('a').setAttribute('data-hover-color', c.hover_color);
-
-                        // Restore Settings Attributes
-                        const settingsKeys = ['layout', 'shape', 'icon_type', 'hover_style', 'text-transform'];
-                        settingsKeys.forEach(key => {
-                            if (c[key]) newEl.setAttribute('data-setting-' + key, c[key]);
-                        });
                     }
 
-                    // Restore Element Style
                     if (elData.style) {
                         let target = getStyleTarget(newEl, elData.class);
                         if(target) {
@@ -93,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 1. DRAG & DROP & EVENTS ---
+    // --- 1. DRAG & DROP ---
     draggables.forEach(item => item.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', item.dataset.class); e.dataTransfer.setData('name', item.innerText.trim()); }));
     dropZones.forEach(zone => {
         zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
@@ -114,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- 2. EVENTS ---
     rows.forEach(row => row.addEventListener('click', (e) => {
         if (e.target.closest('.builder-element') || e.target.classList.contains('btn-delete')) return;
         if (window.activeElement) window.activeElement.classList.remove('is-selected', 'ring-2', 'ring-indigo-500');
@@ -157,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputs = propertyPanel.querySelectorAll('.prop-input');
         const cls = window.activeElement ? window.activeElement.getAttribute('data-class') : '';
 
-        // REPEATER INIT
+        // REPEATER LOGIC
         if (cls.includes('Menu') || cls.includes('Socials')) {
             const container = document.getElementById(cls.includes('Menu') ? 'menu-items-container' : 'social-items-container');
             const hiddenInput = document.getElementById(cls.includes('Menu') ? 'hidden-menu-config' : 'hidden-social-items');
@@ -201,10 +194,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         inputs.forEach(input => {
-            // Restore Values from DOM
+            // Restore Values
             if(window.activeElement) {
                 const type = input.dataset.style;
-                // Settings Attributes
+                // Settings
                 if (window.activeElement.hasAttribute('data-setting-' + type)) input.value = window.activeElement.getAttribute('data-setting-' + type);
                 
                 // Row Settings
@@ -214,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (type === 'min-height') input.value = parseInt(window.activeElement.style.minHeight) || 50;
                 }
 
-                // Element Settings
                 if(cls.includes('Button')) {
                      const a = window.activeElement.querySelector('a');
                      if(type === 'hover_bg') input.value = a.getAttribute('data-hover-bg') || '#1d4ed8';
@@ -235,31 +227,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 switch (type) {
-                    // --- LOGIC MỚI: CONTAINER WIDTH ---
-                    // Chỗ bạn đang tìm là ở đây:
+                    // Container Width
                     case 'width-mode':
                         window.activeElement.setAttribute('data-width-mode', val);
-                        if (val === 'full') {
-                            window.activeElement.style.maxWidth = '100%';
-                            window.activeElement.style.marginLeft = '0';
-                            window.activeElement.style.marginRight = '0';
-                        } else {
-                            const currentW = window.activeElement.getAttribute('data-container-width') || '1200px';
-                            window.activeElement.style.maxWidth = currentW;
-                            window.activeElement.style.marginLeft = 'auto';
-                            window.activeElement.style.marginRight = 'auto';
-                        }
+                        if (val === 'full') { window.activeElement.style.maxWidth = '100%'; window.activeElement.style.margin = '0'; }
+                        else { const currentW = window.activeElement.getAttribute('data-container-width') || '1200px'; window.activeElement.style.maxWidth = currentW; window.activeElement.style.marginLeft = 'auto'; window.activeElement.style.marginRight = 'auto'; }
                         break;
                     case 'container-width':
                         window.activeElement.setAttribute('data-container-width', val + 'px');
-                        if (window.activeElement.getAttribute('data-width-mode') !== 'full') {
-                            window.activeElement.style.maxWidth = val + 'px';
-                            window.activeElement.style.marginLeft = 'auto';
-                            window.activeElement.style.marginRight = 'auto';
-                        }
+                        if (window.activeElement.getAttribute('data-width-mode') !== 'full') { window.activeElement.style.maxWidth = val + 'px'; window.activeElement.style.marginLeft = 'auto'; window.activeElement.style.marginRight = 'auto'; }
                         break;
-                    // ----------------------------------
-
                     case 'min-height': window.activeElement.style.minHeight = val + 'px'; break;
 
                     case 'text': const txt=window.activeElement.querySelector('.text-content, button, a, .inner-text'); if(txt) txt.innerText=val; const i=window.activeElement.querySelector('input'); if(i) i.placeholder=val; break;
@@ -303,10 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         break;
                     
                     case 'icon_type':
-                         if (cls.includes('Cart')) {
-                             const icon = window.activeElement.querySelector('i');
-                             icon.className = `ph ${val}`;
-                         }
+                         if (cls.includes('Cart')) { const icon = window.activeElement.querySelector('i'); icon.className = `ph ${val}`; }
                          break;
 
                     case 'shape':
@@ -324,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 4. VIEW MODES ---
     viewBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             viewBtns.forEach(b => { b.classList.remove('bg-white', 'text-gray-800', 'shadow-sm', 'border-gray-200'); b.classList.add('text-gray-500', 'border-transparent'); });
@@ -379,6 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
             content = `<div class="inner-box flex items-center gap-2 px-4 py-2 pointer-events-none" style="background-color:#f3f4f6; color:#333; border-radius:4px"><i class="ph ph-list text-lg"></i><span class="text-xs font-bold uppercase whitespace-nowrap inner-text">DANH MỤC</span><i class="ph ph-caret-down text-xs ml-1"></i></div>`;
         }
         else if (className.includes('Socials')) {
+            // Fix: Add default data so it is not null
             content = `<div class="flex items-center social-group gap-3 pointer-events-none" data-social-items='[{"icon":"ph-facebook-logo","link":"#"}]' style="font-size:18px"><a class="social-link flex items-center justify-center"><i class="ph ph-facebook-logo"></i></a></div>`;
         }
         else if (className.includes('Search')) {

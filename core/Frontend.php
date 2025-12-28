@@ -38,21 +38,17 @@ class Frontend
             $widthMode = $rowData['width_mode'] ?? 'container';
             $containerWidth = $rowData['container_width'] ?? '1200px';
 
-            $innerClass = 'flex items-center justify-between h-full px-4'; // Mặc định có padding 2 bên
+            $innerClass = 'flex items-center justify-between h-full px-4';
             $innerStyle = '';
 
             if ($widthMode === 'full') {
-                $innerClass .= ' w-full'; // Full màn hình
+                $innerClass .= ' w-full';
             } else {
-                $innerClass .= ' mx-auto'; // Căn giữa
+                $innerClass .= ' mx-auto';
                 $innerStyle = "max-width: {$containerWidth}; width: 100%;";
             }
 
-            // RENDER HTML
-            // Lớp Ngoài: Chịu trách nhiệm Background + Sticky
             echo "<div class='header-row relative border-b border-transparent overflow-hidden' style='{$style}'>";
-
-            // Lớp Trong: Chịu trách nhiệm Width + Flexbox
             echo "<div class='{$innerClass}' style='{$innerStyle}'>";
 
             // Render Zones
@@ -60,10 +56,11 @@ class Frontend
             echo self::renderZone($rowData['columns'], 'center');
             echo self::renderZone($rowData['columns'], 'right');
 
-            echo "</div></div>"; // Đóng Inner và Outer
+            echo "</div></div>";
         }
         echo '</header>';
     }
+
     private static function renderZone($columns, $position)
     {
         $targetData = [];
@@ -76,16 +73,16 @@ class Frontend
 
         $justify = 'justify-start';
         $flex = 'flex-1';
+
         if ($position === 'center') {
             $justify = 'justify-center';
-            $flex = 'flex-[2]';
+            if (count($targetData) > 0) $flex = 'flex-[2]';
         }
         if ($position === 'right') {
             $justify = 'justify-end';
         }
 
-        // COLUMN: Thêm h-full để nó cao bằng cha, giúp căn giữa (items-center) hoạt động chuẩn
-        echo "<div class='header-col {$flex} flex items-center gap-6 {$justify} h-full'>";
+        echo "<div class='header-col {$flex} flex items-center gap-4 {$justify} h-full'>";
 
         if (!empty($targetData)) {
             foreach ($targetData as $item) {
@@ -114,8 +111,12 @@ class Frontend
             $wrapperStyle .= "width: {$styles['width']};";
         }
 
-        // WRAPPER ELEMENT: h-full để nội dung bên trong có thể căn chỉnh theo chiều cao dòng
-        return "<div class='header-item-wrapper flex items-center h-full' style='{$wrapperStyle}'>{$html}</div>";
+        // Search Full Width Logic
+        if (strpos($className, 'Search') !== false && isset($styles['width'])) {
+            $wrapperStyle .= "width: {$styles['width']};";
+        }
+
+        return "<div class='header-item-wrapper flex items-center' style='{$wrapperStyle}; max-height: 100%;'>{$html}</div>";
     }
 
     private static function parseStyleString($str)
