@@ -9,11 +9,11 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
     </h3>
 </div>
 
-<div class="px-4 pb-20 space-y-5">
+<div class="px-4 pb-20 space-y-6">
 
-    <!-- 1. BACKGROUND & COLOR -->
-    <div class="space-y-3">
-        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Giao diện</label>
+    <!-- 1. GIAO DIỆN (Background & Text) -->
+    <div class="space-y-4">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Giao diện</label>
 
         <div>
             <label class="text-xs text-gray-400 block mb-1">Màu nền (Background)</label>
@@ -27,20 +27,22 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 
         <div>
             <label class="text-xs text-gray-400 block mb-1">Màu chữ mặc định</label>
-            <input type="color" data-style="color"
-                class="prop-input w-full h-8 bg-transparent border border-gray-700 rounded cursor-pointer">
-            <p class="text-[10px] text-gray-600 mt-1">Áp dụng cho text không có màu riêng.</p>
+            <div class="flex gap-2">
+                <input type="color" data-style="color"
+                    class="prop-input w-8 h-8 bg-transparent border border-gray-700 rounded p-0 cursor-pointer">
+                <div class="flex-1 text-[10px] text-gray-500 flex items-center">Áp dụng cho text/icon con</div>
+            </div>
         </div>
     </div>
 
     <hr class="border-gray-800">
 
-    <!-- 2. DIMENSIONS -->
-    <div class="space-y-3">
-        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Kích thước</label>
+    <!-- 2. KÍCH THƯỚC (Height & Border) -->
+    <div class="space-y-4">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Kích thước</label>
 
         <div>
-            <label class="text-xs text-gray-400 block mb-1">Chiều cao (Min Height)</label>
+            <label class="text-xs text-gray-400 block mb-1">Chiều cao tối thiểu (Min Height)</label>
             <div class="flex items-center gap-2">
                 <input type="range" data-style="min-height" min="30" max="150" value="50"
                     class="prop-input flex-1 accent-indigo-500">
@@ -49,7 +51,7 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
         </div>
 
         <div>
-            <label class="text-xs text-gray-400 block mb-1">Border Bottom</label>
+            <label class="text-xs text-gray-400 block mb-1">Đường viền dưới (Border Bottom)</label>
             <div class="flex items-center gap-2">
                 <input type="color" data-style="border-bottom-color"
                     class="prop-input w-8 h-8 bg-transparent border border-gray-700 rounded p-0">
@@ -66,40 +68,40 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 
     <hr class="border-gray-800">
 
-    <!-- 3. ADVANCED (Sticky, Shadow) -->
-    <div class="space-y-3">
-        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Hiệu ứng</label>
+    <!-- 3. HIỆU ỨNG (Sticky, Shadow) -->
+    <div class="space-y-4">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Hiệu ứng</label>
 
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between bg-gray-800 p-2 rounded border border-gray-700">
             <label class="text-xs text-gray-300">Sticky (Ghim khi cuộn)</label>
             <input type="checkbox" onchange="toggleSticky(this)"
-                class="w-4 h-4 rounded bg-gray-700 border-gray-600 accent-indigo-500">
+                class="w-4 h-4 rounded bg-gray-700 border-gray-600 accent-indigo-500 cursor-pointer">
         </div>
 
-        <div class="flex items-center justify-between">
-            <label class="text-xs text-gray-300">Box Shadow (Đổ bóng)</label>
+        <div>
+            <label class="text-xs text-gray-400 block mb-1">Đổ bóng (Box Shadow)</label>
             <select data-style="box-shadow"
-                class="prop-input bg-gray-800 text-white text-xs p-1 rounded border border-gray-700 w-24">
+                class="prop-input bg-gray-800 text-white text-xs p-2 rounded border border-gray-700 w-full">
                 <option value="none">None</option>
-                <option value="0 1px 3px 0 rgb(0 0 0 / 0.1)">Nhẹ</option>
-                <option value="0 4px 6px -1px rgb(0 0 0 / 0.1)">Vừa</option>
-                <option value="0 10px 15px -3px rgb(0 0 0 / 0.1)">Đậm</option>
+                <option value="0 1px 2px 0 rgb(0 0 0 / 0.05)">Nhẹ (Light)</option>
+                <option value="0 4px 6px -1px rgb(0 0 0 / 0.1)">Vừa (Medium)</option>
+                <option value="0 10px 15px -3px rgb(0 0 0 / 0.1)">Đậm (Heavy)</option>
             </select>
         </div>
     </div>
 </div>
 
 <script>
-    // Hàm xử lý Sticky (thêm class sticky)
+    // Hàm xử lý Sticky riêng biệt
     function toggleSticky(cb) {
-        if (!activeElement) return;
+        if (!window.activeElement) return;
         if (cb.checked) {
-            activeElement.style.position = 'sticky';
-            activeElement.style.top = '0';
-            activeElement.style.zIndex = '999';
+            window.activeElement.style.position = 'sticky';
+            window.activeElement.style.top = '0';
+            window.activeElement.style.zIndex = '999';
         } else {
-            activeElement.style.position = 'relative';
-            activeElement.style.top = 'auto';
+            window.activeElement.style.position = 'relative';
+            window.activeElement.style.top = 'auto';
         }
     }
 </script>
