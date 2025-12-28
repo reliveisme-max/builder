@@ -110,3 +110,9 @@
     border-radius: 2px;
     white-space: nowrap;
 }
+/* Class dùng để Highlight phần tử đang chọn (Thay cho style inline) */
+.is-selected {
+    outline: 2px solid #6366f1 !important; /* Màu xanh tím */
+    outline-offset: -2px;
+    z-index: 100;
+}
