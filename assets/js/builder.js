@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // 5. HÀM LIVE EDIT (NÂNG CẤP)
+    // 5. HÀM LIVE EDIT (FINAL VERSION - Support cả Row & Element)
     function initLiveEdit() {
         const inputs = propertyPanel.querySelectorAll('.prop-input');
         
@@ -115,53 +115,82 @@ document.addEventListener('DOMContentLoaded', () => {
                 const styleType = this.dataset.style; 
                 const value = this.value;
                 
-                // Tìm đúng đối tượng cần sửa (Ưu tiên nav, input, img, text)
-                const target = activeElement.querySelector('nav, input, img, button, .text-content') || activeElement;
-                
-                // Xử lý từng loại Style
+                // Logic target: Nếu đang chọn Row thì target chính là row
+                // Nếu đang chọn Element thì tìm con bên trong
+                let target = activeElement;
+                if (!activeElement.classList.contains('builder-row')) {
+                    target = activeElement.querySelector('nav, input, img, button, .text-content') || activeElement;
+                }
+
                 switch (styleType) {
+                    case 'src':
+                        const img = activeElement.querySelector('img');
+                        if (img) img.src = value;
+                        break;
                     case 'color':
                         target.style.color = value;
-                        // Sửa màu cho cả icon và link bên trong
-                        target.querySelectorAll('a, i, span').forEach(el => el.style.color = value); 
+                        // Nếu là row thì gán màu cho cả con cháu
+                        if(activeElement.classList.contains('builder-row')) {
+                             activeElement.querySelectorAll('.empty-placeholder').forEach(el => el.style.color = value);
+                        } else {
+                             target.querySelectorAll('a, i, span').forEach(el => el.style.color = value);
+                        }
                         break;
-                        
                     case 'background-color':
-                         // Nếu là search box thì sửa input, nếu nút thì sửa nút
-                         const bgTarget = activeElement.querySelector('input, button, div') || activeElement;
-                         bgTarget.style.backgroundColor = value;
+                         // Nếu là row thì gán bg trực tiếp
+                         if(activeElement.classList.contains('builder-row')) {
+                             activeElement.style.backgroundColor = value;
+                         } else {
+                             const bgTarget = activeElement.querySelector('input, button, div') || activeElement;
+                             bgTarget.style.backgroundColor = value;
+                         }
                          break;
-
                     case 'font-size':
                         target.style.fontSize = value + 'px';
                         break;
-                        
-                    case 'font-weight': // Bold / Normal
+                    case 'font-weight':
                         target.style.fontWeight = value;
                         break;
-                        
-                    case 'text-transform': // Uppercase / None
+                    case 'text-transform':
                         target.style.textTransform = value;
                         break;
-                        
-                    case 'border-radius': // Bo góc
+                    case 'border-radius':
                         const borderTarget = activeElement.querySelector('input, button, div') || activeElement;
                         borderTarget.style.borderRadius = value + 'px';
                         break;
-
-                    case 'width': // Chiều rộng (cho Logo/Search)
-                        const widthTarget = activeElement.querySelector('img, input, .w-full') || activeElement;
-                        widthTarget.style.width = value + (value.includes('%') ? '' : 'px');
+                    case 'width':
+                         const imgTarget = activeElement.querySelector('img');
+                         if(imgTarget) imgTarget.style.width = value + 'px';
+                         else {
+                             const wTarget = activeElement.querySelector('input, .w-full') || activeElement;
+                             wTarget.style.width = value + (value.includes('%') ? '' : 'px');
+                         }
                         break;
-
-                    case 'gap': // Khoảng cách menu
+                    case 'gap':
                         target.style.gap = value + 'px';
                         break;
-                        
-                    case 'justify-content': // Căn lề Flexbox (Quan trọng)
-                        activeElement.style.display = 'flex';
-                        activeElement.style.width = '100%'; // Phải full width mới căn được
-                        activeElement.style.justifyContent = value;
+                    case 'justify-content': 
+                        if (!activeElement.classList.contains('builder-row')) {
+                            activeElement.style.display = 'flex';
+                            activeElement.style.width = '100%';
+                            activeElement.style.justifyContent = value;
+                        }
+                        break;
+                    
+                    // --- ROW SPECIFIC ---
+                    case 'min-height':
+                        activeElement.style.minHeight = value + 'px';
+                        break;
+                    case 'border-bottom-color':
+                        activeElement.style.borderBottomColor = value;
+                        break;
+                    case 'border-bottom-width':
+                        activeElement.style.borderBottomWidth = value;
+                        activeElement.style.borderBottomStyle = 'solid';
+                        break;
+                     case 'box-shadow':
+                        activeElement.style.boxShadow = value;
+                        activeElement.style.zIndex = value === 'none' ? 'auto' : '20';
                         break;
                 }
             });
@@ -224,6 +253,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="text-xs font-bold uppercase whitespace-nowrap">Danh mục</span>
             </div>`;
         }
+        // 8. SOCIALS
+        else if (name.includes('Social')) {
+            content = `<div class="flex items-center gap-3 pointer-events-none text-inherit">
+                <i class="ph ph-facebook-logo text-lg"></i>
+                <i class="ph ph-instagram-logo text-lg"></i>
+                <i class="ph ph-tiktok-logo text-lg"></i>
+            </div>`;
+        }
+        // 9. DIVIDER
+        else if (name.includes('Vertical') || name.includes('Line')) {
+            content = `<div class="h-6 w-px bg-gray-300 mx-2 pointer-events-none"></div>`;
+        }
+        // 10. BUTTON
+        else if (name.includes('Button')) {
+            content = `<a class="bg-blue-600 text-white px-4 py-1.5 rounded text-xs font-bold pointer-events-none whitespace-nowrap">Button</a>`;
+        }
         // --- DEFAULT ---
         else {
             content = `<span class="font-bold text-sm pointer-events-none">${name}</span>`;
@@ -241,4 +286,41 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
     }
+    // 7. XỬ LÝ CHỌN ROW (DÒNG)
+    const rows = document.querySelectorAll('.builder-row');
+    rows.forEach(row => {
+        row.addEventListener('click', (e) => {
+            // Nếu click trúng element con thì không chọn row
+            if (e.target.closest('.builder-element') || e.target.classList.contains('btn-delete')) {
+                return;
+            }
+
+            // Xóa active cũ của element và row
+            if (activeElement) {
+                activeElement.classList.remove('ring-2', 'ring-indigo-500');
+                // Nếu active cũ là row, xóa border xanh của row
+                if(activeElement.classList.contains('builder-row')) {
+                    activeElement.style.outline = 'none';
+                }
+            }
+
+            // Active Row mới
+            activeElement = row;
+            // Dùng outline để highlight row (không dùng ring vì bị khuất)
+            activeElement.style.outline = '2px solid #6366f1'; 
+            activeElement.style.outlineOffset = '-2px';
+
+            // Load Form Settings cho Row
+            const label = row.getAttribute('data-label') || 'Row';
+            propertyPanel.innerHTML = '<div class="h-full flex flex-col items-center justify-center text-gray-500 space-y-3 opacity-60"><i class="ph ph-spinner animate-spin text-3xl"></i><p class="text-xs">Loading row settings...</p></div>';
+
+            fetch('api/row_form.php?label=' + encodeURIComponent(label))
+                .then(res => res.text())
+                .then(html => {
+                    propertyPanel.innerHTML = html;
+                    initLiveEdit(); // Tái sử dụng hàm live edit
+                });
+        });
+    });
+
 });
