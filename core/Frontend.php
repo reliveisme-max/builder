@@ -21,6 +21,52 @@ class Frontend
         $structure = json_decode($row['data_json'], true);
         if (!$structure) return;
 
+        // --- CSS FRONTEND ---
+        echo '<style>
+            /* 1. Container chính: Căn giữa chiều dọc (align-items: center) */
+            .hb-inner-content { 
+                display: flex; 
+                align-items: center; /* FIX: Căn giữa chiều dọc */
+                width: 100%; 
+                margin: 0 auto; 
+                gap: 15px; 
+            }
+            
+            /* Cấu hình các Cột */
+            .header-col { display: flex; align-items: center; height: 100%; gap: 15px; }
+            
+            /* Cột Giữa: Chiếm hết khoảng trống */
+            .header-col.col-center { flex: 1 1 auto; justify-content: center; width: auto; }
+            
+            /* Cột Trái / Phải: Co khít nội dung */
+            .header-col.col-left, .header-col.col-right { flex: 0 0 auto; width: auto; }
+            .header-col.col-right { justify-content: flex-end; }
+            
+            /* 2. ITEM WRAPPER */
+            .header-item-wrapper { 
+                display: flex; 
+                align-items: center; 
+                width: auto; 
+                position: relative;
+            }
+            
+            /* FIX LOGO: Ảnh bên trong wrapper sẽ luôn fill 100% width của wrapper */
+            /* Điều này giúp khi ta set width cho wrapper, ảnh logo sẽ to/nhỏ theo */
+            .header-item-wrapper img { 
+                width: 100%; 
+                height: auto; 
+                object-fit: contain; 
+                display: block;
+            }
+            
+            /* 3. RIÊNG SEARCH BOX Ở CỘT GIỮA */
+            .header-item-wrapper.is-search-center {
+                width: 100%;
+                flex: 1;
+            }
+            .search-box { width: 100% !important; max-width: 100% !important; }
+        </style>';
+
         echo '<header id="site-header" class="w-full relative bg-white shadow-sm font-sans text-sm z-50">';
 
         foreach ($structure as $rowData) {
@@ -31,26 +77,25 @@ class Frontend
             }
 
             $style = $rowData['style'] ?? '';
+            // Xóa width cứng
             $style = preg_replace('/(max-)?width\s*:[^;]+;/', '', $style);
 
             if (strpos($style, 'sticky') !== false && strpos($style, 'top:') === false) {
-                $style .= '; top: 0;';
+                $style .= '; top: 0; z-index: 999;';
             }
 
             $widthMode = $rowData['width_mode'] ?? 'container';
             $containerWidth = $rowData['container_width'] ?? '1200px';
 
-            $innerClass = 'hb-inner-content flex items-stretch h-full px-4 mx-auto';
-            $innerStyle = '';
-
+            $innerStyle = "";
             if ($widthMode === 'full') {
-                $innerStyle = "width: 100%; max-width: 100%;";
+                $innerStyle = "width: 100%; max-width: 100%; padding: 0 20px;";
             } else {
-                $innerStyle = "width: 100%; max-width: {$containerWidth};";
+                $innerStyle = "width: 100%; max-width: {$containerWidth}; padding: 0 15px;";
             }
 
             echo "<div class='header-row w-full relative border-b border-transparent overflow-hidden flex flex-col justify-center' style='{$style}'>";
-            echo "<div class='{$innerClass}' style='{$innerStyle}'>";
+            echo "<div class='hb-inner-content' style='{$innerStyle}'>";
 
             self::renderZone($rowData['columns'], 'left');
             self::renderZone($rowData['columns'], 'center');
@@ -71,31 +116,17 @@ class Frontend
             }
         }
 
-        $justify = 'justify-start';
-        // --- LOGIC MỚI: CO GIÃN TỰ ĐỘNG ---
-        // Left/Right: Co lại vừa khít
-        $flexStyle = 'flex: 0 0 auto; width: auto;';
-
-        if ($position === 'center') {
-            $justify = 'justify-center';
-            // Center: Chiếm hết chỗ thừa
-            $flexStyle = 'flex: 1 1 auto; width: auto;';
-        }
-        if ($position === 'right') {
-            $justify = 'justify-end';
-        }
-
-        echo "<div class='header-col flex items-center h-full {$justify} gap-4' style='{$flexStyle}'>";
-
+        $colClass = "col-{$position}";
+        echo "<div class='header-col {$colClass}'>";
         if (!empty($targetData)) {
             foreach ($targetData as $item) {
-                echo self::renderElement($item);
+                echo self::renderElement($item, $position);
             }
         }
         echo "</div>";
     }
 
-    private static function renderElement($item)
+    private static function renderElement($item, $position)
     {
         $className = $item['class'];
         $styleStr = $item['style'] ?? '';
@@ -115,11 +146,19 @@ class Frontend
         $html = $element->render($mergedSettings);
 
         $wrapperStyle = "";
-        if (isset($styles['width']) && (strpos($className, 'Logo') !== false || strpos($className, 'Search') !== false)) {
-            $wrapperStyle .= "width: {$styles['width']};";
+        $extraClass = "";
+
+        // LOGIC XỬ LÝ STYLE
+        if ($position === 'center' && strpos($className, 'Search') !== false) {
+            // Search ở giữa -> Full Width
+            $extraClass = "is-search-center";
+        } elseif (isset($styles['width'])) {
+            // FIX LOGO: Nếu có width (do người dùng kéo), gán width đó cho Wrapper
+            // CSS .header-item-wrapper img { width: 100% } sẽ lo phần còn lại
+            $wrapperStyle = "width: {$styles['width']};";
         }
 
-        return "<div class='header-item-wrapper flex items-center h-full' style='{$wrapperStyle}'>{$html}</div>";
+        return "<div class='header-item-wrapper {$extraClass}' style='{$wrapperStyle}'>{$html}</div>";
     }
 
     private static function parseStyleString($str)
@@ -128,8 +167,10 @@ class Frontend
         $parts = explode(';', $str);
         foreach ($parts as $part) {
             if (trim($part) === '') continue;
-            list($key, $val) = explode(':', $part, 2);
-            $result[trim($key)] = trim($val);
+            $arr = explode(':', $part, 2);
+            if (count($arr) == 2) {
+                $result[trim($arr[0])] = trim($arr[1]);
+            }
         }
         return $result;
     }

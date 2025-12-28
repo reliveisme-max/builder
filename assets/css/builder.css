@@ -1,68 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
 body { font-family: 'Inter', sans-serif; }
 
-/* 1. GENERAL UI */
+/* 1. UI CHUNG */
 .workspace-bg { background-color: #f3f4f6; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* 2. DROP ZONES */
-.drop-zone { transition: all 0.2s ease; position: relative; min-height: 100%; }
-.drop-zone:empty, .drop-zone:has(.empty-placeholder) { border: 1px dashed #e5e7eb; }
-.builder-row:hover .drop-zone:empty { border-color: #d1d5db; }
-.drop-zone.drag-over { background-color: #eff6ff !important; border: 1px dashed #3b82f6 !important; z-index: 10; }
+/* 2. LAYOUT CHÍNH (FLATSOME STYLE) */
+.hb-inner-content { 
+    display: flex; 
+    align-items: center; /* Căn giữa chiều dọc */
+    width: 100%; 
+    height: 100%; 
+    margin: 0 auto; 
+    min-height: 50px; 
+    gap: 15px; /* Khoảng cách giữa các cột */
+    transition: all 0.3s ease;
+}
 
-/* 3. PLACEHOLDER */
-.empty-placeholder { color: #9ca3af; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center; height: 100%; min-height: 32px; user-select: none; cursor: default; }
-.empty-placeholder::before { content: '+'; font-size: 14px; margin-right: 4px; color: #d1d5db; }
+/* 3. DROP ZONES (CÁC CỘT) */
+.drop-zone { 
+    height: 100%; 
+    min-height: 50px; 
+    display: flex; 
+    align-items: center; 
+    padding: 0 5px; 
+    transition: all 0.2s; 
+    border: 1px dashed transparent; 
+    min-width: 30px;
+    position: relative;
+    gap: 10px; /* Gap giữa các phần tử */
+}
 
-/* 4. ROW HANDLE (TAB BÊN NGOÀI) */
+/* Hiệu ứng kéo thả */
+.drop-zone.drag-over { 
+    background-color: rgba(59, 130, 246, 0.1) !important; 
+    border: 2px dashed #3b82f6 !important; 
+    border-radius: 4px;
+    z-index: 10;
+}
+
+/* --- TRẠNG THÁI RỖNG (UX) --- */
+.drop-zone.is-empty {
+    flex: 1 1 0% !important; 
+    min-width: 100px !important;
+    border: 1px dashed #e5e7eb;
+    justify-content: center;
+}
+.drop-zone.is-empty::after {
+    content: attr(data-label);
+    color: #d1d5db; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; pointer-events: none;
+}
+.empty-placeholder { display: none !important; }
+
+/* --- CẤU HÌNH CỘT (KHI CÓ DATA) --- */
+/* Left/Right: Co khít */
+.drop-zone:not(.is-empty)[data-zone*="left"], 
+.drop-zone:not(.is-empty)[data-zone*="right"] {
+    flex: 0 0 auto !important; 
+    width: auto !important;
+    border-color: transparent;
+}
+/* Center: Dãn hết cỡ */
+.drop-zone:not(.is-empty)[data-zone*="center"] {
+    flex: 1 1 auto !important; 
+    width: auto !important;
+    justify-content: center;
+    border-color: transparent;
+}
+
+/* 4. ELEMENTS (PHẦN TỬ) */
+.builder-element { 
+    max-width: 100%; 
+    display: flex; 
+    align-items: center; 
+    position: relative; 
+    cursor: grab; 
+    border: 1px solid transparent;
+    width: auto; /* Mặc định width auto */
+}
+.builder-element:active { cursor: grabbing; }
+
+/* FIX LOGO QUAN TRỌNG: Ảnh luôn dãn 100% theo wrapper cha */
+/* Điều này giúp khi bạn kéo thanh trượt Width của wrapper, ảnh logo sẽ to theo */
+.builder-element img { 
+    width: 100% !important;  /* Bắt buộc chiếm hết width của thẻ cha */
+    height: auto !important; 
+    object-fit: contain; 
+    display: block; 
+}
+
+/* FIX SEARCH BOX Ở CENTER: Luôn Full Width */
+.drop-zone[data-zone*="center"] .builder-element[data-class*="Search"] { 
+    width: 100% !important; 
+    flex: 1;
+}
+.drop-zone[data-zone*="center"] .builder-element[data-class*="Search"] form { 
+    width: 100% !important; 
+    max-width: 100% !important; 
+}
+
+/* Các trạng thái khác */
+.builder-element.dragging { opacity: 0.4; border: 1px dashed #3b82f6; }
+.builder-row.is-hidden { opacity: 0.5; filter: grayscale(100%); background: repeating-linear-gradient(45deg, #f3f4f6, #f3f4f6 10px, #fff 10px, #fff 20px); }
+
+/* Nút xóa (X) */
+.btn-delete { display: none; }
+.builder-element:hover .btn-delete { display: flex; }
+
+/* 5. ROW HANDLES (Nút Cài đặt Row) */
 .row-handle {
-    position: absolute;
-    left: -120px;
-    top: 0;
-    bottom: 0;
-    width: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 10px;
-    opacity: 0; 
-    transition: all 0.2s ease;
-    pointer-events: none;
-    z-index: 50;
+    position: absolute; left: -36px; top: 0; bottom: 0; width: 36px;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: all 0.2s ease; pointer-events: none; z-index: 50;
 }
 .builder-row:hover .row-handle, .row-handle:hover { opacity: 1; pointer-events: auto; }
-
 .handle-btn {
-    background-color: #3b82f6;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 4px 0 0 4px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transform: translateX(5px);
-    transition: transform 0.2s;
+    background-color: #3b82f6; color: white; width: 28px; height: 28px;
+    border-radius: 4px; font-size: 0; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transform: translateX(5px); transition: all 0.2s; position: relative;
 }
-.builder-row:hover .handle-btn { transform: translateX(0); }
+.handle-btn i { font-size: 16px; }
 .handle-btn:hover { background-color: #2563eb; }
-
-/* Active State */
-.is-selected { outline: 2px solid #6366f1 !important; outline-offset: -2px; z-index: 100; }
 .builder-row.is-selected .row-handle { opacity: 1; }
-.builder-row.is-selected .handle-btn { background-color: #4f46e5; font-weight: bold; }
-/* --- FIX LAYOUT CONTAINER --- */
-.hb-inner-content {
-    width: 100%; /* Bắt buộc chiếm hết chiều ngang */
-    margin-left: auto;
-    margin-right: auto;
-    display: flex; /* Giữ cấu trúc chia cột */
-    align-items: stretch;
-}
+.builder-row.is-selected .handle-btn { background-color: #4f46e5; }
+.is-selected { outline: 2px solid #6366f1 !important; outline-offset: -2px; z-index: 100; }
