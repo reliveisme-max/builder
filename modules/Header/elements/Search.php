@@ -16,17 +16,22 @@ class Search extends Block
         $placeholder = $settings['text'] ?? 'Bạn tìm gì...';
         $bg = $settings['background-color'] ?? '#f3f4f6';
         $color = $settings['color'] ?? '#333333';
-        $radius = $settings['border-radius'] ?? '20';
-        $width = $settings['width'] ?? '100';
+        $radius = $settings['border-radius'] ?? '20px';
+        if (is_numeric($radius)) $radius .= 'px';
 
-        // Class search-box dùng để JS target vào
+        $width = $settings['width'] ?? '100%';
+        if (is_numeric($width) && $width <= 100) $width .= '%';
+
         return "
-            <div class='search-box relative flex items-center h-9' style='width: {$width}%; background-color: {$bg}; border-radius: {$radius}px;'>
-                <input type='text' placeholder='{$placeholder}' class='w-full h-full px-4 border-0 outline-none bg-transparent text-xs' style='color: {$color};'>
-                <button class='px-3 h-full flex items-center justify-center opacity-60 hover:opacity-100 cursor-pointer border-0 bg-transparent' style='color: {$color};'>
+            <form action='search.php' method='GET' class='search-box relative flex items-center h-9' 
+                  style='width: {$width}; min-width: 200px; background-color: {$bg}; border-radius: {$radius};'>
+                <input type='text' name='q' placeholder='{$placeholder}' 
+                       class='w-full h-full px-4 border-0 outline-none bg-transparent text-xs' 
+                       style='color: {$color};'>
+                <button type='submit' class='px-3 h-full flex items-center justify-center opacity-60 hover:opacity-100 cursor-pointer border-0 bg-transparent' style='color: {$color};'>
                     <i class='ph ph-magnifying-glass text-lg'></i>
                 </button>
-            </div>
+            </form>
         ";
     }
 

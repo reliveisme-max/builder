@@ -16,11 +16,16 @@ class Button extends Block
         $text = $settings['text'] ?? 'Button';
         $bg = $settings['background-color'] ?? '#2563eb';
         $color = $settings['color'] ?? '#ffffff';
-        $radius = $settings['border-radius'] ?? '4';
-        $padX = $settings['padding-x'] ?? '16';
+        $radius = $settings['border-radius'] ?? '4px';
+        if (is_numeric($radius)) $radius .= 'px';
+
+        $padL = $settings['padding-left'] ?? '16px';
+        $padR = $settings['padding-right'] ?? '16px';
+        if (is_numeric($padL)) $padL .= 'px';
+        if (is_numeric($padR)) $padR .= 'px';
 
         return "<a href='#' class='inner-box flex items-center justify-center py-2 text-xs font-bold whitespace-nowrap transition hover:opacity-90' 
-                style='background-color: {$bg}; color: {$color}; border-radius: {$radius}px; padding-left: {$padX}px; padding-right: {$padX}px; text-decoration: none;'>
+                style='background-color: {$bg}; color: {$color}; border-radius: {$radius}; padding-left: {$padL}; padding-right: {$padR}; text-decoration: none;'>
                 {$text}
             </a>";
     }
