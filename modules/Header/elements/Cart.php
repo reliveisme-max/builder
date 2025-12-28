@@ -13,15 +13,15 @@ class Cart extends Block
 
     public function render($settings = [])
     {
-        $layout = $settings['layout'] ?? 'icon'; // icon, icon_price, icon_label
+        $layout = $settings['layout'] ?? 'icon';
         $iconType = $settings['icon_type'] ?? 'ph-shopping-cart';
         $color = $settings['color'] ?? 'inherit';
-        $size = $settings['font-size'] ?? '24';
 
-        // Demo Data
+        // FIX
+        $size = intval($settings['font-size'] ?? '24');
+
         $price = '1.250.000₫';
         $count = '3';
-
         $extraHtml = '';
         if ($layout === 'icon_price') $extraHtml = "<span class='text-xs font-bold ml-2'>{$price}</span>";
         if ($layout === 'icon_label') $extraHtml = "<span class='text-xs font-bold ml-2'>Giỏ hàng</span>";
@@ -36,7 +36,6 @@ class Cart extends Block
             </a>
         ";
     }
-
     public function getForm()
     {
         return '

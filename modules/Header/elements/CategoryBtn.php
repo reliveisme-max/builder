@@ -17,7 +17,9 @@ class CategoryBtn extends Block
         $icon = $settings['icon_class'] ?? 'ph-list';
         $bg = $settings['background-color'] ?? '#f3f4f6';
         $color = $settings['color'] ?? '#333333';
-        $radius = $settings['border-radius'] ?? '4';
+
+        // FIX
+        $radius = intval($settings['border-radius'] ?? '4');
 
         return "
             <div class='inner-box flex items-center gap-2 px-4 py-2 cursor-pointer hover:opacity-90 transition' 
@@ -28,7 +30,6 @@ class CategoryBtn extends Block
             </div>
         ";
     }
-
     public function getForm()
     {
         return '

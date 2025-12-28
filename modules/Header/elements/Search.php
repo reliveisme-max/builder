@@ -13,17 +13,19 @@ class Search extends Block
 
     public function render($settings = [])
     {
-        $layout = $settings['layout'] ?? 'form'; // form, icon
+        $layout = $settings['layout'] ?? 'form';
         $placeholder = $settings['text'] ?? 'Tìm kiếm...';
         $bg = $settings['background-color'] ?? '#f3f4f6';
         $color = $settings['color'] ?? '#333333';
-        $radius = $settings['border-radius'] ?? '20px';
-        if (is_numeric($radius)) $radius .= 'px';
-        $width = $settings['width'] ?? '100%';
-        if (is_numeric($width)) $width .= '%';
 
-        // Style Border
-        $borderW = $settings['border-width'] ?? '0';
+        // FIX: intval cho radius
+        $radius = intval($settings['border-radius'] ?? '20');
+
+        // FIX: Width thông minh (nếu lưu là 100% hoặc 200px)
+        $rawWidth = $settings['width'] ?? '100';
+        $width = (strpos($rawWidth, '%') !== false || strpos($rawWidth, 'px') !== false) ? $rawWidth : $rawWidth . '%';
+
+        $borderW = intval($settings['border-width'] ?? '0');
         $borderColor = $settings['border-color'] ?? 'transparent';
         $borderStyle = "border: {$borderW}px solid {$borderColor};";
 
@@ -33,7 +35,7 @@ class Search extends Block
 
         return "
             <form action='/search' class='search-box relative flex items-center h-9' 
-                  style='width: {$width}; min-width: 200px; background-color: {$bg}; border-radius: {$radius}; {$borderStyle}'>
+                  style='width: {$width}; min-width: 200px; background-color: {$bg}; border-radius: {$radius}px; {$borderStyle}'>
                 <input type='text' placeholder='{$placeholder}' class='w-full h-full px-4 border-0 outline-none bg-transparent text-xs' style='color: {$color};'>
                 <button type='submit' class='px-3 h-full flex items-center justify-center opacity-60 hover:opacity-100 border-0 bg-transparent' style='color: {$color};'>
                     <i class='ph ph-magnifying-glass text-lg'></i>

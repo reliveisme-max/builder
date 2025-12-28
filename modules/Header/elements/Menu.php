@@ -19,11 +19,13 @@ class Menu extends Block
         if (!is_array($items)) $items = [];
 
         $color = $settings['color'] ?? 'inherit';
-        $size = $settings['font-size'] ?? '14';
-        $gap = $settings['gap'] ?? '24';
-        $transform = $settings['text-transform'] ?? 'none';
 
-        $hoverClass = "hover:text-blue-600"; // Mặc định
+        // FIX: intval xử lý đơn vị
+        $size = intval($settings['font-size'] ?? '14');
+        $gap = intval($settings['gap'] ?? '24');
+
+        $transform = $settings['text-transform'] ?? 'none';
+        $hoverClass = "hover:text-blue-600";
         if (($settings['hover_style'] ?? '') === 'underline') $hoverClass = "hover:underline underline-offset-4";
 
         $html = '';
@@ -37,6 +39,7 @@ class Menu extends Block
                 {$html}
             </nav>";
     }
+
 
     public function getForm()
     {

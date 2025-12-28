@@ -15,16 +15,15 @@ class Button extends Block
     {
         $text = $settings['text'] ?? 'Button';
         $href = $settings['href'] ?? '#';
-
         $bg = $settings['background-color'] ?? '#2563eb';
         $color = $settings['color'] ?? '#ffffff';
-
-        // Hover Colors (Lưu vào data attribute để JS xử lý)
         $hBg = $settings['hover_bg'] ?? '#1d4ed8';
         $hColor = $settings['hover_color'] ?? '#ffffff';
 
-        $radius = $settings['border-radius'] ?? '4';
-        $borderW = $settings['border-width'] ?? '0';
+        // FIX: intval
+        $radius = intval($settings['border-radius'] ?? '4');
+        $borderW = intval($settings['border-width'] ?? '0');
+
         $borderColor = $settings['border-color'] ?? 'transparent';
 
         return "<a href='{$href}' class='inner-box flex items-center justify-center py-2 px-4 text-xs font-bold transition duration-200' 

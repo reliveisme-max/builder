@@ -15,7 +15,10 @@ class Text extends Block
     {
         $content = $settings['text_content'] ?? 'Nội dung...';
         $color = $settings['color'] ?? 'inherit';
-        $size = $settings['font-size'] ?? '14';
+
+        // FIX
+        $size = intval($settings['font-size'] ?? '14');
+
         $weight = $settings['font-weight'] ?? '400';
         $align = $settings['text-align'] ?? 'left';
 
