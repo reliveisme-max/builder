@@ -17,11 +17,12 @@ class Text extends Block
 
     public function render($settings = [])
     {
-        return '
-            <div class="text-sm text-gray-600 hover:text-blue-600 cursor-pointer whitespace-nowrap">
-                <span class="font-bold">Hotline:</span> 1800 6601
-            </div>
-        ';
+        // FIX: Lấy text động
+        $content = $settings['text'] ?? '<span class="font-bold">Hotline:</span> 1800 6601';
+
+        return "<div class='text-sm pointer-events-none whitespace-nowrap text-content'>
+                    {$content}
+                </div>";
     }
 
     public function getForm()
@@ -30,10 +31,11 @@ class Text extends Block
             <div class="space-y-3">
                 <div>
                     <label class="text-xs text-gray-400 block mb-1">Nội dung</label>
-                    <input type="text" value="Hotline: 1800 6601" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs">
+                    <input type="text" value="Hotline: 1800 6601" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs"
+                           oninput="window.activeElement.querySelector(\'.text-content\').innerHTML = this.value">
                 </div>
                 <div>
-                    <label class="text-xs text-gray-400 block mb-1">Cỡ chữ (px)</label>
+                    <label class="text-xs text-gray-400 block mb-1">Cỡ chữ</label>
                     <input type="number" data-style="font-size" value="14" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs">
                 </div>
                  <div>
