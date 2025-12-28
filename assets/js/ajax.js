@@ -1,25 +1,25 @@
 // assets/js/ajax.js
 document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('btn-save');
-    if (!saveBtn) return;
+    if (!saveBtn) { console.error("Lỗi: Không tìm thấy nút Save"); return; }
 
     saveBtn.addEventListener('click', function() {
         const btn = this;
         const originalText = btn.innerHTML;
         
-        // 1. Loading
+        // 1. Loading UI
         btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Saving...';
         btn.disabled = true;
         btn.classList.add('opacity-75');
 
-        // 2. QUÉT DỮ LIỆU
+        // 2. SCAN CANVAS -> JSON
         const structure = [];
         const rows = document.querySelectorAll('#canvas-frame .builder-row');
 
         rows.forEach(row => {
             const rowData = {
                 label: row.getAttribute('data-label'),
-                style: row.getAttribute('style') || '', // Lưu màu nền, height Row
+                style: row.getAttribute('style') || '', 
                 columns: {}
             };
 
@@ -29,29 +29,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 const elements = [];
 
                 zone.querySelectorAll('.builder-element').forEach(el => {
-                    // Lấy style inline (Width, Color, Font...)
+                    // Lấy Style inline
                     let style = el.getAttribute('style') || '';
                     
-                    // Lấy nội dung đặc biệt (Content)
+                    // Lấy Nội dung (Content)
                     const content = {};
-                    
-                    // 1. Lấy SRC ảnh (Logo)
+                    const cls = el.getAttribute('data-class');
+
+                    // A. Lấy Link Ảnh (Logo)
                     const img = el.querySelector('img');
                     if (img) content.src = img.src;
 
-                    // 2. Lấy Text (Button, Text HTML)
-                    const textNode = el.querySelector('.text-content, button, a, span.font-bold');
-                    if (textNode && !el.dataset.class.includes('Menu')) { 
-                        // Trừ Menu ra vì Menu ko lưu text kiểu này
-                        content.text = textNode.innerText;
+                    // B. Lấy Text (Button, Text HTML) - Trừ Menu ra
+                    if (!cls.includes('Menu')) {
+                        const textNode = el.querySelector('.text-content, button, a');
+                        if (textNode) content.text = textNode.innerText;
+                        
+                        const inputNode = el.querySelector('input');
+                        if (inputNode) content.text = inputNode.placeholder;
                     }
 
-                    // 3. Lấy href (Nếu có link)
-                    const link = el.querySelector('a');
-                    if (link) content.href = link.getAttribute('href');
-
                     elements.push({
-                        class: el.getAttribute('data-class'),
+                        class: cls,
                         style: style,
                         content: content
                     });
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             structure.push(rowData);
         });
 
-        // 3. GỬI VỀ SERVER
+        // 3. SEND API
         fetch('api/save.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -74,12 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.status === 'success') {
                 btn.innerHTML = '<i class="ph ph-check"></i> Saved!';
                 btn.classList.replace('bg-[#111827]', 'bg-green-600');
+                btn.classList.replace('bg-indigo-600', 'bg-green-600');
+                
                 setTimeout(() => {
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                     btn.classList.replace('bg-green-600', 'bg-[#111827]');
                     btn.classList.remove('opacity-75');
-                }, 1500);
+                }, 2000);
             } else {
                 alert('Lỗi: ' + data.message);
                 resetBtn(btn, originalText);
@@ -87,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(err => {
             console.error(err);
-            alert('Lỗi kết nối Server!');
+            alert('Lỗi kết nối server!');
             resetBtn(btn, originalText);
         });
     });

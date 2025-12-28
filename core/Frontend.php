@@ -8,7 +8,6 @@ class Frontend
 {
     public static function renderHeader()
     {
-        // ... (Đoạn kết nối DB giữ nguyên) ...
         try {
             $db = Database::getInstance()->getConnection();
             $stmt = $db->prepare("SELECT data_json FROM settings WHERE section_key = 'header'");
@@ -78,19 +77,16 @@ class Frontend
     private static function renderElement($item)
     {
         $className = $item['class'];
-        // Lấy style đã lưu (ví dụ: width: 200px; color: red;)
         $style = $item['style'] ?? '';
-        // Lấy content (src, text...)
+        // Lấy content (text, src) từ JSON
         $content = $item['content'] ?? [];
 
         if (class_exists($className)) {
             $element = new $className();
 
-            // QUAN TRỌNG: Truyền content vào hàm render của Element
+            // TRUYỀN CONTENT VÀO HÀM RENDER
             $rawHtml = $element->render($content);
 
-            // Bọc wrapper và áp dụng style vào wrapper này
-            // display:flex để nội dung bên trong ăn theo align-items
             return "<div class='header-item-wrapper flex items-center' style='{$style}'>{$rawHtml}</div>";
         }
         return "";

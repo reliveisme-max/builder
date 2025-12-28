@@ -124,32 +124,61 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
+    // assets/js/builder.js - Hàm initLiveEdit Cập nhật
     function initLiveEdit() {
         const inputs = propertyPanel.querySelectorAll('.prop-input');
+        
         inputs.forEach(input => {
             input.addEventListener('input', function() {
                 if (!window.activeElement) return;
+
                 const styleType = this.dataset.style; 
                 const value = this.value;
                 
+                // Xác định đối tượng target
                 let target = window.activeElement;
                 if (!window.activeElement.classList.contains('builder-row')) {
                     target = window.activeElement.querySelector('nav, input, img, button, .text-content') || window.activeElement;
                 }
 
                 switch (styleType) {
+                    // --- 1. XỬ LÝ NỘI DUNG CHỮ (FIX LỖI updateText) ---
+                    case 'text':
+                        // Nếu là Button hoặc Link
+                        const btn = window.activeElement.querySelector('a, button');
+                        if (btn) { 
+                            btn.innerText = value; 
+                        }
+                        
+                        // Nếu là Text/Hotline (cho phép HTML)
+                        const txt = window.activeElement.querySelector('.text-content');
+                        if (txt) { 
+                            txt.innerHTML = value; 
+                        }
+
+                        // Nếu là Search Box (Placeholder)
+                        const inp = window.activeElement.querySelector('input');
+                        if (inp) { 
+                            inp.placeholder = value; 
+                        }
+                        break;
+                    // --------------------------------------------------
+
                     case 'src':
                         const img = window.activeElement.querySelector('img');
                         if (img) img.src = value;
                         break;
+                    
                     case 'color':
                         target.style.color = value;
                         if(window.activeElement.classList.contains('builder-row')) {
                              window.activeElement.querySelectorAll('.empty-placeholder').forEach(el => el.style.color = value);
+                             window.activeElement.querySelectorAll('i, span').forEach(el => el.style.color = value);
                         } else {
                              target.querySelectorAll('a, i, span').forEach(el => el.style.color = value);
                         }
                         break;
+                    
                     case 'background-color':
                          if(window.activeElement.classList.contains('builder-row')) {
                              window.activeElement.style.backgroundColor = value;
@@ -158,9 +187,11 @@ document.addEventListener('DOMContentLoaded', () => {
                              bgTarget.style.backgroundColor = value;
                          }
                          break;
+
                     case 'font-size': target.style.fontSize = value + 'px'; break;
                     case 'font-weight': target.style.fontWeight = value; break;
                     case 'text-transform': target.style.textTransform = value; break;
+                    
                     case 'border-radius':
                         const radTarget = window.activeElement.querySelector('input, button, div') || window.activeElement;
                         radTarget.style.borderRadius = value + 'px';
@@ -174,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                          }
                         break;
                     case 'gap': target.style.gap = value + 'px'; break;
+                    
                     case 'justify-content': 
                         if (!window.activeElement.classList.contains('builder-row')) {
                             window.activeElement.style.display = 'flex';
@@ -181,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             window.activeElement.style.justifyContent = value;
                         }
                         break;
+                    
                     case 'min-height': window.activeElement.style.minHeight = value + 'px'; break;
                     case 'border-bottom-color': window.activeElement.style.borderBottomColor = value; break;
                     case 'border-bottom-width': 
