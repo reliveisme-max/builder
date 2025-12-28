@@ -27,19 +27,20 @@ class Frontend
             if (!isset($rowData['columns'])) continue;
 
             $style = $rowData['style'] ?? '';
-            // Xử lý sticky
+            // Fix sticky
             if (strpos($style, 'sticky') !== false && strpos($style, 'top:') === false) {
                 $style .= '; top: 0;';
             }
 
-            // --- FIX 1: Xóa 'py-2' để chiều cao chuẩn theo Builder ---
-            // Thêm 'overflow-hidden' để tránh content lồi ra làm vỡ khung
-            echo "<div class='header-row relative border-b border-transparent flex items-center overflow-hidden' style='{$style}'>";
+            // ROW: Flex để căn giữa dọc
+            echo "<div class='header-row relative border-b border-transparent flex items-center' style='{$style}'>";
 
-            echo "<div class='container mx-auto px-4 w-full h-full'>"; // Thêm h-full
-            echo "<div class='flex items-center justify-between w-full h-full'>"; // Thêm h-full
+            // CONTAINER: Thêm h-full để nó cao bằng Row
+            echo "<div class='container mx-auto px-4 w-full h-full'>";
 
-            // Render Zones
+            // INNER WRAPPER: Thêm h-full để nó cao bằng Container
+            echo "<div class='flex items-center justify-between w-full h-full'>";
+
             echo self::renderZone($rowData['columns'], 'left');
             echo self::renderZone($rowData['columns'], 'center');
             echo self::renderZone($rowData['columns'], 'right');
@@ -60,23 +61,17 @@ class Frontend
         }
 
         $justify = 'justify-start';
-        // --- FIX 2: Đồng bộ tỷ lệ cột với Builder ---
-        // Trong Builder: Topbar là flex-1 đều. Main Header là Logo fix, Center flex-2.
-        // Ở đây ta để logic linh hoạt:
         $flex = 'flex-1';
-
         if ($position === 'center') {
             $justify = 'justify-center';
-            // Nếu là Main Header (thường chứa Search), cho rộng hơn
-            // Logic tạm: Nếu có nhiều element thì flex-grow
-            if (count($targetData) > 0) $flex = 'flex-[2]';
+            $flex = 'flex-[2]';
         }
         if ($position === 'right') {
             $justify = 'justify-end';
         }
 
-        // Thêm 'h-full' để cột cao bằng dòng
-        echo "<div class='header-col {$flex} flex items-center gap-4 {$justify} h-full'>";
+        // COLUMN: Thêm h-full để nó cao bằng cha, giúp căn giữa (items-center) hoạt động chuẩn
+        echo "<div class='header-col {$flex} flex items-center gap-6 {$justify} h-full'>";
 
         if (!empty($targetData)) {
             foreach ($targetData as $item) {
@@ -101,14 +96,12 @@ class Frontend
         $html = $element->render($mergedSettings);
 
         $wrapperStyle = "";
-        // Logo cần width wrapper, nhưng chiều cao phải auto để không vỡ dòng
         if (isset($styles['width']) && strpos($className, 'Logo') !== false) {
             $wrapperStyle .= "width: {$styles['width']};";
         }
 
-        // --- FIX 3: Wrapper ảnh hưởng chiều cao ---
-        // Thêm max-height: 100% để phần tử con không cao hơn dòng cha
-        return "<div class='header-item-wrapper flex items-center' style='{$wrapperStyle}; max-height: 100%;'>{$html}</div>";
+        // WRAPPER ELEMENT: h-full để nội dung bên trong có thể căn chỉnh theo chiều cao dòng
+        return "<div class='header-item-wrapper flex items-center h-full' style='{$wrapperStyle}'>{$html}</div>";
     }
 
     private static function parseStyleString($str)

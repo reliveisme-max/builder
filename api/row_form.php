@@ -44,9 +44,13 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
         <div>
             <label class="text-xs text-gray-400 block mb-1">Chiều cao tối thiểu (Min Height)</label>
             <div class="flex items-center gap-2">
-                <input type="range" data-style="min-height" min="30" max="150" value="50"
-                    class="prop-input flex-1 accent-indigo-500">
-                <span class="text-xs text-gray-500 w-8 text-right">px</span>
+                <!-- Đã thêm ID và sự kiện oninput -->
+                <input type="range" id="input-height" data-style="min-height" min="30" max="150" value="50"
+                    class="prop-input flex-1 accent-indigo-500"
+                    oninput="document.getElementById('display-height').innerText = this.value + 'px'">
+
+                <!-- Đã thêm ID display-height -->
+                <span id="display-height" class="text-xs text-gray-500 w-8 text-right">50px</span>
             </div>
         </div>
 
@@ -74,7 +78,7 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 
         <div class="flex items-center justify-between bg-gray-800 p-2 rounded border border-gray-700">
             <label class="text-xs text-gray-300">Sticky (Ghim khi cuộn)</label>
-            <input type="checkbox" onchange="toggleSticky(this)"
+            <input type="checkbox" id="chk-sticky" onchange="toggleSticky(this)"
                 class="w-4 h-4 rounded bg-gray-700 border-gray-600 accent-indigo-500 cursor-pointer">
         </div>
 
@@ -92,7 +96,7 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
 </div>
 
 <script>
-    // Hàm xử lý Sticky riêng biệt
+    // 1. Hàm xử lý Sticky
     function toggleSticky(cb) {
         if (!window.activeElement) return;
         if (cb.checked) {
@@ -104,4 +108,28 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
             window.activeElement.style.top = 'auto';
         }
     }
+
+    // 2. Tự động lấy giá trị hiện tại của Row đưa vào Form
+    (function syncCurrentValues() {
+        if (!window.activeElement) return;
+
+        const style = window.getComputedStyle(window.activeElement);
+
+        // Sync Height
+        const h = parseInt(style.minHeight);
+        if (!isNaN(h)) {
+            const range = document.getElementById('input-height');
+            const display = document.getElementById('display-height');
+            if (range && display) {
+                range.value = h;
+                display.innerText = h + 'px';
+            }
+        }
+
+        // Sync Sticky Checkbox
+        const pos = style.position;
+        if (pos === 'sticky') {
+            document.getElementById('chk-sticky').checked = true;
+        }
+    })();
 </script>

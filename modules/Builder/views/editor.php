@@ -5,12 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relive Builder</title>
-
-    <!-- Resources -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <!-- Link CSS gốc -->
     <link rel="stylesheet" href="assets/css/builder.css">
 
     <style>
@@ -18,7 +15,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* --- 1. GENERAL UI --- */
         .workspace-bg {
             background-color: #f3f4f6;
         }
@@ -37,32 +33,28 @@
             background: transparent;
         }
 
-        /* --- 2. DROP ZONES --- */
+        /* --- UI BUILDER --- */
         .drop-zone {
             transition: all 0.2s ease;
             position: relative;
             min-height: 100%;
         }
 
-        /* Viền mặc định mờ */
         .drop-zone:empty,
         .drop-zone:has(.empty-placeholder) {
             border: 1px dashed #e5e7eb;
         }
 
-        /* Hover vào dòng thì hiện viền cột rõ hơn */
         .builder-row:hover .drop-zone:empty {
             border-color: #d1d5db;
         }
 
-        /* Khi kéo item đè lên: Sáng màu */
         .drop-zone.drag-over {
             background-color: #eff6ff !important;
             border: 1px dashed #3b82f6 !important;
             z-index: 10;
         }
 
-        /* --- 3. PLACEHOLDER --- */
         .empty-placeholder {
             color: #9ca3af;
             font-size: 11px;
@@ -83,25 +75,25 @@
             color: #d1d5db;
         }
 
-        /* --- 4. ROW HANDLE (TAB BÊN NGOÀI - GIỮ LẠI CÁI NÀY) --- */
+        /* --- FIX: HANDLE NÚT CÀI ĐẶT (Gọn lại để không bị che) --- */
         .row-handle {
             position: absolute;
-            left: -120px;
-            /* Đẩy hẳn ra ngoài */
+            left: -36px;
+            /* Thu gọn khoảng cách */
             top: 0;
             bottom: 0;
-            width: 120px;
+            width: 36px;
+            /* Thu nhỏ vùng hover */
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            padding-right: 10px;
+            justify-content: center;
+            /* Căn giữa icon */
             opacity: 0;
             transition: all 0.2s ease;
             pointer-events: none;
             z-index: 50;
         }
 
-        /* Hiện khi hover vào dòng hoặc hover vào chính nó */
         .builder-row:hover .row-handle,
         .row-handle:hover {
             opacity: 1;
@@ -111,20 +103,49 @@
         .handle-btn {
             background-color: #3b82f6;
             color: white;
-            padding: 4px 10px;
-            border-radius: 4px 0 0 4px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            /* Bo tròn đều */
+            font-size: 0;
+            /* Ẩn chữ đi cho gọn */
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
             transform: translateX(5px);
-            /* Hiệu ứng trượt */
-            transition: transform 0.2s;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        /* Hiển thị Icon */
+        .handle-btn i {
+            font-size: 16px;
+        }
+
+        /* Tooltip tên dòng khi hover */
+        .handle-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            margin-left: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 60;
+        }
+
+        .handle-btn:hover::after {
+            opacity: 1;
         }
 
         .builder-row:hover .handle-btn {
@@ -135,14 +156,12 @@
             background-color: #2563eb;
         }
 
-        /* Active State */
         .builder-row.is-selected .row-handle {
             opacity: 1;
         }
 
         .builder-row.is-selected .handle-btn {
             background-color: #4f46e5;
-            font-weight: bold;
         }
     </style>
 </head>
@@ -156,7 +175,6 @@
             class="h-14 border-b border-gray-800 flex items-center px-4 font-semibold text-white tracking-wide shadow-sm">
             <i class="ph ph-cube text-xl mr-2 text-indigo-500"></i> Components
         </div>
-
         <div class="flex-1 overflow-y-auto p-4 space-y-6">
             <div>
                 <div class="text-[10px] font-bold text-gray-500 uppercase mb-3 tracking-widest">Blocks</div>
@@ -183,7 +201,6 @@
 
     <!-- CENTER WORKSPACE -->
     <main class="flex-1 flex flex-col min-w-0 bg-[#f3f4f6]">
-
         <!-- Toolbar -->
         <header class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-20">
             <div class="flex items-center gap-2">
@@ -193,14 +210,20 @@
             <div class="flex items-center gap-3">
                 <div class="bg-gray-100 rounded-lg p-1 flex gap-1 border border-gray-200">
                     <button
-                        class="w-8 h-8 rounded-md bg-white text-gray-800 shadow-sm flex items-center justify-center border border-gray-200"><i
-                            class="ph ph-desktop"></i></button>
+                        class="view-mode-btn w-8 h-8 rounded-md bg-white text-gray-800 shadow-sm flex items-center justify-center border border-gray-200 transition"
+                        data-mode="desktop">
+                        <i class="ph ph-desktop"></i>
+                    </button>
                     <button
-                        class="w-8 h-8 rounded-md hover:bg-white text-gray-500 hover:text-gray-800 transition flex items-center justify-center"><i
-                            class="ph ph-device-tablet"></i></button>
+                        class="view-mode-btn w-8 h-8 rounded-md text-gray-500 hover:text-gray-800 flex items-center justify-center border border-transparent transition"
+                        data-mode="tablet">
+                        <i class="ph ph-device-tablet"></i>
+                    </button>
                     <button
-                        class="w-8 h-8 rounded-md hover:bg-white text-gray-500 hover:text-gray-800 transition flex items-center justify-center"><i
-                            class="ph ph-device-mobile"></i></button>
+                        class="view-mode-btn w-8 h-8 rounded-md text-gray-500 hover:text-gray-800 flex items-center justify-center border border-transparent transition"
+                        data-mode="mobile">
+                        <i class="ph ph-device-mobile"></i>
+                    </button>
                 </div>
 
                 <div class="w-px h-6 bg-gray-300 mx-2"></div>
@@ -215,17 +238,17 @@
         <!-- Canvas Area -->
         <div class="flex-1 overflow-auto p-8 flex justify-center workspace-bg relative">
 
-            <!-- CANVAS FRAME -->
+            <!-- FIX: Thêm ml-10 để đẩy khung sang phải 40px, chừa chỗ cho nút cài đặt -->
             <div id="canvas-frame"
-                class="w-full max-w-[1200px] flex flex-col min-h-[800px] transition-all duration-300">
+                class="w-full max-w-[100%] ml-10 flex flex-col min-h-[800px] transition-all duration-300 ease-in-out">
 
                 <!-- Browser Mockup -->
                 <div
                     class="h-9 bg-[#e5e7eb] rounded-t-lg border border-b-0 border-[#d1d5db] flex items-center px-4 gap-2 select-none sticky top-0 z-30 shadow-sm">
                     <div class="flex gap-1.5">
-                        <div class="w-3 h-3 rounded-full bg-[#ef4444] border border-[#dc2626]/20"></div>
-                        <div class="w-3 h-3 rounded-full bg-[#eab308] border border-[#ca8a04]/20"></div>
-                        <div class="w-3 h-3 rounded-full bg-[#22c55e] border border-[#16a34a]/20"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#ef4444]"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#eab308]"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#22c55e]"></div>
                     </div>
                     <div
                         class="ml-4 flex-1 max-w-[400px] bg-white h-6 rounded text-[10px] flex items-center px-3 text-gray-400 border border-gray-300 shadow-sm">
@@ -236,16 +259,13 @@
                 <!-- MAIN CONTENT CONTAINER -->
                 <div
                     class="bg-white shadow-2xl rounded-b-lg overflow-visible border border-[#d1d5db] flex-1 flex flex-col relative">
-
                     <!-- 1. TOP BAR -->
                     <div class="builder-row group min-h-[40px] bg-[#f8f9fa] flex items-stretch border-b border-gray-100 relative"
                         data-label="Top Bar">
-                        <!-- Handle (Tab trái) -->
                         <div class="row-handle">
-                            <div class="handle-btn"><i class="ph ph-gear-six"></i> Top Bar</div>
+                            <!-- Handle gọn gàng có tooltip -->
+                            <div class="handle-btn" data-tooltip="Top Bar"><i class="ph ph-gear-six"></i></div>
                         </div>
-
-                        <!-- Drop Zones -->
                         <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
                             data-zone="top_left">
                             <div class="empty-placeholder">Left</div>
@@ -262,12 +282,9 @@
                     <!-- 2. MAIN HEADER -->
                     <div class="builder-row group min-h-[90px] bg-white flex items-stretch border-b border-gray-100 shadow-sm z-10 relative"
                         data-label="Main Header">
-                        <!-- Handle (Tab trái) -->
                         <div class="row-handle">
-                            <div class="handle-btn"><i class="ph ph-gear-six"></i> Main Header</div>
+                            <div class="handle-btn" data-tooltip="Main Header"><i class="ph ph-gear-six"></i></div>
                         </div>
-
-                        <!-- Drop Zones -->
                         <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
                             data-zone="main_left">
                             <div class="empty-placeholder">Logo</div>
@@ -284,12 +301,9 @@
                     <!-- 3. BOTTOM HEADER -->
                     <div class="builder-row group min-h-[50px] bg-white flex items-stretch border-b border-gray-100 relative"
                         data-label="Bottom Header">
-                        <!-- Handle (Tab trái) -->
                         <div class="row-handle">
-                            <div class="handle-btn"><i class="ph ph-gear-six"></i> Bottom</div>
+                            <div class="handle-btn" data-tooltip="Bottom Header"><i class="ph ph-gear-six"></i></div>
                         </div>
-
-                        <!-- Drop Zones -->
                         <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
                             data-zone="bottom_left">
                             <div class="empty-placeholder">Left</div>
@@ -315,7 +329,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -331,16 +344,14 @@
         </div>
         <div id="property-panel" class="flex-1 overflow-y-auto p-5">
             <div class="h-full flex flex-col items-center justify-center text-gray-500 space-y-4 opacity-50">
-                <div class="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center">
-                    <i class="ph ph-sliders text-3xl"></i>
-                </div>
+                <div class="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center"><i
+                        class="ph ph-sliders text-3xl"></i></div>
                 <p class="text-xs text-center px-8 leading-5">Select an element on the canvas<br>to edit its properties.
                 </p>
             </div>
         </div>
     </aside>
 
-    <!-- JS -->
     <script>
         window.savedData = <?php echo $savedData ? $savedData : '[]'; ?>;
     </script>

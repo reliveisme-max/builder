@@ -8,71 +8,52 @@ class Menu extends Block
 {
     public function getInfo()
     {
-        return [
-            'name' => 'Main Menu',
-            'icon' => 'ph-list',
-            'group' => 'Navigation'
-        ];
+        return ['name' => 'Main Menu', 'icon' => 'ph-list', 'group' => 'Navigation'];
     }
 
     public function render($settings = [])
     {
-        // Mặc định hiển thị danh sách giả lập
-        return '
-            <nav class="flex items-center gap-6 text-sm font-medium whitespace-nowrap overflow-hidden">
-                <a href="#" class="hover:text-blue-600 transition">Điện thoại</a>
-                <a href="#" class="hover:text-blue-600 transition">Laptop</a>
-                <a href="#" class="hover:text-blue-600 transition">Apple</a>
-                <a href="#" class="hover:text-blue-600 transition">PC - Linh kiện</a>
-                <a href="#" class="hover:text-blue-600 transition">Phụ kiện</a>
-            </nav>
-        ';
+        $defaultJson = json_encode([['text' => 'Trang chủ', 'href' => '/'], ['text' => 'Sản phẩm', 'href' => '/shop']]);
+        $config = $settings['menu_config'] ?? $defaultJson;
+        $items = json_decode($config, true);
+        if (!is_array($items)) $items = [];
+
+        $color = $settings['color'] ?? 'inherit';
+        $size = $settings['font-size'] ?? '14';
+        $gap = $settings['gap'] ?? '24';
+        $transform = $settings['text-transform'] ?? 'none';
+
+        $hoverClass = "hover:text-blue-600"; // Mặc định
+        if (($settings['hover_style'] ?? '') === 'underline') $hoverClass = "hover:underline underline-offset-4";
+
+        $html = '';
+        foreach ($items as $item) {
+            $html .= "<a href='{$item['href']}' class='{$hoverClass} transition px-1'>{$item['text']}</a>";
+        }
+
+        return "<nav class='flex items-center whitespace-nowrap overflow-hidden menu-nav' 
+                 data-menu-config='" . htmlspecialchars($config, ENT_QUOTES, 'UTF-8') . "'
+                 style='color: {$color}; font-size: {$size}px; gap: {$gap}px; text-transform: {$transform}; font-weight: 500;'>
+                {$html}
+            </nav>";
     }
 
     public function getForm()
     {
         return '
             <div class="space-y-4">
-                <!-- Màu sắc & Font -->
+                <label class="text-xs text-gray-400 block font-bold uppercase">Danh sách Menu</label>
+                <div id="menu-items-container" class="space-y-2"></div>
+                <button type="button" id="btn-add-menu" class="w-full py-2 border border-dashed border-gray-600 text-gray-400 text-xs rounded hover:border-gray-400 hover:text-white transition">+ Thêm menu</button>
+                <textarea data-style="menu_config" id="hidden-menu-config" class="prop-input hidden"></textarea>
+                <hr class="border-gray-800">
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Màu chữ</label>
-                        <input type="color" data-style="color" class="prop-input w-full h-8 bg-transparent border border-gray-700 rounded cursor-pointer">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400 block mb-1">Font Size</label>
-                        <input type="number" data-style="font-size" value="14" class="prop-input w-full bg-gray-800 text-white p-1 rounded border border-gray-700 text-xs">
-                    </div>
+                    <div><label class="text-xs text-gray-400 block mb-1">Kiểu chữ</label><select data-style="text-transform" class="prop-input w-full bg-gray-800 text-white p-1 rounded text-xs border border-gray-700"><option value="none">Thường</option><option value="uppercase">IN HOA</option><option value="capitalize">Viết Hoa</option></select></div>
+                    <div><label class="text-xs text-gray-400 block mb-1">Hover</label><select data-style="hover_style" class="prop-input w-full bg-gray-800 text-white p-1 rounded text-xs border border-gray-700"><option value="color">Đổi màu</option><option value="underline">Gạch chân</option></select></div>
                 </div>
-
-                <!-- Typography -->
-                <div class="space-y-2">
-                    <label class="text-xs text-gray-400 font-bold uppercase">Typography</label>
-                    
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-500">Kiểu chữ</span>
-                        <select data-style="text-transform" class="prop-input bg-gray-800 text-white text-xs p-1 rounded border border-gray-700">
-                            <option value="none">Thường</option>
-                            <option value="uppercase">IN HOA</option>
-                            <option value="capitalize">Viết Hoa</option>
-                        </select>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-gray-500">Độ đậm</span>
-                        <select data-style="font-weight" class="prop-input bg-gray-800 text-white text-xs p-1 rounded border border-gray-700">
-                            <option value="400">Normal</option>
-                            <option value="500">Medium</option>
-                            <option value="600">Semi Bold</option>
-                            <option value="700">Bold</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Layout -->
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Khoảng cách (Gap)</label>
-                    <input type="range" data-style="gap" min="10" max="60" value="24" class="prop-input w-full accent-indigo-500">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="text-xs text-gray-400 block mb-1">Màu chữ</label><input type="color" data-style="color" class="prop-input w-full h-8 bg-transparent border border-gray-700 rounded"></div>
+                    <div><label class="text-xs text-gray-400 block mb-1">Size</label><input type="number" data-style="font-size" value="14" class="prop-input w-full bg-gray-800 text-white p-1 rounded border border-gray-700 text-xs"></div>
                 </div>
             </div>
         ';
