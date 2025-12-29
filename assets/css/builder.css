@@ -11,16 +11,16 @@ body { font-family: 'Inter', sans-serif; }
 /* 2. LAYOUT CHÍNH (FLATSOME STYLE) */
 .hb-inner-content { 
     display: flex; 
-    align-items: center; /* Căn giữa chiều dọc */
+    align-items: center; 
     width: 100%; 
     height: 100%; 
     margin: 0 auto; 
     min-height: 50px; 
-    gap: 15px; /* Khoảng cách giữa các cột */
+    gap: 15px; 
     transition: all 0.3s ease;
 }
 
-/* 3. DROP ZONES (CÁC CỘT) */
+/* 3. DROP ZONES */
 .drop-zone { 
     height: 100%; 
     min-height: 50px; 
@@ -31,10 +31,8 @@ body { font-family: 'Inter', sans-serif; }
     border: 1px dashed transparent; 
     min-width: 30px;
     position: relative;
-    gap: 10px; /* Gap giữa các phần tử */
+    gap: 10px;
 }
-
-/* Hiệu ứng kéo thả */
 .drop-zone.drag-over { 
     background-color: rgba(59, 130, 246, 0.1) !important; 
     border: 2px dashed #3b82f6 !important; 
@@ -42,7 +40,7 @@ body { font-family: 'Inter', sans-serif; }
     z-index: 10;
 }
 
-/* --- TRẠNG THÁI RỖNG (UX) --- */
+/* TRẠNG THÁI RỖNG */
 .drop-zone.is-empty {
     flex: 1 1 0% !important; 
     min-width: 100px !important;
@@ -55,15 +53,13 @@ body { font-family: 'Inter', sans-serif; }
 }
 .empty-placeholder { display: none !important; }
 
-/* --- CẤU HÌNH CỘT (KHI CÓ DATA) --- */
-/* Left/Right: Co khít */
+/* CẤU HÌNH CỘT */
 .drop-zone:not(.is-empty)[data-zone*="left"], 
 .drop-zone:not(.is-empty)[data-zone*="right"] {
     flex: 0 0 auto !important; 
     width: auto !important;
     border-color: transparent;
 }
-/* Center: Dãn hết cỡ */
 .drop-zone:not(.is-empty)[data-zone*="center"] {
     flex: 1 1 auto !important; 
     width: auto !important;
@@ -71,7 +67,7 @@ body { font-family: 'Inter', sans-serif; }
     border-color: transparent;
 }
 
-/* 4. ELEMENTS (PHẦN TỬ) */
+/* 4. ELEMENTS */
 .builder-element { 
     max-width: 100%; 
     display: flex; 
@@ -79,38 +75,30 @@ body { font-family: 'Inter', sans-serif; }
     position: relative; 
     cursor: grab; 
     border: 1px solid transparent;
-    width: auto; /* Mặc định width auto */
+    width: auto;
 }
 .builder-element:active { cursor: grabbing; }
-
-/* FIX LOGO QUAN TRỌNG: Ảnh luôn dãn 100% theo wrapper cha */
-/* Điều này giúp khi bạn kéo thanh trượt Width của wrapper, ảnh logo sẽ to theo */
 .builder-element img { 
-    width: 100% !important;  /* Bắt buộc chiếm hết width của thẻ cha */
+    width: 100% !important; 
     height: auto !important; 
     object-fit: contain; 
     display: block; 
 }
 
-/* FIX SEARCH BOX Ở CENTER: Luôn Full Width */
-.drop-zone[data-zone*="center"] .builder-element[data-class*="Search"] { 
-    width: 100% !important; 
-    flex: 1;
-}
-.drop-zone[data-zone*="center"] .builder-element[data-class*="Search"] form { 
-    width: 100% !important; 
-    max-width: 100% !important; 
-}
+/* FIX SEARCH BOX */
+.drop-zone[data-zone*="center"] .builder-element[data-class*="Search"] { width: 100% !important; flex: 1; }
+.drop-zone[data-zone*="center"] .builder-element[data-class*="Search"] form { width: 100% !important; max-width: 100% !important; }
 
-/* Các trạng thái khác */
 .builder-element.dragging { opacity: 0.4; border: 1px dashed #3b82f6; }
 .builder-row.is-hidden { opacity: 0.5; filter: grayscale(100%); background: repeating-linear-gradient(45deg, #f3f4f6, #f3f4f6 10px, #fff 10px, #fff 20px); }
 
-/* Nút xóa (X) */
+/* VISIBILITY INDICATORS (HIỆN TRONG BUILDER KHI BỊ ẨN) */
+.builder-element.opacity-30 { opacity: 0.3 !important; border: 1px dashed #ef4444; }
+
 .btn-delete { display: none; }
 .builder-element:hover .btn-delete { display: flex; }
 
-/* 5. ROW HANDLES (Nút Cài đặt Row) */
+/* 5. ROW HANDLES */
 .row-handle {
     position: absolute; left: -36px; top: 0; bottom: 0; width: 36px;
     display: flex; align-items: center; justify-content: center;

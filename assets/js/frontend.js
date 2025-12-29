@@ -3,15 +3,44 @@
 document.addEventListener('DOMContentLoaded', () => {
     initMobileMenu();
     initSearchModal();
+    initButtonHover();
 });
 
-// 1. XỬ LÝ MOBILE MENU (Tự động tạo nút 3 gạch)
+function initButtonHover() {
+    // Tìm các nút có data-hover
+    const buttons = document.querySelectorAll('.inner-box[data-hover-bg], .inner-box[data-hover-color]');
+    
+    buttons.forEach(btn => {
+        // Lưu màu gốc nếu chưa có
+        if (!btn.getAttribute('data-original-bg')) {
+            btn.setAttribute('data-original-bg', getComputedStyle(btn).backgroundColor);
+        }
+        if (!btn.getAttribute('data-original-color')) {
+            btn.setAttribute('data-original-color', getComputedStyle(btn).color);
+        }
+
+        btn.addEventListener('mouseenter', () => {
+            const hBg = btn.getAttribute('data-hover-bg');
+            const hCol = btn.getAttribute('data-hover-color');
+            if (hBg) btn.style.setProperty('background-color', hBg, 'important');
+            if (hCol) btn.style.setProperty('color', hCol, 'important');
+        });
+
+        btn.addEventListener('mouseleave', () => {
+            const oBg = btn.getAttribute('data-original-bg');
+            const oCol = btn.getAttribute('data-original-color');
+            if (oBg) btn.style.backgroundColor = oBg;
+            if (oCol) btn.style.color = oCol;
+        });
+    });
+}
+
+// ... (Giữ nguyên phần Mobile Menu và Search Modal cũ) ...
+// 1. XỬ LÝ MOBILE MENU
 function initMobileMenu() {
-    // Tìm tất cả các Menu có trên Header
     const menus = document.querySelectorAll('.menu-nav');
     if (menus.length === 0) return;
 
-    // Tạo HTML cho Mobile Drawer (Khung menu trượt)
     const drawerHTML = `
         <div id="mobile-drawer-overlay" class="drawer-overlay"></div>
         <div id="mobile-drawer" class="flex flex-col p-6 space-y-4">
@@ -19,9 +48,7 @@ function initMobileMenu() {
                 <span class="font-bold text-lg">Menu</span>
                 <button id="close-drawer" class="text-2xl">&times;</button>
             </div>
-            <div id="mobile-menu-links" class="flex flex-col space-y-3 text-sm font-medium">
-                <!-- Links sẽ được copy vào đây -->
-            </div>
+            <div id="mobile-menu-links" class="flex flex-col space-y-3 text-sm font-medium"></div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', drawerHTML);
@@ -31,40 +58,26 @@ function initMobileMenu() {
     const closeBtn = document.getElementById('close-drawer');
     const linksContainer = document.getElementById('mobile-menu-links');
 
-    // Duyệt qua từng menu để xử lý Responsive
     menus.forEach(menu => {
-        // A. Ẩn menu gốc trên Mobile
-        menu.classList.add('hidden', 'md:flex'); // Tailwind: ẩn mobile, hiện desktop
-
-        // B. Tạo nút Hamburger (3 gạch) chèn ngay trước Menu gốc
+        menu.classList.add('hidden', 'md:flex'); 
         const hamburgerBtn = document.createElement('button');
         hamburgerBtn.className = 'md:hidden text-2xl px-2 focus:outline-none';
         hamburgerBtn.innerHTML = '<i class="ph ph-list"></i>';
-        
-        // C. Lấy màu chữ từ menu gốc để áp dụng cho icon 3 gạch
         if (menu.style.color) hamburgerBtn.style.color = menu.style.color;
-        
         menu.parentNode.insertBefore(hamburgerBtn, menu);
 
-        // D. Sự kiện Click mở menu
         hamburgerBtn.addEventListener('click', () => {
-            // Copy links từ menu gốc vào drawer
             linksContainer.innerHTML = menu.innerHTML;
-            
-            // Style lại link cho đẹp trên mobile (dạng dọc)
             const links = linksContainer.querySelectorAll('a');
             links.forEach(a => {
                 a.className = 'block py-2 border-b border-gray-100 hover:text-blue-600';
-                a.style.color = '#333'; // Reset màu về đen cho dễ đọc trên nền trắng
+                a.style.color = '#333'; 
             });
-
-            // Mở Drawer
             drawer.classList.add('open');
             overlay.classList.add('open');
         });
     });
 
-    // Đóng Drawer
     const closeDrawer = () => {
         drawer.classList.remove('open');
         overlay.classList.remove('open');
@@ -78,7 +91,6 @@ function initSearchModal() {
     const searchIcons = document.querySelectorAll('.search-icon-only');
     if (searchIcons.length === 0) return;
 
-    // Tạo HTML cho Popup tìm kiếm
     const modalHTML = `
         <div id="search-modal">
             <div class="search-modal-close"><i class="ph ph-x"></i></div>
@@ -98,7 +110,6 @@ function initSearchModal() {
     const modal = document.getElementById('search-modal');
     const closeBtn = modal.querySelector('.search-modal-close');
 
-    // Bấm vào icon kính lúp -> Mở Modal
     searchIcons.forEach(icon => {
         icon.addEventListener('click', () => {
             modal.classList.add('open');
@@ -106,10 +117,7 @@ function initSearchModal() {
         });
     });
 
-    // Đóng Modal
     closeBtn.addEventListener('click', () => modal.classList.remove('open'));
-    
-    // Bấm ESC để đóng
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') modal.classList.remove('open');
     });
