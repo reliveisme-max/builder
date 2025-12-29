@@ -32,13 +32,22 @@ class Frontend
             .header-item-wrapper { display: flex; align-items: center; width: auto; position: relative; flex-shrink: 0; }
             .header-item-wrapper img { width: 100%; height: auto; object-fit: contain; display: block; }
             
-            /* Search Box Center */
             .header-item-wrapper.is-search-center { width: 100%; flex: 1; }
             .header-col.col-center .search-box { width: 100% !important; max-width: 100% !important; }
 
-            /* Visibility */
-            @media (max-width: 768px) { .hidden-mobile { display: none !important; } }
-            @media (min-width: 769px) { .hidden-desktop { display: none !important; } }
+            /* --- VISIBILITY CLASSES --- */
+            /* Mobile (< 768px) */
+            @media (max-width: 767px) {
+                .hidden-mobile { display: none !important; }
+            }
+            /* Tablet (768px -> 1024px) */
+            @media (min-width: 768px) and (max-width: 1024px) {
+                .hidden-tablet { display: none !important; }
+            }
+            /* Desktop (> 1024px) */
+            @media (min-width: 1025px) {
+                .hidden-desktop { display: none !important; }
+            }
         </style>';
 
         echo '<header id="site-header" class="w-full relative bg-white shadow-sm font-sans text-sm z-50">';
@@ -90,7 +99,9 @@ class Frontend
         $content = $item['content'] ?? [];
 
         if (!class_exists($className)) {
-            if (strpos($className, '\\') === false) $className = 'Modules\\Header\\Elements\\' . $className;
+            if (strpos($className, '\\') === false) {
+                $className = 'Modules\\Header\\Elements\\' . $className;
+            }
             if (!class_exists($className)) return "";
         }
 
@@ -102,11 +113,12 @@ class Frontend
         $wrapperStyle = "";
         $extraClass = "";
 
-        // Visibility
+        // Visibility Checks
         if (isset($content['hide_mobile']) && $content['hide_mobile'] === 'true') $extraClass .= " hidden-mobile";
+        if (isset($content['hide_tablet']) && $content['hide_tablet'] === 'true') $extraClass .= " hidden-tablet";
         if (isset($content['hide_desktop']) && $content['hide_desktop'] === 'true') $extraClass .= " hidden-desktop";
 
-        // Mobile Logo
+        // Logo Mobile Width
         if (strpos($className, 'Logo') !== false && !empty($content['mobile_width'])) {
             $uniqueClass = 'logo-' . uniqid();
             $extraClass .= " " . $uniqueClass;

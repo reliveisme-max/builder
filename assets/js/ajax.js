@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // 2. LẤY CONTENT & SETTINGS
                         const content = {};
                         
-                        // --- TEXT & LINK CƠ BẢN ---
+                        // Text & Link cơ bản (Trừ các element phức tạp)
                         const complexElements = ['Menu', 'Socials', 'Account', 'Cart', 'CategoryBtn', 'Search'];
                         const isComplex = complexElements.some(name => cls.includes(name));
 
@@ -75,35 +75,35 @@ document.addEventListener('DOMContentLoaded', () => {
                         const img = el.querySelector('img');
                         if (img) content.src = img.getAttribute('src');
 
-                        // --- CẤU HÌNH NÂNG CAO ---
+                        // Config Nâng cao
                         const nav = el.querySelector('nav'); 
                         if (nav) content['menu_config'] = nav.getAttribute('data-menu-config');
 
                         const socialGrp = el.querySelector('.social-group');
                         if (socialGrp) content['social_items'] = socialGrp.getAttribute('data-social-items');
 
-                        // Hover Colors (Button)
+                        // Hover Colors
                         if (child && cls.includes('Button')) {
                             if (child.getAttribute('data-hover-bg')) content['hover_bg'] = child.getAttribute('data-hover-bg');
                             if (child.getAttribute('data-hover-color')) content['hover_color'] = child.getAttribute('data-hover-color');
                         }
                         
-                        // Account
+                        // Account Data
                         const accW = el.querySelector('.inner-text-welcome'); if(accW) content['text_welcome'] = accW.innerText;
                         const accA = el.querySelector('.inner-text-action'); if(accA) content['text_action'] = accA.innerText;
                         if(cls.includes('Account')) { const al = el.querySelector('a'); if(al) content['link_login'] = al.getAttribute('href'); }
                         
-                        // Text HTML
+                        // Text Content
                         const txtContent = el.querySelector('.text-content'); if (txtContent) content['text_content'] = txtContent.innerText;
 
-                        // --- DANH SÁCH SETTING ĐẶC BIỆT CẦN LƯU ---
+                        // --- DANH SÁCH SETTING ĐẶC BIỆT (FULL) ---
                         const specialSettings = [
                             'layout', 'shape', 'icon_type', 'hover_style', 'text-transform', 
                             'height', 'width', 'font-size', 'color', 'background-color',
                             'mobile_width', 'gap', 'font-weight', 'custom_link', 'show_icon', 
                             'button_type', 'button_bg', 'button_color', 'button_text',
                             'text_content', 'text_align', 'hover_bg', 'hover_color', 'border-radius',
-                            'hide_mobile', 'hide_desktop'
+                            'hide_mobile', 'hide_tablet', 'hide_desktop' // <-- Đã thêm đủ 3 chế độ ẩn
                         ];
 
                         specialSettings.forEach(key => {
@@ -119,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 structure.push(rowData);
             });
 
-            // Gửi API
             fetch('api/save.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

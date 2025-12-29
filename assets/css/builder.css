@@ -92,9 +92,15 @@ body { font-family: 'Inter', sans-serif; }
 .builder-element.dragging { opacity: 0.4; border: 1px dashed #3b82f6; }
 .builder-row.is-hidden { opacity: 0.5; filter: grayscale(100%); background: repeating-linear-gradient(45deg, #f3f4f6, #f3f4f6 10px, #fff 10px, #fff 20px); }
 
-/* VISIBILITY INDICATORS (HIỆN TRONG BUILDER KHI BỊ ẨN) */
-.builder-element.opacity-30 { opacity: 0.3 !important; border: 1px dashed #ef4444; }
-
+/* --- VISIBILITY INDICATORS --- */
+.builder-element.is-hidden-view { 
+    opacity: 0.1 !important; 
+    filter: grayscale(100%); 
+    border: 1px dashed red !important;
+}
+.builder-element.is-hidden-view:hover {
+    opacity: 0.5 !important;
+}
 .btn-delete { display: none; }
 .builder-element:hover .btn-delete { display: flex; }
 

@@ -16,7 +16,7 @@ class Account extends Block
         $welcome = $settings['text_welcome'] ?? 'Xin chào!';
         $action = $settings['text_action'] ?? 'Đăng nhập';
         $link = $settings['link_login'] ?? '/login';
-        $showIcon = $settings['show_icon'] ?? 'true'; // Mặc định hiện
+        $showIcon = $settings['show_icon'] ?? 'true';
 
         $iconHtml = '';
         if ($showIcon !== 'false') {
@@ -49,6 +49,14 @@ class Account extends Block
                     <div><label class="text-xs text-gray-400 block mb-1">Dòng 2</label><input type="text" data-style="text_action" value="Đăng nhập" class="prop-input w-full bg-gray-800 text-white p-2 rounded text-xs border border-gray-700"></div>
                 </div>
                 <div><label class="text-xs text-gray-400 block mb-1">Link Login</label><input type="text" data-style="link_login" placeholder="/login" class="prop-input w-full bg-gray-800 text-white p-2 rounded text-xs border border-gray-700"></div>
+                
+                <hr class="border-gray-800">
+                <label class="text-[10px] font-bold text-gray-500 uppercase mb-2 block">HIỂN THỊ TRÊN</label>
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-style="hide_desktop" class="w-4 h-4 rounded bg-gray-700 border-gray-600 accent-red-500"><span class="text-xs text-gray-400">Ẩn Desktop (>1024px)</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-style="hide_tablet" class="w-4 h-4 rounded bg-gray-700 border-gray-600 accent-red-500"><span class="text-xs text-gray-400">Ẩn Tablet (768-1024px)</span></label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" data-style="hide_mobile" class="w-4 h-4 rounded bg-gray-700 border-gray-600 accent-red-500"><span class="text-xs text-gray-400">Ẩn Mobile (<768px)</span></label>
+                </div>
             </div>
         ';
     }
