@@ -8,15 +8,16 @@ body { font-family: 'Inter', sans-serif; }
 ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* 2. EDITOR PANEL & DROP ZONES */
+/* =========================================
+   2. BUILDER UI (EDITOR PANEL & CHIPS) 
+   ========================================= */
+
 .drop-zone { 
     min-height: 100%; 
     display: flex; 
     align-items: center; 
     padding: 4px; 
     gap: 8px; 
-    transition: all 0.2s ease;
-    /* Thêm viền mờ để nhìn thấy vùng thả kể cả khi Row có màu nền */
     border-right: 1px dashed rgba(0,0,0,0.1);
 }
 .drop-zone:last-child { border-right: none; }
@@ -28,12 +29,12 @@ body { font-family: 'Inter', sans-serif; }
 
 .drop-zone.is-empty { justify-content: center; }
 .empty-placeholder {
-    color: rgba(0,0,0,0.4); /* Màu chữ placeholder thích nghi nền */
+    color: rgba(0,0,0,0.4);
     font-size: 10px; font-weight: 600; text-transform: uppercase;
     letter-spacing: 1px; pointer-events: none; user-select: none;
 }
 
-/* 3. BUILDER ELEMENT (CHIP STYLE) */
+/* Builder Chip (Thẻ nhỏ) */
 .builder-element { 
     display: inline-flex; align-items: center; gap: 8px;
     padding: 6px 10px; background: white; border: 1px solid #e5e7eb;
@@ -57,28 +58,24 @@ body { font-family: 'Inter', sans-serif; }
 .builder-element:hover .btn-delete { opacity: 1; transform: scale(1); }
 .builder-element .btn-delete:hover { background-color: #dc2626; transform: scale(1.1); }
 
-/* 4. DRAG ITEM */
 .draggable-item { cursor: grab; }
 .draggable-item:active { cursor: grabbing; }
 
-/* 5. ROW STYLING (UNIFIED CARD) */
+/* Row Styling (Editor) */
 .builder-row {
     display: flex; align-items: stretch;
-    background: white; /* Màu mặc định */
-    border: 1px solid #e5e7eb; border-radius: 8px;
+    background: white; border: 1px solid #e5e7eb; border-radius: 8px;
     overflow: hidden; transition: all 0.2s;
     min-height: 70px;
 }
 .builder-row:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
 .builder-row.is-selected { border-color: #6366f1 !important; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
 
-/* Label bên trái */
 .row-label {
-    flex: 0 0 30px; background-color: #f8fafc; /* Màu nền nhẹ cho label */
+    flex: 0 0 30px; background-color: #f8fafc;
     border-right: 1px solid rgba(0,0,0,0.05);
     display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s;
-    z-index: 2; /* Đảm bảo nằm trên background của row */
+    cursor: pointer; transition: all 0.2s; z-index: 2;
 }
 .row-label span {
     writing-mode: vertical-lr; transform: rotate(180deg);
@@ -87,24 +84,92 @@ body { font-family: 'Inter', sans-serif; }
 .builder-row.is-selected .row-label { background-color: #e0e7ff; color: #4f46e5; border-right-color: #c7d2fe; }
 .builder-row.is-selected .row-label span { color: #4f46e5; }
 
-/* Nội dung bên phải (Quan trọng: Transparent để ăn theo màu nền Row) */
 .hb-inner-content {
     flex: 1; display: flex; align-items: stretch;
-    background-color: transparent; /* Fix lỗi "lòi lòi" */
+    background-color: transparent; 
 }
 
-/* 6. LIVE PREVIEW PLACEHOLDER (Fix lỗi "Preview đâu rồi") */
+/* =========================================
+   3. FRONTEND STYLES (CHO PREVIEW AREA) 
+   ========================================= */
+/* Đây là phần bị thiếu khiến giao diện Preview bị vỡ */
+
 #live-header-container {
-    min-height: 80px; /* Đảm bảo luôn hiện */
+    min-height: 80px; 
     background: white;
     border-bottom: 1px solid #e5e7eb;
     position: relative;
+    /* Reset font size để không bị ảnh hưởng bởi builder */
+    font-size: 14px; 
+    line-height: 1.5;
 }
-/* Hiện chữ nhắc nhở nếu chưa có nội dung */
+
+/* Placeholder khi chưa có nội dung */
 #live-header-container:empty::after {
-    content: "HEADER PREVIEW AREA (Kéo phần tử vào bên dưới để hiển thị)";
+    content: "Kéo thả phần tử vào bảng bên dưới để xây dựng Header";
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center;
     color: #9ca3af; font-size: 12px; font-weight: 500;
     border: 2px dashed #f3f4f6; margin: 10px; border-radius: 8px;
+    background: #f9fafb;
+}
+
+/* Bố cục Header thật */
+#live-header-container .header-row {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+#live-header-container .hb-inner-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+    /* Quan trọng: Tránh xung đột với class của Editor */
+    min-height: auto !important; 
+    background-color: transparent !important;
+}
+
+#live-header-container .header-col {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 15px;
+}
+
+#live-header-container .header-col.col-center {
+    flex: 1 1 auto;
+    justify-content: center;
+}
+
+#live-header-container .header-col.col-left,
+#live-header-container .header-col.col-right {
+    flex: 0 0 auto;
+}
+
+#live-header-container .header-col.col-right {
+    justify-content: flex-end;
+}
+
+/* Wrapper của từng Element */
+#live-header-container .header-item-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+#live-header-container .header-item-wrapper img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Fix lỗi icon Phosphor bị lệch hoặc to nhỏ */
+#live-header-container i.ph {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
 }

@@ -13,8 +13,11 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Custom CSS -->
+    <!-- Custom CSS cho Builder (Giao diện Admin) -->
     <link rel="stylesheet" href="assets/css/builder.css">
+
+    <!-- QUAN TRỌNG: Custom CSS cho Frontend (Để Preview giống thật) -->
+    <link rel="stylesheet" href="assets/css/frontend.css">
 
     <style>
     body {
@@ -50,7 +53,7 @@
         transition: all 0.3s;
     }
 
-    /* KHUNG MÔ PHỎNG (Điện thoại/PC) */
+    /* KHUNG MÔ PHỎNG */
     #simulation-frame {
         background: white;
         margin: 0 auto;
@@ -72,7 +75,6 @@
         margin-bottom: 20px;
     }
 
-    /* Tai thỏ giả cho Mobile */
     #simulation-frame.mode-mobile::before {
         content: '';
         position: absolute;
@@ -97,7 +99,7 @@
         margin-top: 20px;
     }
 
-    /* CHẾ ĐỘ DESKTOP (Mặc định) */
+    /* CHẾ ĐỘ DESKTOP */
     #simulation-frame.mode-desktop {
         width: 100% !important;
         height: 100%;
@@ -106,7 +108,6 @@
         overflow-y: auto;
     }
 
-    /* Ẩn thanh cuộn của iframe/preview container */
     #preview-content {
         width: 100%;
         height: 100%;
@@ -114,16 +115,16 @@
         background: white;
     }
 
-    /* Wrapper Header trong Preview (Không cho tương tác chuột, chỉ xem) */
     .preview-header-wrapper {
         pointer-events: none;
+        /* Chỉ xem, không click */
     }
     </style>
 </head>
 
 <body class="bg-gray-50 h-screen flex text-sm text-gray-700">
 
-    <!-- 1. LEFT SIDEBAR (Components) -->
+    <!-- 1. LEFT SIDEBAR -->
     <aside class="w-[240px] bg-[#18181b] border-r border-gray-800 flex flex-col flex-shrink-0 z-50">
         <div
             class="h-14 border-b border-gray-800 flex items-center px-4 font-semibold text-white tracking-wide shadow-sm">
@@ -151,7 +152,7 @@
         </div>
     </aside>
 
-    <!-- 2. MAIN AREA (Split View) -->
+    <!-- 2. MAIN AREA -->
     <main class="flex-1 flex flex-col min-w-0 relative">
 
         <!-- TOOLBAR -->
@@ -162,21 +163,20 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <!-- View Mode Switcher -->
                 <div class="bg-gray-100 rounded-lg p-1 flex gap-1 border border-gray-200">
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md bg-white text-gray-800 shadow-sm flex items-center justify-center border border-gray-200 transition"
-                        data-mode="desktop" title="Desktop View">
+                        data-mode="desktop" title="Desktop">
                         <i class="ph ph-desktop"></i>
                     </button>
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md text-gray-500 hover:text-gray-800 flex items-center justify-center border border-transparent transition"
-                        data-mode="tablet" title="Tablet View">
+                        data-mode="tablet" title="Tablet">
                         <i class="ph ph-device-tablet"></i>
                     </button>
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md text-gray-500 hover:text-gray-800 flex items-center justify-center border border-transparent transition"
-                        data-mode="mobile" title="Mobile View">
+                        data-mode="mobile" title="Mobile">
                         <i class="ph ph-device-mobile"></i>
                     </button>
                 </div>
@@ -192,15 +192,12 @@
 
         <!-- TẦNG 1: SÂN KHẤU (PREVIEW AREA) -->
         <div id="stage-area" class="flex-1 overflow-hidden relative flex flex-col">
-            <!-- Khung mô phỏng -->
             <div id="simulation-frame" class="mode-desktop">
-
-                <!-- NỘI DUNG LIVE PREVIEW -->
                 <div id="preview-content">
-                    <!-- Header sẽ được JS clone và render vào đây -->
+                    <!-- HTML Header sẽ được JS render vào đây -->
                     <div id="live-header-container" class="preview-header-wrapper"></div>
 
-                    <!-- Nội dung giả lập bên dưới (Placeholder Body) -->
+                    <!-- Nội dung giả lập bên dưới -->
                     <div class="p-4 bg-white opacity-50 grayscale pointer-events-none select-none">
                         <div class="w-full h-[300px] bg-gray-200 rounded-lg mb-4"></div>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -218,7 +215,6 @@
         <div id="editor-panel"
             class="h-[350px] bg-white border-t border-gray-300 flex flex-col z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] relative">
 
-            <!-- Header của Panel -->
             <div
                 class="h-9 bg-gray-50 border-b border-gray-200 flex items-center justify-between px-4 text-xs font-bold text-gray-500 uppercase select-none">
                 <span><i class="ph ph-faders mr-1"></i> Structure & Settings (Drag & Drop Here)</span>
@@ -227,14 +223,11 @@
                 </span>
             </div>
 
-            <!-- Vùng chứa các dòng (Top/Main/Bottom) -->
             <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50 relative">
 
                 <!-- 1. TOP BAR -->
                 <div class="builder-row" data-label="Top Bar">
-                    <div class="row-label row-settings-trigger">
-                        <span>TOP</span>
-                    </div>
+                    <div class="row-label row-settings-trigger"><span>TOP</span></div>
                     <div class="hb-inner-content">
                         <div class="drop-zone w-1/4 flex justify-start" data-zone="top_left"></div>
                         <div class="drop-zone flex-1 flex justify-center" data-zone="top_center"></div>
@@ -244,9 +237,7 @@
 
                 <!-- 2. MAIN HEADER -->
                 <div class="builder-row" data-label="Main Header">
-                    <div class="row-label row-settings-trigger">
-                        <span>MAIN</span>
-                    </div>
+                    <div class="row-label row-settings-trigger"><span>MAIN</span></div>
                     <div class="hb-inner-content" style="min-height: 80px;">
                         <div class="drop-zone w-1/4 flex justify-start" data-zone="main_left">
                             <div class="empty-placeholder">Left</div>
@@ -262,9 +253,7 @@
 
                 <!-- 3. BOTTOM HEADER -->
                 <div class="builder-row" data-label="Bottom Header">
-                    <div class="row-label row-settings-trigger">
-                        <span>BTM</span>
-                    </div>
+                    <div class="row-label row-settings-trigger"><span>BTM</span></div>
                     <div class="hb-inner-content">
                         <div class="drop-zone w-1/6 flex justify-start" data-zone="bottom_left"></div>
                         <div class="drop-zone flex-1 flex justify-center" data-zone="bottom_center">
@@ -278,7 +267,7 @@
         </div>
     </main>
 
-    <!-- 3. RIGHT SIDEBAR (Properties) -->
+    <!-- 3. RIGHT SIDEBAR -->
     <aside class="w-[300px] bg-[#18181b] border-l border-gray-800 flex flex-col flex-shrink-0 z-50">
         <div
             class="h-14 border-b border-gray-800 flex items-center px-4 justify-between font-semibold text-white shadow-sm">
@@ -296,19 +285,20 @@
     </aside>
 
     <script>
-    // Dữ liệu đã lưu từ DB
     window.savedData = <?php echo $savedData ? $savedData : '[]'; ?>;
 
-    // Hàm tiện ích Resize Panel
     function toggleEditorHeight() {
         const panel = document.getElementById('editor-panel');
         const h = panel.style.height;
         if (h === '500px') panel.style.height = '350px';
         else panel.style.height = '500px';
     }
+
+    const style = document.createElement('style');
+    style.innerHTML = `.writing-vertical-lr { writing-mode: vertical-lr; transform: rotate(180deg); }`;
+    document.head.appendChild(style);
     </script>
 
-    <!-- Load Scripts -->
     <script src="assets/js/builder.js"></script>
     <script src="assets/js/ajax.js"></script>
 </body>
