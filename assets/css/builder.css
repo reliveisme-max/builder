@@ -2,123 +2,109 @@
 
 body { font-family: 'Inter', sans-serif; }
 
-/* 1. UI CHUNG */
-.workspace-bg { background-color: #f3f4f6; }
+/* 1. SCROLLBARS */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 ::-webkit-scrollbar-track { background: transparent; }
 
-/* 2. LAYOUT CHÍNH (FLATSOME STYLE) */
-.hb-inner-content { 
-    display: flex; 
-    align-items: center; 
-    width: 100%; 
-    height: 100%; 
-    margin: 0 auto; 
-    min-height: 50px; 
-    gap: 15px; 
-    transition: all 0.3s ease;
-}
-
-/* 3. DROP ZONES */
+/* 2. EDITOR PANEL & DROP ZONES */
 .drop-zone { 
-    height: 100%; 
-    min-height: 50px; 
+    min-height: 100%; 
     display: flex; 
     align-items: center; 
-    padding: 0 5px; 
-    transition: all 0.2s; 
-    border: 1px dashed transparent; 
-    min-width: 30px;
-    position: relative;
-    gap: 10px;
+    padding: 4px; 
+    gap: 8px; 
+    transition: all 0.2s ease;
+    /* Thêm viền mờ để nhìn thấy vùng thả kể cả khi Row có màu nền */
+    border-right: 1px dashed rgba(0,0,0,0.1);
 }
+.drop-zone:last-child { border-right: none; }
+
 .drop-zone.drag-over { 
-    background-color: rgba(59, 130, 246, 0.1) !important; 
-    border: 2px dashed #3b82f6 !important; 
-    border-radius: 4px;
-    z-index: 10;
+    background-color: rgba(99, 102, 241, 0.1) !important;
+    border: 1px dashed #6366f1 !important;
 }
 
-/* TRẠNG THÁI RỖNG */
-.drop-zone.is-empty {
-    flex: 1 1 0% !important; 
-    min-width: 100px !important;
-    border: 1px dashed #e5e7eb;
-    justify-content: center;
-}
-.drop-zone.is-empty::after {
-    content: attr(data-label);
-    color: #d1d5db; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; pointer-events: none;
-}
-.empty-placeholder { display: none !important; }
-
-/* CẤU HÌNH CỘT */
-.drop-zone:not(.is-empty)[data-zone*="left"], 
-.drop-zone:not(.is-empty)[data-zone*="right"] {
-    flex: 0 0 auto !important; 
-    width: auto !important;
-    border-color: transparent;
-}
-.drop-zone:not(.is-empty)[data-zone*="center"] {
-    flex: 1 1 auto !important; 
-    width: auto !important;
-    justify-content: center;
-    border-color: transparent;
+.drop-zone.is-empty { justify-content: center; }
+.empty-placeholder {
+    color: rgba(0,0,0,0.4); /* Màu chữ placeholder thích nghi nền */
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 1px; pointer-events: none; user-select: none;
 }
 
-/* 4. ELEMENTS */
+/* 3. BUILDER ELEMENT (CHIP STYLE) */
 .builder-element { 
-    max-width: 100%; 
-    display: flex; 
-    align-items: center; 
-    position: relative; 
-    cursor: grab; 
-    border: 1px solid transparent;
-    width: auto;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 10px; background: white; border: 1px solid #e5e7eb;
+    border-radius: 6px; font-size: 11px; font-weight: 600; color: #374151;
+    cursor: grab; user-select: none; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    transition: all 0.2s; position: relative; white-space: nowrap; max-width: 100%;
 }
-.builder-element:active { cursor: grabbing; }
-.builder-element img { 
-    width: 100% !important; 
-    height: auto !important; 
-    object-fit: contain; 
-    display: block; 
-}
+.builder-element:hover { border-color: #a5b4fc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.builder-element.is-selected { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); z-index: 10; }
+.builder-element i { font-size: 14px; color: #6366f1; }
+.builder-element.dragging { opacity: 0.5; border: 1px dashed #6366f1; background: #eef2ff; }
 
-/* FIX SEARCH BOX */
-.drop-zone[data-zone*="center"] .builder-element[data-class*="Search"] { width: 100% !important; flex: 1; }
-.drop-zone[data-zone*="center"] .builder-element[data-class*="Search"] form { width: 100% !important; max-width: 100% !important; }
-
-.builder-element.dragging { opacity: 0.4; border: 1px dashed #3b82f6; }
-.builder-row.is-hidden { opacity: 0.5; filter: grayscale(100%); background: repeating-linear-gradient(45deg, #f3f4f6, #f3f4f6 10px, #fff 10px, #fff 20px); }
-
-/* --- VISIBILITY INDICATORS --- */
-.builder-element.is-hidden-view { 
-    opacity: 0.1 !important; 
-    filter: grayscale(100%); 
-    border: 1px dashed red !important;
-}
-.builder-element.is-hidden-view:hover {
-    opacity: 0.5 !important;
-}
-.btn-delete { display: none; }
-.builder-element:hover .btn-delete { display: flex; }
-
-/* 5. ROW HANDLES */
-.row-handle {
-    position: absolute; left: -36px; top: 0; bottom: 0; width: 36px;
+/* Nút Xóa Chip */
+.builder-element .btn-delete {
+    position: absolute; top: -6px; right: -6px; width: 16px; height: 16px;
+    background-color: #ef4444; color: white; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    opacity: 0; transition: all 0.2s ease; pointer-events: none; z-index: 50;
+    font-size: 10px; opacity: 0; transform: scale(0.8); transition: all 0.2s;
+    cursor: pointer; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-.builder-row:hover .row-handle, .row-handle:hover { opacity: 1; pointer-events: auto; }
-.handle-btn {
-    background-color: #3b82f6; color: white; width: 28px; height: 28px;
-    border-radius: 4px; font-size: 0; box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transform: translateX(5px); transition: all 0.2s; position: relative;
+.builder-element:hover .btn-delete { opacity: 1; transform: scale(1); }
+.builder-element .btn-delete:hover { background-color: #dc2626; transform: scale(1.1); }
+
+/* 4. DRAG ITEM */
+.draggable-item { cursor: grab; }
+.draggable-item:active { cursor: grabbing; }
+
+/* 5. ROW STYLING (UNIFIED CARD) */
+.builder-row {
+    display: flex; align-items: stretch;
+    background: white; /* Màu mặc định */
+    border: 1px solid #e5e7eb; border-radius: 8px;
+    overflow: hidden; transition: all 0.2s;
+    min-height: 70px;
 }
-.handle-btn i { font-size: 16px; }
-.handle-btn:hover { background-color: #2563eb; }
-.builder-row.is-selected .row-handle { opacity: 1; }
-.builder-row.is-selected .handle-btn { background-color: #4f46e5; }
-.is-selected { outline: 2px solid #6366f1 !important; outline-offset: -2px; z-index: 100; }
+.builder-row:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+.builder-row.is-selected { border-color: #6366f1 !important; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
+
+/* Label bên trái */
+.row-label {
+    flex: 0 0 30px; background-color: #f8fafc; /* Màu nền nhẹ cho label */
+    border-right: 1px solid rgba(0,0,0,0.05);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s;
+    z-index: 2; /* Đảm bảo nằm trên background của row */
+}
+.row-label span {
+    writing-mode: vertical-lr; transform: rotate(180deg);
+    font-size: 10px; font-weight: 700; color: #9ca3af; letter-spacing: 1px;
+}
+.builder-row.is-selected .row-label { background-color: #e0e7ff; color: #4f46e5; border-right-color: #c7d2fe; }
+.builder-row.is-selected .row-label span { color: #4f46e5; }
+
+/* Nội dung bên phải (Quan trọng: Transparent để ăn theo màu nền Row) */
+.hb-inner-content {
+    flex: 1; display: flex; align-items: stretch;
+    background-color: transparent; /* Fix lỗi "lòi lòi" */
+}
+
+/* 6. LIVE PREVIEW PLACEHOLDER (Fix lỗi "Preview đâu rồi") */
+#live-header-container {
+    min-height: 80px; /* Đảm bảo luôn hiện */
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    position: relative;
+}
+/* Hiện chữ nhắc nhở nếu chưa có nội dung */
+#live-header-container:empty::after {
+    content: "HEADER PREVIEW AREA (Kéo phần tử vào bên dưới để hiển thị)";
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #9ca3af; font-size: 12px; font-weight: 500;
+    border: 2px dashed #f3f4f6; margin: 10px; border-radius: 8px;
+}

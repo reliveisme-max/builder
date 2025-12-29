@@ -4,24 +4,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relive Builder</title>
+    <title>Relive Builder - Split View</title>
+
+    <!-- TailwindCSS & Icons -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/builder.css">
 
     <style>
     body {
         font-family: 'Inter', sans-serif;
+        overflow: hidden;
     }
 
-    .workspace-bg {
-        background-color: #f3f4f6;
-    }
-
+    /* TÙY CHỈNH THANH CUỘN */
     ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
     }
 
     ::-webkit-scrollbar-thumb {
@@ -29,151 +37,97 @@
         border-radius: 3px;
     }
 
-    ::-webkit-scrollbar-track {
-        background: transparent;
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
     }
 
-    /* --- UI BUILDER --- */
-    .drop-zone {
-        transition: all 0.2s ease;
+    /* VÙNG SÂN KHẤU (PREVIEW) */
+    #stage-area {
+        background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+        background-size: 20px 20px;
+        background-color: #f9fafb;
+        box-shadow: inset 0 -10px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s;
+    }
+
+    /* KHUNG MÔ PHỎNG (Điện thoại/PC) */
+    #simulation-frame {
+        background: white;
+        margin: 0 auto;
+        transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.25);
         position: relative;
-        min-height: 100%;
-    }
-
-    .drop-zone:empty,
-    .drop-zone:has(.empty-placeholder) {
-        border: 1px dashed #e5e7eb;
-    }
-
-    .builder-row:hover .drop-zone:empty {
-        border-color: #d1d5db;
-    }
-
-    .drop-zone.drag-over {
-        background-color: #eff6ff !important;
-        border: 1px dashed #3b82f6 !important;
-        z-index: 10;
-    }
-
-    .empty-placeholder {
-        color: #9ca3af;
-        font-size: 11px;
-        font-weight: 500;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column;
+    }
+
+    /* CHẾ ĐỘ MOBILE VIEW */
+    #simulation-frame.mode-mobile {
+        width: 375px !important;
         height: 100%;
-        min-height: 32px;
-        user-select: none;
-        cursor: default;
+        border: 8px solid #1f2937;
+        border-radius: 30px;
+        overflow: hidden;
+        margin-top: 20px;
+        margin-bottom: 20px;
     }
 
-    .empty-placeholder::before {
-        content: '+';
-        font-size: 14px;
-        margin-right: 4px;
-        color: #d1d5db;
-    }
-
-    /* --- FIX: HANDLE NÚT CÀI ĐẶT (Gọn lại để không bị che) --- */
-    .row-handle {
+    /* Tai thỏ giả cho Mobile */
+    #simulation-frame.mode-mobile::before {
+        content: '';
         position: absolute;
-        left: -36px;
-        /* Thu gọn khoảng cách */
         top: 0;
-        bottom: 0;
-        width: 36px;
-        /* Thu nhỏ vùng hover */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        /* Căn giữa icon */
-        opacity: 0;
-        transition: all 0.2s ease;
-        pointer-events: none;
-        z-index: 50;
-    }
-
-    .builder-row:hover .row-handle,
-    .row-handle:hover {
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    .handle-btn {
-        background-color: #3b82f6;
-        color: white;
-        width: 28px;
-        height: 28px;
-        border-radius: 4px;
-        /* Bo tròn đều */
-        font-size: 0;
-        /* Ẩn chữ đi cho gọn */
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transform: translateX(5px);
-        transition: all 0.2s;
-        position: relative;
-    }
-
-    /* Hiển thị Icon */
-    .handle-btn i {
-        font-size: 16px;
-    }
-
-    /* Tooltip tên dòng khi hover */
-    .handle-btn::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 25px;
         background: #1f2937;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 10px;
-        white-space: nowrap;
-        margin-left: 8px;
-        opacity: 0;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        z-index: 9999;
+    }
+
+    /* CHẾ ĐỘ TABLET VIEW */
+    #simulation-frame.mode-tablet {
+        width: 768px !important;
+        height: 95%;
+        border: 8px solid #1f2937;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-top: 20px;
+    }
+
+    /* CHẾ ĐỘ DESKTOP (Mặc định) */
+    #simulation-frame.mode-desktop {
+        width: 100% !important;
+        height: 100%;
+        border: none;
+        border-radius: 0;
+        overflow-y: auto;
+    }
+
+    /* Ẩn thanh cuộn của iframe/preview container */
+    #preview-content {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        background: white;
+    }
+
+    /* Wrapper Header trong Preview (Không cho tương tác chuột, chỉ xem) */
+    .preview-header-wrapper {
         pointer-events: none;
-        transition: opacity 0.2s;
-        z-index: 60;
-    }
-
-    .handle-btn:hover::after {
-        opacity: 1;
-    }
-
-    .builder-row:hover .handle-btn {
-        transform: translateX(0);
-    }
-
-    .handle-btn:hover {
-        background-color: #2563eb;
-    }
-
-    .builder-row.is-selected .row-handle {
-        opacity: 1;
-    }
-
-    .builder-row.is-selected .handle-btn {
-        background-color: #4f46e5;
     }
     </style>
 </head>
 
-<body
-    class="bg-[#111827] text-gray-300 h-screen flex overflow-hidden text-sm selection:bg-indigo-500 selection:text-white">
+<body class="bg-gray-50 h-screen flex text-sm text-gray-700">
 
-    <!-- LEFT SIDEBAR -->
-    <aside class="w-[260px] bg-[#18181b] border-r border-gray-800 flex flex-col flex-shrink-0 z-30">
+    <!-- 1. LEFT SIDEBAR (Components) -->
+    <aside class="w-[240px] bg-[#18181b] border-r border-gray-800 flex flex-col flex-shrink-0 z-50">
         <div
             class="h-14 border-b border-gray-800 flex items-center px-4 font-semibold text-white tracking-wide shadow-sm">
-            <i class="ph ph-cube text-xl mr-2 text-indigo-500"></i> Components
+            <i class="ph ph-cube text-xl mr-2 text-indigo-500"></i> Builder
         </div>
         <div class="flex-1 overflow-y-auto p-4 space-y-6">
             <div>
@@ -190,38 +144,39 @@
                     </div>
                     <?php endforeach; ?>
                     <?php else: ?>
-                    <div
-                        class="col-span-2 text-center py-4 border border-dashed border-gray-700 rounded text-gray-500 text-xs">
-                        Empty</div>
+                    <div class="col-span-2 text-center text-gray-500">Empty</div>
                     <?php endif; ?>
                 </div>
             </div>
         </div>
     </aside>
 
-    <!-- CENTER WORKSPACE -->
-    <main class="flex-1 flex flex-col min-w-0 bg-[#f3f4f6]">
-        <!-- Toolbar -->
-        <header class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-20">
+    <!-- 2. MAIN AREA (Split View) -->
+    <main class="flex-1 flex flex-col min-w-0 relative">
+
+        <!-- TOOLBAR -->
+        <header
+            class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-40 relative">
             <div class="flex items-center gap-2">
                 <span class="text-gray-800 font-bold text-lg tracking-tight">Header Builder</span>
             </div>
 
             <div class="flex items-center gap-3">
+                <!-- View Mode Switcher -->
                 <div class="bg-gray-100 rounded-lg p-1 flex gap-1 border border-gray-200">
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md bg-white text-gray-800 shadow-sm flex items-center justify-center border border-gray-200 transition"
-                        data-mode="desktop">
+                        data-mode="desktop" title="Desktop View">
                         <i class="ph ph-desktop"></i>
                     </button>
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md text-gray-500 hover:text-gray-800 flex items-center justify-center border border-transparent transition"
-                        data-mode="tablet">
+                        data-mode="tablet" title="Tablet View">
                         <i class="ph ph-device-tablet"></i>
                     </button>
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md text-gray-500 hover:text-gray-800 flex items-center justify-center border border-transparent transition"
-                        data-mode="mobile">
+                        data-mode="mobile" title="Mobile View">
                         <i class="ph ph-device-mobile"></i>
                     </button>
                 </div>
@@ -235,138 +190,125 @@
             </div>
         </header>
 
-        <!-- Canvas Area -->
-        <div class="flex-1 overflow-auto p-8 flex justify-center workspace-bg relative">
+        <!-- TẦNG 1: SÂN KHẤU (PREVIEW AREA) -->
+        <div id="stage-area" class="flex-1 overflow-hidden relative flex flex-col">
+            <!-- Khung mô phỏng -->
+            <div id="simulation-frame" class="mode-desktop">
 
-            <!-- FIX: Thêm ml-10 để đẩy khung sang phải 40px, chừa chỗ cho nút cài đặt -->
-            <div id="canvas-frame"
-                class="w-full max-w-[100%] ml-10 flex flex-col min-h-[800px] transition-all duration-300 ease-in-out">
+                <!-- NỘI DUNG LIVE PREVIEW -->
+                <div id="preview-content">
+                    <!-- Header sẽ được JS clone và render vào đây -->
+                    <div id="live-header-container" class="preview-header-wrapper"></div>
 
-                <!-- Browser Mockup -->
-                <div
-                    class="h-9 bg-[#e5e7eb] rounded-t-lg border border-b-0 border-[#d1d5db] flex items-center px-4 gap-2 select-none sticky top-0 z-30 shadow-sm">
-                    <div class="flex gap-1.5">
-                        <div class="w-3 h-3 rounded-full bg-[#ef4444]"></div>
-                        <div class="w-3 h-3 rounded-full bg-[#eab308]"></div>
-                        <div class="w-3 h-3 rounded-full bg-[#22c55e]"></div>
-                    </div>
-                    <div
-                        class="ml-4 flex-1 max-w-[400px] bg-white h-6 rounded text-[10px] flex items-center px-3 text-gray-400 border border-gray-300 shadow-sm">
-                        https://fptshop.com.vn
-                    </div>
-                </div>
-
-                <!-- MAIN CONTENT CONTAINER -->
-                <div
-                    class="bg-white shadow-2xl rounded-b-lg overflow-visible border border-[#d1d5db] flex-1 flex flex-col relative">
-                    <!-- 1. TOP BAR -->
-                    <div class="builder-row group min-h-[40px] bg-[#f8f9fa] border-b border-gray-100 relative"
-                        data-label="Top Bar">
-                        <div class="row-handle">
-                            <div class="handle-btn" data-tooltip="Top Bar"><i class="ph ph-gear-six"></i></div>
-                        </div>
-
-                        <!-- THÊM CLASS NÀY: Wrapper chịu trách nhiệm Width -->
-                        <div class="hb-inner-content flex items-stretch h-full w-full mx-auto">
-                            <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
-                                data-zone="top_left">
-                                <div class="empty-placeholder">Left</div>
-                            </div>
-                            <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
-                                data-zone="top_center">
-                                <div class="empty-placeholder">Center</div>
-                            </div>
-                            <div class="drop-zone flex-1 p-2 flex items-center justify-end" data-zone="top_right">
-                                <div class="empty-placeholder">Right</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. MAIN HEADER -->
-                    <div class="builder-row group min-h-[90px] bg-white border-b border-gray-100 shadow-sm z-10 relative"
-                        data-label="Main Header">
-                        <div class="row-handle">
-                            <div class="handle-btn" data-tooltip="Main Header"><i class="ph ph-gear-six"></i></div>
-                        </div>
-
-                        <!-- THÊM CLASS NÀY -->
-                        <div class="hb-inner-content flex items-stretch h-full w-full mx-auto">
-                            <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
-                                data-zone="main_left">
-                                <div class="empty-placeholder">Logo</div>
-                            </div>
-                            <div class="drop-zone flex-[2] border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
-                                data-zone="main_center">
-                                <div class="empty-placeholder">Search</div>
-                            </div>
-                            <div class="drop-zone flex-1 p-2 flex items-center justify-end gap-2"
-                                data-zone="main_right">
-                                <div class="empty-placeholder">Actions</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. BOTTOM HEADER -->
-                    <div class="builder-row group min-h-[50px] bg-white border-b border-gray-100 relative"
-                        data-label="Bottom Header">
-                        <div class="row-handle">
-                            <div class="handle-btn" data-tooltip="Bottom Header"><i class="ph ph-gear-six"></i></div>
-                        </div>
-
-                        <!-- THÊM CLASS NÀY -->
-                        <div class="hb-inner-content flex items-stretch h-full w-full mx-auto">
-                            <div class="drop-zone flex-1 border-r border-dashed border-gray-200 p-2 flex items-center"
-                                data-zone="bottom_left">
-                                <div class="empty-placeholder">Left</div>
-                            </div>
-                            <div class="drop-zone flex-[3] border-r border-dashed border-gray-200 p-2 flex items-center justify-center"
-                                data-zone="bottom_center">
-                                <div class="empty-placeholder">Menu</div>
-                            </div>
-                            <div class="drop-zone flex-1 p-2 flex items-center justify-end" data-zone="bottom_right">
-                                <div class="empty-placeholder">Right</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PREVIEW BODY CONTENT -->
-                    <div class="flex-1 bg-gray-50 p-8 pointer-events-none select-none relative overflow-hidden z-0">
-                        <div class="max-w-6xl mx-auto space-y-8 opacity-50 grayscale-[0.5]">
-                            <div class="w-full h-[400px] bg-white rounded-lg shadow-sm border border-gray-200"></div>
-                            <div class="grid grid-cols-4 gap-6">
-                                <div class="h-64 bg-white rounded shadow-sm"></div>
-                                <div class="h-64 bg-white rounded shadow-sm"></div>
-                                <div class="h-64 bg-white rounded shadow-sm"></div>
-                                <div class="h-64 bg-white rounded shadow-sm"></div>
-                            </div>
+                    <!-- Nội dung giả lập bên dưới (Placeholder Body) -->
+                    <div class="p-4 bg-white opacity-50 grayscale pointer-events-none select-none">
+                        <div class="w-full h-[300px] bg-gray-200 rounded-lg mb-4"></div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="h-40 bg-gray-100 rounded"></div>
+                            <div class="h-40 bg-gray-100 rounded"></div>
+                            <div class="h-40 bg-gray-100 rounded"></div>
+                            <div class="h-40 bg-gray-100 rounded"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- TẦNG 2: BÀN ĐIỀU KHIỂN (EDITOR PANEL) -->
+        <div id="editor-panel"
+            class="h-[350px] bg-white border-t border-gray-300 flex flex-col z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] relative">
+
+            <!-- Header của Panel -->
+            <div
+                class="h-9 bg-gray-50 border-b border-gray-200 flex items-center justify-between px-4 text-xs font-bold text-gray-500 uppercase select-none">
+                <span><i class="ph ph-faders mr-1"></i> Structure & Settings (Drag & Drop Here)</span>
+                <span class="text-indigo-600 cursor-pointer hover:underline" onclick="toggleEditorHeight()">
+                    <i class="ph ph-arrows-out-line-vertical"></i> Resize
+                </span>
+            </div>
+
+            <!-- Vùng chứa các dòng (Top/Main/Bottom) -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50 relative">
+
+                <!-- 1. TOP BAR -->
+                <div class="builder-row" data-label="Top Bar">
+                    <div class="row-label row-settings-trigger">
+                        <span>TOP</span>
+                    </div>
+                    <div class="hb-inner-content">
+                        <div class="drop-zone w-1/4 flex justify-start" data-zone="top_left"></div>
+                        <div class="drop-zone flex-1 flex justify-center" data-zone="top_center"></div>
+                        <div class="drop-zone w-1/4 flex justify-end" data-zone="top_right"></div>
+                    </div>
+                </div>
+
+                <!-- 2. MAIN HEADER -->
+                <div class="builder-row" data-label="Main Header">
+                    <div class="row-label row-settings-trigger">
+                        <span>MAIN</span>
+                    </div>
+                    <div class="hb-inner-content" style="min-height: 80px;">
+                        <div class="drop-zone w-1/4 flex justify-start" data-zone="main_left">
+                            <div class="empty-placeholder">Left</div>
+                        </div>
+                        <div class="drop-zone flex-1 flex justify-center" data-zone="main_center">
+                            <div class="empty-placeholder">Center</div>
+                        </div>
+                        <div class="drop-zone w-1/4 flex justify-end" data-zone="main_right">
+                            <div class="empty-placeholder">Right</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. BOTTOM HEADER -->
+                <div class="builder-row" data-label="Bottom Header">
+                    <div class="row-label row-settings-trigger">
+                        <span>BTM</span>
+                    </div>
+                    <div class="hb-inner-content">
+                        <div class="drop-zone w-1/6 flex justify-start" data-zone="bottom_left"></div>
+                        <div class="drop-zone flex-1 flex justify-center" data-zone="bottom_center">
+                            <div class="empty-placeholder">Menu</div>
+                        </div>
+                        <div class="drop-zone w-1/6 flex justify-end" data-zone="bottom_right"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </main>
 
-    <!-- RIGHT SIDEBAR -->
-    <aside class="w-[300px] bg-[#18181b] border-l border-gray-800 flex flex-col flex-shrink-0 z-30">
+    <!-- 3. RIGHT SIDEBAR (Properties) -->
+    <aside class="w-[300px] bg-[#18181b] border-l border-gray-800 flex flex-col flex-shrink-0 z-50">
         <div
             class="h-14 border-b border-gray-800 flex items-center px-4 justify-between font-semibold text-white shadow-sm">
             <span>Properties</span>
             <i class="ph ph-trash hover:text-red-500 cursor-pointer transition p-2 rounded hover:bg-gray-800"
-                title="Delete Element"></i>
+                title="Delete Element" id="global-delete-btn"></i>
         </div>
         <div id="property-panel" class="flex-1 overflow-y-auto p-5">
             <div class="h-full flex flex-col items-center justify-center text-gray-500 space-y-4 opacity-50">
                 <div class="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center"><i
                         class="ph ph-sliders text-3xl"></i></div>
-                <p class="text-xs text-center px-8 leading-5">Select an element on the canvas<br>to edit its properties.
-                </p>
+                <p class="text-xs text-center px-8 leading-5">Click vào Element ở dưới<br>để sửa cài đặt.</p>
             </div>
         </div>
     </aside>
 
     <script>
+    // Dữ liệu đã lưu từ DB
     window.savedData = <?php echo $savedData ? $savedData : '[]'; ?>;
+
+    // Hàm tiện ích Resize Panel
+    function toggleEditorHeight() {
+        const panel = document.getElementById('editor-panel');
+        const h = panel.style.height;
+        if (h === '500px') panel.style.height = '350px';
+        else panel.style.height = '500px';
+    }
     </script>
+
+    <!-- Load Scripts -->
     <script src="assets/js/builder.js"></script>
     <script src="assets/js/ajax.js"></script>
 </body>
