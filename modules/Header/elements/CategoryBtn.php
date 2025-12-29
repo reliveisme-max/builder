@@ -14,18 +14,16 @@ class CategoryBtn extends Block
     public function render($settings = [])
     {
         $text = $settings['text'] ?? 'DANH MỤC';
-        $icon = $settings['icon_class'] ?? 'ph-list';
         $bg = $settings['background-color'] ?? '#f3f4f6';
         $color = $settings['color'] ?? '#333333';
-
-        // FIX
         $radius = intval($settings['border-radius'] ?? '4');
+        $height = intval($settings['height'] ?? '40'); // Mặc định 40px
 
         return "
-            <div class='inner-box flex items-center gap-2 px-4 py-2 cursor-pointer hover:opacity-90 transition' 
-                 style='background-color: {$bg}; color: {$color}; border-radius: {$radius}px;'>
-                <i class='ph {$icon} text-lg'></i>
-                <span class='text-xs font-bold whitespace-nowrap inner-text uppercase'>{$text}</span>
+            <div class='inner-box flex items-center gap-2 px-4 cursor-pointer hover:opacity-90 transition' 
+                 style='background-color: {$bg}; color: {$color}; border-radius: {$radius}px; height: {$height}px;'>
+                <i class='ph ph-list text-lg'></i>
+                <span class='text-xs font-bold uppercase whitespace-nowrap inner-text'>{$text}</span>
                 <i class='ph ph-caret-down text-xs ml-1'></i>
             </div>
         ";
@@ -41,9 +39,15 @@ class CategoryBtn extends Block
                     <div><label class="text-xs text-gray-400 block mb-1">Màu chữ</label><input type="color" data-style="color" value="#333333" class="prop-input w-full h-8 bg-transparent border border-gray-700 rounded"></div>
                 </div>
                 
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Bo góc (Radius)</label>
-                    <input type="range" data-style="border-radius" min="0" max="50" value="4" class="prop-input w-full accent-indigo-500">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Bo góc (px)</label>
+                        <input type="number" data-style="border-radius" value="4" class="prop-input w-full bg-gray-800 text-white p-2 rounded text-xs border border-gray-700">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Chiều cao (px)</label>
+                        <input type="number" data-style="height" value="40" class="prop-input w-full bg-gray-800 text-white p-2 rounded text-xs border border-gray-700">
+                    </div>
                 </div>
             </div>
         ';

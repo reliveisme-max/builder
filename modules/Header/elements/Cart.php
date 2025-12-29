@@ -16,9 +16,8 @@ class Cart extends Block
         $layout = $settings['layout'] ?? 'icon';
         $iconType = $settings['icon_type'] ?? 'ph-shopping-cart';
         $color = $settings['color'] ?? 'inherit';
-
-        // FIX
         $size = intval($settings['font-size'] ?? '24');
+        $customLink = $settings['custom_link'] ?? '/cart'; // Link tùy chỉnh
 
         $price = '1.250.000₫';
         $count = '3';
@@ -27,7 +26,7 @@ class Cart extends Block
         if ($layout === 'icon_label') $extraHtml = "<span class='text-xs font-bold ml-2'>Giỏ hàng</span>";
 
         return "
-            <a href='/cart' class='flex items-center cursor-pointer group relative px-2 hover:opacity-80 transition' style='text-decoration: none; color: {$color};'>
+            <a href='{$customLink}' class='flex items-center cursor-pointer group relative px-2 hover:opacity-80 transition' style='text-decoration: none; color: {$color};'>
                 <div class='relative flex items-center'>
                     <i class='ph {$iconType}' style='font-size: {$size}px;'></i>
                     <span class='absolute -top-1 -right-2 bg-red-600 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center border border-white'>{$count}</span>
@@ -40,21 +39,25 @@ class Cart extends Block
     {
         return '
             <div class="space-y-3">
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Giao diện</label>
-                    <select data-style="layout" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs">
-                        <option value="icon">Chỉ Icon</option>
-                        <option value="icon_price">Icon + Giá tiền</option>
-                        <option value="icon_label">Icon + Chữ "Giỏ hàng"</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 block mb-1">Loại Icon</label>
-                    <select data-style="icon_type" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs">
-                        <option value="ph-shopping-cart">Xe đẩy (Cart)</option>
-                        <option value="ph-bag">Túi xách (Bag)</option>
-                        <option value="ph-basket">Giỏ (Basket)</option>
-                    </select>
+                <div><label class="text-xs text-gray-400 block mb-1">Đường dẫn (Link)</label><input type="text" data-style="custom_link" value="/cart" class="prop-input w-full bg-gray-800 text-white p-2 rounded text-xs border border-gray-700"></div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Giao diện</label>
+                        <select data-style="layout" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs">
+                            <option value="icon">Chỉ Icon</option>
+                            <option value="icon_price">Icon + Giá</option>
+                            <option value="icon_label">Icon + Chữ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Loại Icon</label>
+                        <select data-style="icon_type" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs">
+                            <option value="ph-shopping-cart">Xe đẩy</option>
+                            <option value="ph-bag">Túi xách</option>
+                            <option value="ph-basket">Giỏ</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="text-xs text-gray-400 block mb-1">Màu sắc</label><input type="color" data-style="color" class="prop-input w-full h-8 bg-transparent border border-gray-700 rounded"></div>

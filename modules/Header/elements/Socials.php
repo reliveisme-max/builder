@@ -13,10 +13,11 @@ class Socials extends Block
 
     public function render($settings = [])
     {
+        // Dữ liệu mặc định
         $defaultJson = json_encode([
-            ['icon' => 'ph-facebook-logo', 'link' => '#'],
-            ['icon' => 'ph-instagram-logo', 'link' => '#'],
-            ['icon' => 'ph-youtube-logo', 'link' => '#']
+            ['type' => 'icon', 'val' => 'ph-facebook-logo', 'link' => '#'],
+            ['type' => 'icon', 'val' => 'ph-instagram-logo', 'link' => '#'],
+            ['type' => 'icon', 'val' => 'ph-youtube-logo', 'link' => '#']
         ]);
 
         $config = $settings['social_items'] ?? $defaultJson;
@@ -24,11 +25,8 @@ class Socials extends Block
         if (!is_array($items)) $items = [];
 
         $color = $settings['color'] ?? 'inherit';
-
-        // FIX: Dùng intval để loại bỏ 'px' thừa nếu có
-        $size = intval($settings['font-size'] ?? '18');
-        $gap = intval($settings['gap'] ?? '12');
-
+        $size = intval($settings['font-size'] ?? '20');
+        $gap = intval($settings['gap'] ?? '15'); // Khoảng cách
         $shape = $settings['shape'] ?? 'none';
 
         $shapeClass = '';
@@ -37,32 +35,78 @@ class Socials extends Block
 
         $html = '';
         foreach ($items as $item) {
-            $icon = $item['icon'] ?? 'ph-link';
+            $type = $item['type'] ?? 'icon'; // icon hoặc image
+            $val  = $item['val'] ?? '';      // class icon hoặc url ảnh
             $link = $item['link'] ?? '#';
+
+            $content = '';
+            if ($type === 'image') {
+                // Render Ảnh
+                $content = "<img src='{$val}' alt='Social' style='width: {$size}px; height: {$size}px; object-fit: cover; display: block;'>";
+            } else {
+                // Render Icon Phosphor
+                // Lưu ý: Nếu user nhập 'ph-facebook-logo', ta thêm class 'ph' đằng trước
+                $iconClass = (strpos($val, 'ph-') === false) ? 'ph-' . $val : $val;
+                $content = "<i class='ph {$iconClass}' style='font-size: {$size}px;'></i>";
+            }
+
             $html .= "<a href='{$link}' target='_blank' class='social-link hover:opacity-80 transition flex items-center justify-center {$shapeClass}' title='Social'>
-                        <i class='ph {$icon}'></i>
+                        {$content}
                       </a>";
         }
 
         return "<div class='flex items-center social-group' data-social-items='" . htmlspecialchars($config, ENT_QUOTES, 'UTF-8') . "' 
-                     style='gap: {$gap}px; color: {$color}; font-size: {$size}px;'>{$html}</div>";
+                     style='gap: {$gap}px; color: {$color};'>{$html}</div>";
     }
 
     public function getForm()
     {
         return '
             <div class="space-y-4">
-                <label class="text-xs text-gray-400 block font-bold uppercase">Danh sách Icons</label>
-                <div id="social-items-container" class="space-y-2"></div>
-                <button type="button" id="btn-add-social" class="w-full py-2 border border-dashed border-gray-600 text-gray-400 text-xs rounded hover:border-gray-400 hover:text-white transition">+ Thêm Icon</button>
-                <textarea data-style="social_items" id="hidden-social-items" class="prop-input hidden"></textarea>
-                <hr class="border-gray-800">
-                <div><label class="text-xs text-gray-400 block mb-1">Hình dáng</label><select data-style="shape" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs"><option value="none">Trống (Chỉ Icon)</option><option value="circle">Hình tròn (Circle)</option><option value="square">Hình vuông (Square)</option></select></div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div><label class="text-xs text-gray-400 block mb-1">Màu Icon</label><input type="color" data-style="color" class="prop-input w-full h-8 bg-transparent border border-gray-700 rounded"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">Size</label><input type="number" data-style="font-size" value="18" class="prop-input w-full bg-gray-800 text-white p-1 rounded border border-gray-700 text-xs"></div>
+                <div class="bg-blue-900/20 p-2 rounded border border-blue-800 text-[10px] text-blue-200">
+                    <i class="ph ph-info"></i> Lấy tên icon tại: <a href="https://phosphoricons.com" target="_blank" class="text-blue-400 underline">phosphoricons.com</a>
+                    <br>(Ví dụ: ph-tiktok-logo, ph-zalo...)
                 </div>
-                <div><label class="text-xs text-gray-400 block mb-1">Khoảng cách</label><input type="range" data-style="gap" min="4" max="50" value="12" class="prop-input w-full accent-indigo-500"></div>
+
+                <label class="text-xs text-gray-400 block font-bold uppercase">Danh sách Icons</label>
+                
+                <!-- Container chứa các item (JS sẽ render vào đây) -->
+                <div id="social-items-container" class="space-y-3"></div>
+                
+                <button type="button" id="btn-add-social" class="w-full py-2 border border-dashed border-gray-600 text-gray-400 text-xs rounded hover:border-gray-400 hover:text-white transition flex items-center justify-center gap-2">
+                    <i class="ph ph-plus"></i> Thêm Mạng xã hội
+                </button>
+                
+                <!-- Input ẩn để lưu JSON -->
+                <textarea data-style="social_items" id="hidden-social-items" class="prop-input hidden"></textarea>
+                
+                <hr class="border-gray-800">
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Hình dáng</label>
+                        <select data-style="shape" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs">
+                            <option value="none">Trống (None)</option>
+                            <option value="circle">Hình tròn (Circle)</option>
+                            <option value="square">Hình vuông (Square)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Màu Icon</label>
+                        <input type="color" data-style="color" class="prop-input w-full h-8 bg-transparent border border-gray-700 rounded">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Kích thước (px)</label>
+                        <input type="number" data-style="font-size" value="20" class="prop-input w-full bg-gray-800 text-white p-1 rounded border border-gray-700 text-xs">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400 block mb-1">Khoảng cách (px)</label>
+                        <input type="number" data-style="gap" value="15" class="prop-input w-full bg-gray-800 text-white p-1 rounded border border-gray-700 text-xs">
+                    </div>
+                </div>
             </div>
         ';
     }

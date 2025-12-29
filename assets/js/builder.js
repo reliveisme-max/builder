@@ -209,15 +209,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (el.parentNode) checkZoneEmpty(el.parentNode);
         });
 
-        // Hover Effect cho Button
+        // FIX LỖI HOVER BUTTON
         if(cls.includes('Button')) {
-            const a = el.querySelector('a');
+            const a = el.querySelector('.inner-box');
             if(a) {
-                a.addEventListener('mouseenter', () => { a.style.backgroundColor = a.getAttribute('data-hover-bg') || a.getAttribute('data-original-bg'); a.style.color = a.getAttribute('data-hover-color') || a.getAttribute('data-original-color'); });
-                a.addEventListener('mouseleave', () => { a.style.backgroundColor = a.getAttribute('data-original-bg'); a.style.color = a.getAttribute('data-original-color'); });
+                // Sự kiện Hover vào
+                a.addEventListener('mouseenter', () => { 
+                    const hBg = a.getAttribute('data-hover-bg');
+                    const hCol = a.getAttribute('data-hover-color');
+                    // Chỉ đổi nếu có setting hover
+                    if(hBg) a.style.backgroundColor = hBg;
+                    if(hCol) a.style.color = hCol;
+                });
+                
+                // Sự kiện Hover ra (Trả về màu gốc)
+                a.addEventListener('mouseleave', () => { 
+                    const oBg = a.getAttribute('data-original-bg');
+                    const oCol = a.getAttribute('data-original-color');
+                    if(oBg) a.style.backgroundColor = oBg;
+                    if(oCol) a.style.color = oCol;
+                });
             }
         }
-    }
 
     function loadSettingsForm(url) {
         propertyPanel.innerHTML = '<div class="h-full flex items-center justify-center text-gray-500"><i class="ph ph-spinner animate-spin text-2xl"></i></div>';
@@ -304,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAllZonesState();
     }
 
-    // --- 7. LIVE EDIT & HELPERS ---
+    // --- 7. LIVE EDIT (Bản Fix Lỗi Toàn Diện) ---
     window.initLiveEdit = function() {
         const inputs = propertyPanel.querySelectorAll('.prop-input');
         if(!window.activeElement) return;
@@ -317,82 +330,293 @@ document.addEventListener('DOMContentLoaded', () => {
             const type = input.dataset.style;
             if(!type) return;
 
-            if (window.activeElement.hasAttribute('data-setting-' + type)) input.value = window.activeElement.getAttribute('data-setting-' + type);
-            if (isRow) {
-                if (type === 'width-mode') input.value = window.activeElement.getAttribute('data-width-mode') || 'container';
-                if (type === 'container-width') input.value = parseInt(window.activeElement.getAttribute('data-container-width')) || 1200;
-                if (type === 'min-height') input.value = parseInt(window.activeElement.style.minHeight) || 50;
-                if (type === 'background-color') { const rgb = window.activeElement.style.backgroundColor; if(rgb) input.value = rgbToHex(rgb); }
-                if (type === 'row_hidden') input.checked = window.activeElement.getAttribute('data-row-hidden') === 'true';
+            // Load giá trị hiện tại
+            if (window.activeElement.hasAttribute('data-setting-' + type)) {
+                const val = window.activeElement.getAttribute('data-setting-' + type);
+                if (input.type === 'checkbox') input.checked = (val === 'true');
+                else input.value = val;
+            }
+            
+            // Xử lý riêng cho Row & các field đặc biệt
+            if (isRow) { /* ... (giữ nguyên logic row nếu muốn, hoặc copy lại từ bản trước) ... */ 
+                 if (type === 'width-mode') input.value = window.activeElement.getAttribute('data-width-mode') || 'container';
+                 if (type === 'container-width') input.value = parseInt(window.activeElement.getAttribute('data-container-width')) || 1200;
+                 if (type === 'min-height') input.value = parseInt(window.activeElement.style.minHeight) || 50;
+                 if (type === 'background-color') { const rgb = window.activeElement.style.backgroundColor; if(rgb) input.value = rgbToHex(rgb); }
+                 if (type === 'row_hidden') input.checked = window.activeElement.getAttribute('data-row-hidden') === 'true';
             }
             if(type === 'src') { const img = window.activeElement.querySelector('img'); if(img) input.value = img.getAttribute('src'); }
-            if(type === 'font-size' && cls.includes('Cart')) { const i = window.activeElement.querySelector('i'); if(i) input.value = parseInt(i.style.fontSize)||24; }
+            if(type === 'text_content') { const t = window.activeElement.querySelector('.text-content'); if(t) input.value = t.innerText; }
+            if(type === 'font-size') {
+                const target = getStyleTarget(window.activeElement, cls);
+                // Fix lấy size cho Socials/Cart
+                let s = window.getComputedStyle(target).fontSize;
+                if(cls.includes('Cart') || cls.includes('Socials')) {
+                    const i = window.activeElement.querySelector('i, img');
+                    if(i) s = window.getComputedStyle(i).fontSize || window.getComputedStyle(i).width;
+                }
+                input.value = parseInt(s) || 14; 
+            }
 
+            // --- SỰ KIỆN INPUT CHANGE ---
             input.addEventListener('input', function() {
-                const val = (input.type === 'checkbox') ? input.checked : input.value;
+                const val = (input.type === 'checkbox') ? (input.checked ? 'true' : 'false') : input.value;
                 const target = getStyleTarget(window.activeElement, cls);
                 
-                if(['layout','shape','icon_type','font-size','color','width', 'height'].includes(type)) window.activeElement.setAttribute('data-setting-' + type, val);
+                // Lưu attribute để Save
+                const keysToSave = [
+                    'layout','shape','icon_type','font-size','color','width', 'height', 
+                    'mobile_width', 'gap', 'font-weight', 'text-transform', 'hover_style',
+                    'custom_link', 'show_icon', 'button_type', 'button_bg', 'button_color',
+                    'text_content', 'text_align' // Thêm các key text
+                ];
+                if(keysToSave.includes(type)) window.activeElement.setAttribute('data-setting-' + type, val);
 
                 switch (type) {
+                    // --- FIX TEXT HTML ---
+                    case 'text_content':
+                        if(target.classList.contains('text-content')) target.innerText = val;
+                        break;
+                    case 'text_align':
+                        target.style.textAlign = val;
+                        break;
+
+                    // --- DIMENSIONS ---
                     case 'height': 
                         if (cls.includes('Search')) { const b = window.activeElement.querySelector('.search-box'); if(b) b.style.height = val + 'px'; } 
                         else target.style.height = val + 'px'; 
                         break;
                     case 'width': 
-    if (cls.includes('Search')) {
-        // Search thì dùng cssText !important
-        target.style.cssText += `; width: ${val}% !important;`;
-    }
-    else {
-        // Các cái khác (bao gồm Logo) thì dùng style.width bình thường
-        // Vì target của Logo giờ là Wrapper nên nó sẽ nhận width px
-        target.style.width = val.includes('%') ? val : val + 'px'; 
-    }
-    break;
-                    case 'row_hidden': if (val) { window.activeElement.setAttribute('data-row-hidden', 'true'); window.activeElement.classList.add('is-hidden'); } else { window.activeElement.removeAttribute('data-row-hidden'); window.activeElement.classList.remove('is-hidden'); } break;
-                    case 'width-mode': window.activeElement.setAttribute('data-width-mode', val); const inner = window.activeElement.querySelector('.hb-inner-content'); if (inner) inner.style.maxWidth = (val === 'full') ? '100%' : (window.activeElement.getAttribute('data-container-width') || '1200px'); break;
-                    case 'container-width': window.activeElement.setAttribute('data-container-width', val + 'px'); if (window.activeElement.getAttribute('data-width-mode') !== 'full') { window.activeElement.querySelector('.hb-inner-content').style.maxWidth = val + 'px'; } break;
-                    case 'min-height': window.activeElement.style.minHeight = val + 'px'; break;
-                    case 'background-color': if (isRow) window.activeElement.style.backgroundColor = val; else { target.style.backgroundColor = val; if(cls.includes('Button')) target.setAttribute('data-original-bg', val); } break;
-                    case 'color': target.style.color = val; target.querySelectorAll('i, a, span, input').forEach(el => el.style.color = 'inherit'); if(cls.includes('Button')) target.setAttribute('data-original-color', val); break;
-                    case 'font-size': if(cls.includes('Cart')) { const i = window.activeElement.querySelector('i'); if(i) i.style.fontSize = val + 'px'; } else target.style.fontSize = val + 'px'; break;
-                    case 'gap': target.style.gap = val + 'px'; break;
-                    case 'border-radius': target.style.borderRadius = val + 'px'; break;
-                    case 'text': const t = window.activeElement.querySelector('.inner-text, .text-content, button, a'); if(t) t.innerText = val; const inp = window.activeElement.querySelector('input'); if(inp) inp.placeholder = val; break;
-                    case 'src': const img = window.activeElement.querySelector('img'); if(img) img.src = val; break;
-                    case 'layout':
-                        if (cls.includes('Search')) { const old = window.activeElement.querySelector('form, .search-icon-only'); if(old) old.remove(); let html = (val === 'icon') ? `<div class="search-icon-only cursor-pointer hover:opacity-70" style="color:inherit;font-size:20px"><i class="ph ph-magnifying-glass"></i></div>` : `<form class="search-box relative flex items-center h-9 w-full bg-gray-100 rounded-full pointer-events-none" style="min-width:200px; width: 100%"><input type="text" placeholder="Tìm kiếm..." class="w-full h-full px-4 border-0 bg-transparent text-xs"><i class="ph ph-magnifying-glass absolute right-3 opacity-50"></i></form>`; window.activeElement.insertAdjacentHTML('afterbegin', html); }
-                        if (cls.includes('Cart')) { const wrap = window.activeElement.querySelector('.flex'); const span = wrap.querySelector('span:not(.absolute)'); if(span) span.remove(); if(val === 'icon_price') wrap.insertAdjacentHTML('beforeend', `<span class='text-xs font-bold ml-2'>1.250.000₫</span>`); if(val === 'icon_label') wrap.insertAdjacentHTML('beforeend', `<span class='text-xs font-bold ml-2'>Giỏ hàng</span>`); }
+                        if (cls.includes('Search')) target.style.cssText += `; width: ${val}% !important;`;
+                        else target.style.width = val.includes('%') ? val : val + 'px'; 
                         break;
-                    case 'icon_type': if (cls.includes('Cart')) { const i = window.activeElement.querySelector('i'); if(i) i.className = `ph ${val}`; } break;
-                    case 'shape': if(cls.includes('Socials')) { const lks = target.querySelectorAll('a'); lks.forEach(a => { a.className = 'social-link hover:opacity-80 transition flex items-center justify-center'; if(val === 'circle') a.classList.add('rounded-full', 'bg-gray-100', 'p-2'); if(val === 'square') a.classList.add('rounded', 'bg-gray-100', 'p-2'); }); } break;
+                    case 'gap': target.style.gap = val + 'px'; break;
+
+                    // --- TYPOGRAPHY & SIZE ---
+                    case 'font-size': 
+                        if(cls.includes('Cart')) {
+                            // Fix Cart: Chỉ chỉnh icon bên trong
+                            const i = window.activeElement.querySelector('i'); if(i) i.style.fontSize = val + 'px';
+                        } else if(cls.includes('Socials')) {
+                            // Fix Socials: Chỉnh cả Icon và Ảnh
+                            target.querySelectorAll('i').forEach(el => el.style.fontSize = val + 'px');
+                            target.querySelectorAll('img').forEach(el => { el.style.width = val + 'px'; el.style.height = val + 'px'; });
+                        } else {
+                            target.style.fontSize = val + 'px'; 
+                        }
+                        break;
+                    
+                    case 'font-weight': target.style.fontWeight = val; break;
+                    case 'text-transform': target.style.textTransform = val; break;
+                    
+                    // --- COLORS ---
+                    case 'color': 
+                        target.style.color = val; 
+                        target.querySelectorAll('i, a, span, input').forEach(el => el.style.color = 'inherit');
+                        if(cls.includes('Button')) target.setAttribute('data-original-color', val); 
+                        break;
+                    
+                    case 'background-color': 
+                        if (isRow) window.activeElement.style.backgroundColor = val; 
+                        else { 
+                            target.style.backgroundColor = val; 
+                            if(cls.includes('Button')) target.setAttribute('data-original-bg', val); 
+                        } 
+                        break;
+                    // --- CẬP NHẬT MÀU HOVER REAL-TIME ---
+                    case 'hover_bg':
+                        const btnH = window.activeElement.querySelector('.inner-box');
+                        if(btnH) btnH.setAttribute('data-hover-bg', val);
+                        break;
+                        
+                    case 'hover_color':
+                        const btnC = window.activeElement.querySelector('.inner-box');
+                        if(btnC) btnC.setAttribute('data-hover-color', val);
+                        break;
+
+                    // --- MÀU GỐC (Cần lưu vào attribute để hover ra còn biết đường về) ---
+                    case 'background-color': 
+                        if (isRow) window.activeElement.style.backgroundColor = val; 
+                        else { 
+                            target.style.backgroundColor = val; 
+                            if(cls.includes('Button')) target.setAttribute('data-original-bg', val); 
+                        } 
+                        break;
+                    
+                    case 'color': 
+                        target.style.color = val; 
+                        target.querySelectorAll('i, a, span, input').forEach(el => el.style.color = 'inherit');
+                        if(cls.includes('Button')) target.setAttribute('data-original-color', val); 
+                        break;    
+
+                    // --- SPECIALS ---
+                    case 'icon_type': 
+                        if (cls.includes('Cart')) { 
+                            const i = window.activeElement.querySelector('i'); 
+                            if(i) {
+                                i.className = `ph ${val}`; 
+                                // FIX QUAN TRỌNG: Re-apply font-size ngay lập tức để không bị bé lại
+                                const currentSize = window.activeElement.getAttribute('data-setting-font-size') || 24;
+                                i.style.fontSize = currentSize + 'px';
+                            }
+                        } 
+                        break;
+
+                    case 'show_icon':
+                        const iconDiv = window.activeElement.querySelector('.w-8.h-8');
+                        if(iconDiv) iconDiv.style.display = (val === 'true') ? 'flex' : 'none';
+                        break;
+                        
+                    case 'button_bg':
+                        const btnS = window.activeElement.querySelector('button[type="submit"]');
+                        if(btnS) btnS.style.backgroundColor = val;
+                        break;
+                        
+                    case 'row_hidden': 
+                        if (val === 'true') { window.activeElement.setAttribute('data-row-hidden', 'true'); window.activeElement.classList.add('is-hidden'); } 
+                        else { window.activeElement.removeAttribute('data-row-hidden'); window.activeElement.classList.remove('is-hidden'); } 
+                        break;
+                        
+                    case 'text': 
+                        const t = window.activeElement.querySelector('.inner-text, .text-content, button, a'); if(t) t.innerText = val; 
+                        const inp = window.activeElement.querySelector('input'); if(inp) inp.placeholder = val; 
+                        break;
+                        
+                    case 'src': 
+                        const img = window.activeElement.querySelector('img'); if(img) img.src = val; 
+                        break;
                 }
             });
         });
     };
 
+    // --- SETUP REPEATER (Fix UI: Thêm min-w-0 để input không bị tràn) ---
     function setupRepeater(cls) {
         const container = document.getElementById(cls.includes('Menu')?'menu-items-container':'social-items-container');
         const hiddenInput = document.getElementById(cls.includes('Menu')?'hidden-menu-config':'hidden-social-items');
         const btnAdd = document.getElementById(cls.includes('Menu')?'btn-add-menu':'btn-add-social');
         if(!container || !hiddenInput || !btnAdd) return;
+        
         const target = cls.includes('Menu') ? window.activeElement.querySelector('nav') : window.activeElement.querySelector('.social-group');
         const attr = cls.includes('Menu') ? 'data-menu-config' : 'data-social-items';
-        let data = []; try { data = JSON.parse(target.getAttribute(attr)) || []; } catch(e){ data = []; } hiddenInput.value = JSON.stringify(data);
+        let data = []; try { data = JSON.parse(target.getAttribute(attr)) || []; } catch(e){ data = []; } 
+        
+        hiddenInput.value = JSON.stringify(data);
+
         function render() {
-            container.innerHTML = ''; data.forEach((item, i) => { const d = document.createElement('div'); d.className = 'bg-gray-800 p-2 rounded border border-gray-700 flex flex-col gap-2 mb-2'; if(cls.includes('Menu')) d.innerHTML = `<div class="flex gap-2"><input type="text" value="${item.text}" data-idx="${i}" data-key="text" class="rep-inp flex-1 bg-gray-900 text-white text-xs p-1 rounded"><button onclick="window.delRep(${i})" class="text-red-500">X</button></div><input type="text" value="${item.href}" data-idx="${i}" data-key="href" class="rep-inp w-full bg-gray-900 text-gray-400 text-[10px] p-1 rounded">`; else d.innerHTML = `<div class="flex gap-2"><select data-idx="${i}" data-key="icon" class="rep-inp bg-gray-900 text-white text-xs p-1 rounded flex-1"><option value="ph-facebook-logo">Facebook</option><option value="ph-instagram-logo">Instagram</option><option value="ph-youtube-logo">Youtube</option><option value="ph-tiktok-logo">TikTok</option></select><button onclick="window.delRep(${i})" class="text-red-500">X</button></div>`; container.appendChild(d); });
-            document.querySelectorAll('.rep-inp').forEach(inpt => { inpt.addEventListener('input', (e) => { data[e.target.dataset.idx][e.target.dataset.key] = e.target.value; update(); }); });
-            if(!cls.includes('Menu')) { document.querySelectorAll('select.rep-inp').forEach(s => s.value = data[s.dataset.idx].icon); }
+            container.innerHTML = ''; 
+            data.forEach((item, i) => { 
+                const d = document.createElement('div'); 
+                // Thêm relative để đặt nút X
+                d.className = 'bg-gray-900 p-2 rounded border border-gray-700 flex flex-col gap-2 mb-2 relative group'; 
+                
+                // Nút xóa (X) - Đặt góc trên phải
+                const btnDel = `<button onclick="window.delRep(${i})" class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-500 hover:text-red-500 bg-gray-800 hover:bg-gray-700 rounded z-10"><i class="ph ph-x text-xs"></i></button>`;
+
+                if(cls.includes('Menu')) {
+                    // Form Menu
+                    d.innerHTML = `
+                        ${btnDel}
+                        <div class="pr-6">
+                            <input type="text" value="${item.text}" data-idx="${i}" data-key="text" class="rep-inp w-full bg-gray-800 text-white text-xs p-1.5 rounded border border-gray-600 focus:border-blue-500 outline-none" placeholder="Tên menu">
+                        </div>
+                        <div>
+                            <input type="text" value="${item.href}" data-idx="${i}" data-key="href" class="rep-inp w-full bg-gray-800 text-blue-400 text-[10px] p-1.5 rounded border border-gray-600 focus:border-blue-500 outline-none" placeholder="Link">
+                        </div>
+                    `;
+                } else {
+                    // Form Socials (Fix overflow)
+                    const isImg = item.type === 'image';
+                    d.innerHTML = `
+                        ${btnDel}
+                        <div class="flex gap-2 pr-6"> <!-- pr-6 để tránh dính nút X -->
+                            <!-- Select Type -->
+                            <select data-idx="${i}" data-key="type" class="rep-inp bg-gray-800 text-white text-[10px] p-1 rounded border border-gray-600 w-16 focus:border-blue-500 outline-none" onchange="window.renderRep()">
+                                <option value="icon" ${!isImg?'selected':''}>Icon</option>
+                                <option value="image" ${isImg?'selected':''}>Ảnh</option>
+                            </select>
+                            
+                            <!-- Input Value: Thêm min-w-0 để không bị tràn -->
+                            <input type="text" value="${item.val || ''}" data-idx="${i}" data-key="val" class="rep-inp flex-1 min-w-0 bg-gray-800 text-white text-xs p-1.5 rounded border border-gray-600 focus:border-blue-500 outline-none" placeholder="${isImg ? 'Link Ảnh' : 'Mã (vd: ph-user)'}">
+                        </div>
+                        
+                        <div>
+                            <input type="text" value="${item.link || ''}" data-idx="${i}" data-key="link" class="rep-inp w-full bg-gray-800 text-blue-400 text-[10px] p-1.5 rounded border border-gray-600 focus:border-blue-500 outline-none" placeholder="Link liên kết (#)">
+                        </div>
+                    `;
+                }
+                container.appendChild(d); 
+            });
+            
+            // Bind sự kiện nhập liệu
+            document.querySelectorAll('.rep-inp').forEach(inpt => { 
+                inpt.addEventListener('input', (e) => { 
+                    data[e.target.dataset.idx][e.target.dataset.key] = e.target.value; 
+                    update(); 
+                }); 
+            });
         }
-        function update() { const j = JSON.stringify(data); hiddenInput.value = j; if(target) { target.setAttribute(attr, j); renderRepeaterHTML(window.activeElement, cls.includes('Menu')?'Menu':'Socials'); } }
+
+        function update() { 
+            const j = JSON.stringify(data); 
+            hiddenInput.value = j; 
+            if(target) { 
+                target.setAttribute(attr, j); 
+                renderRepeaterHTML(window.activeElement, cls.includes('Menu')?'Menu':'Socials'); 
+            } 
+        }
+        
         window.delRep = (i) => { data.splice(i, 1); render(); update(); };
-        btnAdd.onclick = () => { data.push(cls.includes('Menu')?{text:'Link',href:'#'}:{icon:'ph-link',link:'#'}); render(); update(); };
+        window.renderRep = () => { render(); }; 
+
+        btnAdd.onclick = () => { 
+            if (cls.includes('Menu')) data.push({text:'Menu Item', href:'#'});
+            else data.push({type:'icon', val:'ph-star', link:'#'}); 
+            render(); update(); 
+        };
+        
         render();
     }
     
     // --- 8. HELPER FUNCTIONS ---
-    function renderRepeaterHTML(el, type) { if(type==='Menu') { const n=el.querySelector('nav'); try{ const d=JSON.parse(n.getAttribute('data-menu-config')); let h=''; d.forEach(i=>h+=`<a href="${i.href}" class="hover:text-blue-600 transition px-1">${i.text}</a>`); n.innerHTML=h; }catch(e){} } if(type==='Socials') { const g=el.querySelector('.social-group'); try{ const d=JSON.parse(g.getAttribute('data-social-items')); let h=''; const s=window.activeElement.getAttribute('data-setting-shape'); const sc=(s==='circle')?'rounded-full bg-gray-100 p-2':((s==='square')?'rounded bg-gray-100 p-2':''); d.forEach(i=>h+=`<a href="${i.link}" class="social-link hover:opacity-80 transition flex items-center justify-center ${sc}"><i class="ph ${i.icon}"></i></a>`); g.innerHTML=h; }catch(e){} } }
+    function renderRepeaterHTML(el, type) { 
+        if(type==='Menu') { 
+            const n=el.querySelector('nav'); 
+            try{ 
+                const d=JSON.parse(n.getAttribute('data-menu-config')); 
+                let h=''; d.forEach(i=>h+=`<a href="${i.href}" class="hover:text-blue-600 transition px-1">${i.text}</a>`); 
+                n.innerHTML=h; 
+            }catch(e){} 
+        } 
+        if(type==='Socials') { 
+            const g=el.querySelector('.social-group'); 
+            try{ 
+                const d=JSON.parse(g.getAttribute('data-social-items')); 
+                
+                // Lấy style hiện tại để áp dụng cho item mới
+                const size = el.getAttribute('data-setting-font-size') || 20;
+                const shape = el.getAttribute('data-setting-shape');
+                let shapeClass = '';
+                if (shape === 'circle') shapeClass = 'rounded-full bg-gray-100 p-2 hover:bg-gray-200';
+                if (shape === 'square') shapeClass = 'rounded bg-gray-100 p-2 hover:bg-gray-200';
+
+                let h=''; 
+                d.forEach(i => {
+                    let content = '';
+                    if(i.type === 'image') {
+                        content = `<img src="${i.val}" style="width:${size}px; height:${size}px; object-fit:cover; display:block;">`;
+                    } else {
+                        // Tự động thêm 'ph-' nếu người dùng quên nhập
+                        let iconCls = i.val || 'ph-warning';
+                        if (!iconCls.includes('ph-') && !iconCls.includes('fa-')) iconCls = 'ph-' + iconCls;
+                        content = `<i class="ph ${iconCls}" style="font-size:${size}px"></i>`;
+                    }
+                    h += `<a href="${i.link}" class="social-link hover:opacity-80 transition flex items-center justify-center ${shapeClass}">${content}</a>`;
+                });
+                g.innerHTML=h; 
+            }catch(e){} 
+        } 
+    }
     
     function rgbToHex(rgb) { if(!rgb || rgb==='rgba(0, 0, 0, 0)') return '#ffffff'; if(rgb.startsWith('#')) return rgb; let sep=rgb.indexOf(",")>-1?",":" "; rgb=rgb.substr(4).split(")")[0].split(sep); let r=(+rgb[0]).toString(16),g=(+rgb[1]).toString(16),b=(+rgb[2]).toString(16); if(r.length==1)r="0"+r; if(g.length==1)g="0"+g; if(b.length==1)b="0"+b; return "#"+r+g+b; }
     

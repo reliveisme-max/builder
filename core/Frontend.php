@@ -148,19 +148,25 @@ class Frontend
         $wrapperStyle = "";
         $extraClass = "";
 
-        // LOGIC XỬ LÝ STYLE
+        // --- XỬ LÝ LOGO MOBILE WIDTH ---
+        $mobileCss = "";
+        if (strpos($className, 'Logo') !== false && !empty($content['mobile_width'])) {
+            $uniqueClass = 'logo-' . uniqid();
+            $extraClass .= " " . $uniqueClass;
+            $mw = $content['mobile_width'];
+            // In thẳng CSS Media Query ra (hơi thô nhưng hiệu quả tức thì)
+            echo "<style>@media (max-width: 768px) { .{$uniqueClass} { width: {$mw}px !important; } }</style>";
+        }
+
+        // Logic cũ
         if ($position === 'center' && strpos($className, 'Search') !== false) {
-            // Search ở giữa -> Full Width
-            $extraClass = "is-search-center";
+            $extraClass .= " is-search-center";
         } elseif (isset($styles['width'])) {
-            // FIX LOGO: Nếu có width (do người dùng kéo), gán width đó cho Wrapper
-            // CSS .header-item-wrapper img { width: 100% } sẽ lo phần còn lại
             $wrapperStyle = "width: {$styles['width']};";
         }
 
         return "<div class='header-item-wrapper {$extraClass}' style='{$wrapperStyle}'>{$html}</div>";
     }
-
     private static function parseStyleString($str)
     {
         $result = [];

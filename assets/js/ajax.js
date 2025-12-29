@@ -100,7 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         const txtContent = el.querySelector('.text-content'); if (txtContent) content['text_content'] = txtContent.innerText;
 
                         // Lấy Settings đặc biệt
-                        const specialSettings = ['layout', 'shape', 'icon_type', 'hover_style', 'text-transform', 'height', 'width', 'font-size', 'color', 'background-color'];
+                        const specialSettings = [
+    'layout', 'shape', 'icon_type', 'hover_style', 'text-transform', 
+    'height', 'width', 'font-size', 'color', 'background-color',
+    'mobile_width', 'gap', 'font-weight', 'custom_link', 'show_icon', 
+    'button_type', 'button_bg', 'button_color',
+    'text_content', 'text_align', 'hover_bg', 'hover_color' // <-- Mới thêm
+];
                         specialSettings.forEach(key => {
                             if (el.hasAttribute('data-setting-' + key)) {
                                 content[key] = el.getAttribute('data-setting-' + key);
