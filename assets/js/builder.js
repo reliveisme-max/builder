@@ -162,10 +162,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (boxShadow && boxShadow !== 'none') styleStr += `box-shadow: ${boxShadow}; `;
             const minH = row.getAttribute('data-min-height');
             if (minH) styleStr += `min-height: ${minH}px; `;
+            
             rowDiv.setAttribute('style', styleStr);
 
             const container = document.createElement('div');
             container.className = 'hb-inner-content';
+            
+            // [FIX] LẤY GAP TỪ CÀI ĐẶT (Mặc định 30px nếu chưa chỉnh)
+            const gapVal = row.getAttribute('data-gap') || '30';
+            
+            // Áp dụng Gap cho khoảng cách giữa 3 cột Left-Center-Right
+            container.style.gap = gapVal + 'px'; 
+
             const widthMode = row.getAttribute('data-width-mode') || 'container';
             const contWidth = row.getAttribute('data-container-width') || '1200';
             const finalWidth = isNaN(contWidth) ? contWidth : contWidth + 'px';
@@ -183,6 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const position = zoneName.split('_')[1]; 
                 const colDiv = document.createElement('div');
                 colDiv.className = `header-col col-${position}`;
+                
+                // [FIX] Áp dụng cùng Gap cho khoảng cách các phần tử con
+                colDiv.style.gap = gapVal + 'px';
+
                 const chips = zone.querySelectorAll('.builder-element');
                 chips.forEach(chip => {
                     const cls = chip.getAttribute('data-class');
@@ -225,58 +237,37 @@ document.addEventListener('DOMContentLoaded', () => {
     window.updateLivePreview = updateLivePreview;
 
     function renderRealHTML(className, s) {
-        const color = s.color || 'inherit'; const fontSize = s['font-size'] || '14';
+        let color = s.color || 'inherit'; 
         
-        // --- [FIX HOVER BUTTON] ---
         if (className.includes('Button')) { 
-            const bg = s['background-color'] || '#2563eb'; 
-            const r = s['border-radius'] || '4'; 
-            const h = s['height'] || '40';
-            const hBg = s['hover_bg'] || bg;
-            const hCol = s['hover_color'] || color;
-            
-            // Dùng CSS Variable để kết hợp với file CSS
-            return `<a href="${s.href||'#'}" 
-                    class="dynamic-button flex items-center justify-center px-4 text-xs font-bold transition whitespace-nowrap" 
-                    style="background-color:${bg}; color:${color}; 
-                           --btn-hover-bg: ${hBg}; --btn-hover-color: ${hCol}; 
-                           border-radius:${r}px; height:${h}px; min-width: 80px; text-decoration:none; display:inline-flex;">${s.text||'Button'}</a>`; 
+            const bg = s['background-color'] || '#2563eb'; const r = s['border-radius'] || '4'; const h = s['height'] || '40'; const hBg = s['hover_bg'] || bg; const hCol = s['hover_color'] || color;
+            return `<a href="${s.href||'#'}" class="dynamic-button flex items-center justify-center px-4 text-xs font-bold transition whitespace-nowrap" style="--btn-bg:${bg}; --btn-color:${color}; --btn-hover-bg:${hBg}; --btn-hover-color:${hCol}; background-color: var(--btn-bg); color: var(--btn-color); border-radius:${r}px; height:${h}px; min-width: 80px; text-decoration:none; display:inline-flex;">${s.text||'Button'}</a>`; 
         }
-        
         if (className.includes('CategoryBtn')) { 
             const bg = s['background-color'] || '#f3f4f6'; const r = s['border-radius'] || '4'; const h = s['height'] || '40';
             return `<div class="flex items-center gap-2 px-4 whitespace-nowrap" style="background:${bg}; color:${color}; border-radius:${r}px; height:${h}px; display:inline-flex;"><i class="ph ph-squares-four text-lg"></i><span class="text-xs font-bold uppercase">${s.text||'DANH MỤC'}</span><i class="ph ph-caret-down text-xs"></i></div>`; 
         }
-        
         if (className.includes('Search')) { 
             if (s.layout === 'icon') return `<div class="cursor-pointer" style="color:${color}; font-size:20px;"><i class="ph ph-magnifying-glass"></i></div>`; 
             const h = s.height || 36; const r = s['border-radius'] || 20; const bg = s['background-color'] || '#f3f4f6'; const btnBg = s.button_bg || 'transparent'; 
             return `<form class="relative flex items-center w-full" style="height:${h}px; background:${bg}; border-radius:${r}px;"><input type="text" placeholder="${s.text||'Tìm kiếm...'}" class="flex-1 h-full px-4 border-0 bg-transparent text-xs outline-none min-w-0" style="color:${color}"><button type="button" class="px-3 h-full flex items-center justify-center" style="background:${btnBg}"><i class="ph ph-magnifying-glass text-lg"></i></button></form>`; 
         }
-        
         if (className.includes('Logo')) { 
-            let src = s.src;
-            if (!src || src.includes('fpt-shop.png')) src = "https://placehold.co/150x40/png?text=LOGO";
-            const w = s.width || '150'; const mw = s.mobile_width || w; 
-            const isMobile = window.currentViewMode === 'mobile'; const finalW = isMobile ? mw : w; 
+            let src = s.src; if (!src || src.includes('fpt-shop.png')) src = "https://placehold.co/150x40/png?text=LOGO";
+            const w = s.width || '150'; const mw = s.mobile_width || w; const isMobile = window.currentViewMode === 'mobile'; const finalW = isMobile ? mw : w; 
             return `<img src="${src}" style="width:${finalW}px; height:auto; object-fit:contain; display:block;">`; 
         }
-        
         if (className.includes('Cart')) { 
             const icon = s.icon_type || 'ph-shopping-cart'; const size = s['font-size'] || '24';
-            let extra = ''; 
-            if (s.layout === 'icon_price') extra = `<span class="text-xs font-bold ml-2">1.250.000₫</span>`; 
-            if (s.layout === 'icon_label') extra = `<span class="text-xs font-bold ml-2">Giỏ hàng</span>`; 
+            let extra = ''; if (s.layout === 'icon_price') extra = `<span class="text-xs font-bold ml-2">1.250.000₫</span>`; if (s.layout === 'icon_label') extra = `<span class="text-xs font-bold ml-2">Giỏ hàng</span>`; 
             return `<div class="flex items-center relative whitespace-nowrap" style="color:${color}"><div class="relative inline-flex items-center justify-center" style="width:${size}px; height:${size}px;"><i class="ph ${icon}" style="font-size:${size}px !important; line-height: 1 !important; display: block;"></i><span class="absolute -top-1 -right-2 bg-red-600 text-white text-[9px] font-bold h-4 w-4 rounded-full flex items-center justify-center border border-white">3</span></div>${extra}</div>`; 
         }
-        
         if (className.includes('Menu')) { 
             let items = []; try { items = JSON.parse(s.menu_config || '[]'); } catch(e){} if (items.length === 0) items = [{text:'Trang chủ', href:'#'}]; 
             const gap = s.gap || 20; const size = s['font-size'] || '14'; const weight = s['font-weight'] || '500'; const transform = s['text-transform'] || 'none';
             let html = ''; items.forEach(i => html += `<a href="${i.href}" class="hover:text-blue-600 transition">${i.text}</a>`); 
             return `<nav class="flex items-center whitespace-nowrap" style="gap:${gap}px; color:${color}; font-size:${size}px; font-weight:${weight}; text-transform:${transform}">${html}</nav>`; 
         }
-        
         if (className.includes('Socials')) { 
             let items = []; try { items = JSON.parse(s.social_items || '[]'); } catch(e){} if (items.length === 0) items = [{type:'icon', val:'ph-facebook-logo'}]; 
             const gap = s.gap || 15; const size = s['font-size'] || '20'; const shape = s.shape || 'none'; 
@@ -284,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let html = ''; items.forEach(i => { let content = (i.type === 'image') ? `<img src="${i.val}" style="width:${size}px; height:${size}px; object-fit:cover;">` : `<i class="ph ${i.val.includes('ph-')?i.val:'ph-'+i.val}" style="font-size:${size}px !important; line-height: 1;"></i>`; const boxSize = parseInt(size) + (shape === 'none' ? 0 : 12); html += `<a href="#" class="flex items-center justify-center ${shapeClass}" style="width:${boxSize}px; height:${boxSize}px;">${content}</a>`; }); 
             return `<div class="flex items-center" style="gap:${gap}px; color:${color}">${html}</div>`; 
         }
-        
         if (className.includes('Account')) { const showIcon = s.show_icon !== 'false'; const iconHtml = showIcon ? `<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2"><i class="ph ph-user text-lg"></i></div>` : ''; return `<div class="flex items-center whitespace-nowrap" style="color:${color}">${iconHtml}<div class="flex flex-col leading-tight"><span class="text-[10px] opacity-70">${s.text_welcome||'Xin chào!'}</span><span class="text-xs font-bold">${s.text_action||'Đăng nhập'}</span></div></div>`; }
         if (className.includes('Text')) { const align = s['text-align'] || 'left'; const size = s['font-size'] || '14'; return `<div style="color:${color}; font-size:${size}px; font-weight:${s['font-weight']||400}; text-align:${align}; width:100%;">${s.text_content||'Text'}</div>`; }
         if (className.includes('Divider')) return `<div style="height:${s.height||24}px; width:1px; border-left:${s.width||1}px ${s['border-style']||'solid'} ${s['background-color']||'#ccc'}"></div>`;
@@ -295,6 +285,10 @@ document.addEventListener('DOMContentLoaded', () => {
         data.forEach(rowData => {
             const rowEl = document.querySelector(`.builder-row[data-label="${rowData.label}"]`);
             if (!rowEl) return;
+            
+            // Restore Gap
+            if (rowData.gap) rowEl.setAttribute('data-gap', rowData.gap);
+
             if (rowData.min_height) rowEl.setAttribute('data-min-height', rowData.min_height);
             else if (rowData.style) {
                  const minHMatch = rowData.style.match(/min-height:\s*([^;px]+)/);
@@ -344,47 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateLivePreview();
     }
 
-    function setupRepeater(cls) {
-        const container = document.getElementById(cls.includes('Menu')?'menu-items-container':'social-items-container');
-        const hiddenInput = document.getElementById(cls.includes('Menu')?'hidden-menu-config':'hidden-social-items');
-        const btnAdd = document.getElementById(cls.includes('Menu')?'btn-add-menu':'btn-add-social');
-        if(!container) return;
-        const attrKey = cls.includes('Menu') ? 'data-setting-menu_config' : 'data-setting-social_items';
-        let raw = window.activeElement.getAttribute(attrKey);
-        let data = []; try { data = JSON.parse(raw) || []; } catch(e){}
-        function render() {
-            container.innerHTML = '';
-            data.forEach((item, i) => { 
-                const d = document.createElement('div'); 
-                d.className = 'bg-gray-900 p-2 rounded border border-gray-700 flex flex-col gap-2 mb-2 relative group'; 
-                const btnDel = `<button onclick="window.delRep(${i})" class="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-500 hover:text-red-500 bg-gray-800 hover:bg-gray-700 rounded z-10"><i class="ph ph-x text-xs"></i></button>`;
-                if(cls.includes('Menu')) { 
-                    d.innerHTML = `${btnDel}<div class="pr-6"><input type="text" value="${item.text}" data-idx="${i}" data-key="text" class="rep-inp w-full bg-gray-800 text-white text-xs p-1.5 rounded border border-gray-600 focus:border-blue-500 outline-none" placeholder="Tên menu"></div><div><input type="text" value="${item.href}" data-idx="${i}" data-key="href" class="rep-inp w-full bg-gray-800 text-blue-400 text-[10px] p-1.5 rounded border border-gray-600 focus:border-blue-500 outline-none" placeholder="Link"></div>`; 
-                } else { 
-                    const isImg = item.type === 'image'; 
-                    d.innerHTML = `${btnDel}<div class="flex gap-2 pr-6"><select data-idx="${i}" data-key="type" class="rep-inp bg-gray-800 text-white text-[10px] p-1 rounded border border-gray-600 w-16 focus:border-blue-500 outline-none" onchange="window.renderRep()"><option value="icon" ${!isImg?'selected':''}>Icon</option><option value="image" ${isImg?'selected':''}>Ảnh</option></select><input type="text" value="${item.val || ''}" data-idx="${i}" data-key="val" class="rep-inp flex-1 min-w-0 bg-gray-800 text-white text-xs p-1.5 rounded border border-gray-600 focus:border-blue-500 outline-none" placeholder="${isImg ? 'Link Ảnh' : 'Mã (vd: ph-user)'}"></div><div><input type="text" value="${item.link || ''}" data-idx="${i}" data-key="link" class="rep-inp w-full bg-gray-800 text-blue-400 text-[10px] p-1.5 rounded border border-gray-600 focus:border-blue-500 outline-none" placeholder="Link liên kết (#)"></div>`; 
-                }
-                container.appendChild(d); 
-            });
-            document.querySelectorAll('.rep-inp').forEach(inpt => { 
-                inpt.addEventListener('input', (e) => { 
-                    data[e.target.dataset.idx][e.target.dataset.key] = e.target.value; 
-                    update(); 
-                }); 
-            });
-        }
-        function update() { 
-            const j = JSON.stringify(data); 
-            if(hiddenInput) hiddenInput.value = j; 
-            window.activeElement.setAttribute(attrKey, j); 
-            updateLivePreview(); 
-        }
-        window.delRep = (i) => { data.splice(i, 1); render(); update(); };
-        window.renderRep = () => { render(); }; 
-        if(btnAdd) btnAdd.onclick = () => { if (cls.includes('Menu')) data.push({text:'New', href:'#'}); else data.push({type:'icon', val:'ph-star', link:'#'}); render(); update(); };
-        render();
-    }
-
+    // --- HELPER FUNCTIONS ---
     function getDisplayNameByClass(name) {
         const n = name.toLowerCase();
         if(n.includes('logo')) return 'Logo Image';
@@ -411,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(n.includes('button')) return 'ph ph-hand-pointing'; 
         if(n.includes('text')) return 'ph ph-text-t'; 
         if(n.includes('category')) return 'ph ph-squares-four'; 
-        if(n.includes('divider') || n.includes('line')) return 'ph ph-line-vertical';
+        if(n.includes('divider')) return 'ph ph-line-vertical';
         return 'ph ph-cube';
     }
 

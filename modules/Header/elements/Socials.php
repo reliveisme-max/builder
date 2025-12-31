@@ -13,12 +13,15 @@ class Socials extends Block
 
     public function render($settings = [])
     {
+        // Dữ liệu mặc định nếu chưa có
         $defaultJson = json_encode([
             ['type' => 'icon', 'val' => 'ph-facebook-logo', 'link' => '#'],
-            ['type' => 'icon', 'val' => 'ph-instagram-logo', 'link' => '#']
+            ['type' => 'icon', 'val' => 'ph-instagram-logo', 'link' => '#'],
+            ['type' => 'icon', 'val' => 'ph-youtube-logo', 'link' => '#']
         ]);
 
         $config = $settings['social_items'] ?? $defaultJson;
+        // Giải mã JSON, nếu lỗi thì trả về mảng rỗng
         $items = json_decode($config, true);
         if (!is_array($items)) $items = [];
 
@@ -32,8 +35,8 @@ class Socials extends Block
         if ($shape === 'square') $shapeClass = 'rounded bg-gray-100 p-2 hover:bg-gray-200';
 
         $html = '';
-        // Kích thước box chứa icon (để đảm bảo tròn/vuông đẹp)
-        $boxSize = $size + 10;
+        // Tính toán kích thước box chứa icon để đảm bảo cân đối
+        $boxSize = $size + 12;
 
         foreach ($items as $item) {
             $type = $item['type'] ?? 'icon';
@@ -44,14 +47,17 @@ class Socials extends Block
             if ($type === 'image') {
                 $content = "<img src='{$val}' alt='Social' style='width: {$size}px; height: {$size}px; object-fit: cover; display: block;'>";
             } else {
+                // Tự động thêm 'ph-' nếu thiếu
                 $iconClass = (strpos($val, 'ph-') === false) ? 'ph-' . $val : $val;
-                $content = "<i class='ph {$iconClass}' style='font-size: {$size}px;'></i>";
+                // Fix line-height để icon đứng giữa
+                $content = "<i class='ph {$iconClass}' style='font-size: {$size}px; line-height: 1;'></i>";
             }
 
             $html .= "<a href='{$link}' target='_blank' class='social-link hover:opacity-80 transition flex items-center justify-center {$shapeClass}' 
                         style='width: {$boxSize}px; height: {$boxSize}px; text-decoration: none; color: inherit;' title='Social'>{$content}</a>";
         }
 
+        // Lưu JSON vào data-social-items để JS Builder đọc lại được khi F5
         return "<div class='flex items-center social-group' data-social-items='" . htmlspecialchars($config, ENT_QUOTES, 'UTF-8') . "' style='gap: {$gap}px; color: {$color};'>{$html}</div>";
     }
 
@@ -64,9 +70,15 @@ class Socials extends Block
                 </div>
 
                 <label class="text-xs text-gray-400 block font-bold uppercase">Danh sách Icons</label>
+                
+                <!-- Container chứa danh sách repeater -->
                 <div id="social-items-container" class="space-y-3"></div>
+                
                 <button type="button" id="btn-add-social" class="w-full py-2 border border-dashed border-gray-600 text-gray-400 text-xs rounded hover:border-gray-400 hover:text-white transition flex items-center justify-center gap-2"><i class="ph ph-plus"></i> Thêm Icon</button>
+                
+                <!-- Input ẩn lưu JSON -->
                 <textarea data-style="social_items" id="hidden-social-items" class="prop-input hidden"></textarea>
+                
                 <hr class="border-gray-800">
                 
                 <div class="grid grid-cols-2 gap-2">

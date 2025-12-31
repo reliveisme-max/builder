@@ -26,10 +26,8 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
         <div>
             <label class="text-xs text-gray-400 block mb-1">Màu nền (Background)</label>
             <div class="flex gap-2">
-                <!-- Picker -->
                 <input type="color" data-style="background-color" id="bg-color-picker"
                     class="prop-input w-8 h-8 bg-transparent border border-gray-700 rounded p-0 cursor-pointer">
-                <!-- Text Hex -->
                 <input type="text" id="bg-color-text" placeholder="#ffffff"
                     class="flex-1 bg-gray-800 text-white text-xs px-2 rounded border border-gray-700 uppercase"
                     oninput="document.getElementById('bg-color-picker').value = this.value; document.getElementById('bg-color-picker').dispatchEvent(new Event('input', { bubbles: true }));">
@@ -40,10 +38,8 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
         <div>
             <label class="text-xs text-gray-400 block mb-1">Màu chữ mặc định</label>
             <div class="flex gap-2">
-                <!-- Picker -->
                 <input type="color" data-style="color" id="text-color-picker"
                     class="prop-input w-8 h-8 bg-transparent border border-gray-700 rounded p-0 cursor-pointer">
-                <!-- Text Hex -->
                 <input type="text" id="text-color-text" placeholder="#000000"
                     class="flex-1 bg-gray-800 text-white text-xs px-2 rounded border border-gray-700 uppercase"
                     oninput="document.getElementById('text-color-picker').value = this.value; document.getElementById('text-color-picker').dispatchEvent(new Event('input', { bubbles: true }));">
@@ -86,6 +82,17 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
                 <span class="text-xs text-gray-500 w-10 text-right">50px</span>
             </div>
         </div>
+
+        <!-- [MỚI] Khoảng cách phần tử (Gap) -->
+        <div>
+            <label class="text-xs text-gray-400 block mb-1">Khoảng cách phần tử (Gap)</label>
+            <div class="flex items-center gap-2">
+                <input type="range" data-style="gap" min="0" max="100" value="15"
+                    class="prop-input flex-1 accent-indigo-500"
+                    oninput="this.nextElementSibling.innerText = this.value + 'px'">
+                <span class="text-xs text-gray-500 w-10 text-right">15px</span>
+            </div>
+        </div>
     </div>
 
     <!-- 4. HIỆU ỨNG -->
@@ -109,23 +116,20 @@ $rowLabel = $_GET['label'] ?? 'Row Settings';
         </div>
     </div>
 
-    <!-- Script nội bộ để sync color picker (UX) -->
     <script>
-    (function() {
-        function syncColor(pickerId, textId) {
-            const picker = document.getElementById(pickerId);
-            const text = document.getElementById(textId);
-            if (picker && text) {
-                // Khi kéo picker -> update text input
-                picker.addEventListener('input', function() {
-                    text.value = this.value;
-                });
-                // Set giá trị ban đầu nếu có
-                if (picker.value) text.value = picker.value;
+        (function() {
+            function syncColor(pickerId, textId) {
+                const picker = document.getElementById(pickerId);
+                const text = document.getElementById(textId);
+                if (picker && text) {
+                    picker.addEventListener('input', function() {
+                        text.value = this.value;
+                    });
+                    if (picker.value) text.value = picker.value;
+                }
             }
-        }
-        syncColor('bg-color-picker', 'bg-color-text');
-        syncColor('text-color-picker', 'text-color-text');
-    })();
+            syncColor('bg-color-picker', 'bg-color-text');
+            syncColor('text-color-picker', 'text-color-text');
+        })();
     </script>
 </div>

@@ -18,15 +18,16 @@ body { font-family: 'Inter', sans-serif; }
     background: white; 
     border: 1px solid #cbd5e1; 
     border-radius: 8px;
-    overflow: hidden; transition: all 0.2s;
+    overflow: visible; /* Để tooltip hoặc shadow không bị cắt */
+    transition: all 0.2s;
     min-height: 80px; 
     margin-bottom: 12px; 
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 .builder-row:hover { 
     border-color: #94a3b8; 
     transform: translateY(-1px); 
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.05);
 }
 .builder-row.is-selected { 
     border-color: #6366f1 !important; 
@@ -43,6 +44,7 @@ body { font-family: 'Inter', sans-serif; }
     align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s; z-index: 2;
     color: #64748b; 
+    border-radius: 8px 0 0 8px;
 }
 .row-label:hover { background-color: #e0e7ff; color: #4338ca; }
 .row-label i { font-size: 18px; margin-bottom: 4px; }
@@ -60,32 +62,30 @@ body { font-family: 'Inter', sans-serif; }
     width: 100%;
 }
 
-/* --- [FIX LAYOUT] DROP ZONES --- */
+/* --- [FIX LAYOUT STRUCTURE] --- */
 .drop-zone { 
     min-height: 100%; 
     display: flex; 
     align-items: center; 
-    /* Padding rộng hơn để thẻ không sát viền */
-    padding: 10px 15px; 
-    /* Gap lớn hơn để các thẻ cách nhau ra */
-    gap: 12px; 
+    padding: 12px; 
+    gap: 10px; 
     border-right: none; 
     transition: all 0.2s;
     flex-wrap: wrap; 
-    align-content: center; /* Căn giữa theo trục dọc khi xuống dòng */
+    align-content: center;
     background-color: transparent;
 }
 
-/* Căn chỉnh hướng cho từng vùng */
-.drop-zone[data-zone*="left"] { justify-content: flex-start; }
-.drop-zone[data-zone*="center"] { justify-content: center; }
-.drop-zone[data-zone*="right"] { justify-content: flex-end; }
+/* Tinh chỉnh độ rộng các cột trong Structure để thoáng hơn */
+/* Ghi đè class Tailwind w-1/4 cũ */
+.hb-inner-content .drop-zone:nth-child(1) { flex: 0 0 25%; max-width: 25%; } /* Trái */
+.hb-inner-content .drop-zone:nth-child(2) { flex: 1; } /* Giữa (Co giãn) */
+.hb-inner-content .drop-zone:nth-child(3) { flex: 0 0 35%; max-width: 35%; } /* Phải (Rộng hơn để chứa nhiều nút) */
 
-/* Kẻ viền ngăn cách ở cột Giữa */
-.drop-zone:nth-child(2) {
-    border-left: 1px dashed #e2e8f0;
-    border-right: 1px dashed #e2e8f0;
-}
+/* Căn chỉnh hướng */
+.drop-zone:nth-child(1) { justify-content: flex-start; }
+.drop-zone:nth-child(2) { justify-content: center; border-left: 1px dashed #e2e8f0; border-right: 1px dashed #e2e8f0; }
+.drop-zone:nth-child(3) { justify-content: flex-end; }
 
 .drop-zone.drag-over { 
     background-color: #f0fdf4 !important; 
@@ -93,39 +93,31 @@ body { font-family: 'Inter', sans-serif; }
     border-style: dashed !important;
     border-width: 1px !important;
 }
-
 .drop-zone.is-empty { justify-content: center !important; }
 .empty-placeholder {
-    color: #cbd5e1; 
-    font-size: 11px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1px; pointer-events: none; user-select: none;
+    color: #cbd5e1; font-size: 11px; font-weight: 700; 
+    text-transform: uppercase; letter-spacing: 1px; pointer-events: none; user-select: none;
 }
 
-/* --- BUILDER ELEMENT CHIP (Thẻ) --- */
+/* --- BUILDER ELEMENT CHIP --- */
 .builder-element { 
     display: inline-flex; align-items: center; gap: 8px;
-    height: 36px; padding: 0 14px; 
+    height: 38px; padding: 0 12px; 
     background: white; border: 1px solid #e2e8f0;
     border-radius: 6px; font-size: 12px; font-weight: 600; color: #334155;
     cursor: grab; user-select: none; 
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
     transition: all 0.2s; position: relative; white-space: nowrap; max-width: 100%;
-    
-    /* [FIX] Không cho co nhỏ hơn kích thước thật */
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
 .builder-element:hover { 
-    border-color: #818cf8; 
-    transform: translateY(-2px); 
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
-    z-index: 10;
+    border-color: #818cf8; transform: translateY(-2px); 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); z-index: 10;
 }
 .builder-element.is-selected { 
-    border-color: #6366f1; 
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); 
+    border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); 
     z-index: 10; background-color: #eef2ff; 
 }
-
 .builder-element i { 
     font-size: 16px; color: #4f46e5; line-height: 1; 
     display: inline-flex; align-items: center; justify-content: center;
@@ -157,6 +149,15 @@ body { font-family: 'Inter', sans-serif; }
     min-height: 80px; background: white; border-bottom: 1px solid #e5e7eb;
     position: relative; font-size: 14px; line-height: 1.5;
 }
+/* [FIX HOVER] Cho phép chuột tương tác với preview để hiện Hover */
+#live-header-container * {
+    pointer-events: auto; 
+}
+/* Nhưng vẫn chặn click link để không nhảy trang */
+#live-header-container a {
+    cursor: default;
+}
+
 #live-header-container:empty::after {
     content: "Kéo thả Block từ Sidebar vào bảng bên dưới để xây dựng Header";
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -181,13 +182,9 @@ body { font-family: 'Inter', sans-serif; }
 
 #simulation-frame.mode-mobile .hb-inner-content { flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
 
-/* --- [FIX HOVER BUTTON TRONG PREVIEW] --- */
-/* Class này sẽ được JS gán vào thẻ <a> của Button */
-a.dynamic-button {
-    transition: all 0.3s ease;
-}
+/* [FIX HOVER BUTTON] */
+a.dynamic-button { transition: all 0.2s ease-in-out; }
 a.dynamic-button:hover {
-    /* Dùng !important để đè lên style inline mặc định */
     background-color: var(--btn-hover-bg) !important;
     color: var(--btn-hover-color) !important;
     opacity: 0.95;
