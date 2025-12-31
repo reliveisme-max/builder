@@ -15,8 +15,7 @@ class Socials extends Block
     {
         $defaultJson = json_encode([
             ['type' => 'icon', 'val' => 'ph-facebook-logo', 'link' => '#'],
-            ['type' => 'icon', 'val' => 'ph-instagram-logo', 'link' => '#'],
-            ['type' => 'icon', 'val' => 'ph-youtube-logo', 'link' => '#']
+            ['type' => 'icon', 'val' => 'ph-instagram-logo', 'link' => '#']
         ]);
 
         $config = $settings['social_items'] ?? $defaultJson;
@@ -33,6 +32,9 @@ class Socials extends Block
         if ($shape === 'square') $shapeClass = 'rounded bg-gray-100 p-2 hover:bg-gray-200';
 
         $html = '';
+        // Kích thước box chứa icon (để đảm bảo tròn/vuông đẹp)
+        $boxSize = $size + 10;
+
         foreach ($items as $item) {
             $type = $item['type'] ?? 'icon';
             $val  = $item['val'] ?? '';
@@ -46,7 +48,8 @@ class Socials extends Block
                 $content = "<i class='ph {$iconClass}' style='font-size: {$size}px;'></i>";
             }
 
-            $html .= "<a href='{$link}' target='_blank' class='social-link hover:opacity-80 transition flex items-center justify-center {$shapeClass}' title='Social'>{$content}</a>";
+            $html .= "<a href='{$link}' target='_blank' class='social-link hover:opacity-80 transition flex items-center justify-center {$shapeClass}' 
+                        style='width: {$boxSize}px; height: {$boxSize}px; text-decoration: none; color: inherit;' title='Social'>{$content}</a>";
         }
 
         return "<div class='flex items-center social-group' data-social-items='" . htmlspecialchars($config, ENT_QUOTES, 'UTF-8') . "' style='gap: {$gap}px; color: {$color};'>{$html}</div>";
@@ -82,8 +85,8 @@ class Socials extends Block
                 </div>
 
                 <div class="grid grid-cols-2 gap-2">
-                    <div><label class="text-xs text-gray-400 block mb-1">Kích thước (px)</label><input type="number" data-style="font-size" value="20" class="prop-input w-full bg-gray-800 text-white p-1 rounded border border-gray-700 text-xs"></div>
-                    <div><label class="text-xs text-gray-400 block mb-1">Khoảng cách (px)</label><input type="number" data-style="gap" value="15" class="prop-input w-full bg-gray-800 text-white p-1 rounded border border-gray-700 text-xs"></div>
+                    <div><label class="text-xs text-gray-400 block mb-1">Size Icon (px)</label><input type="number" data-style="font-size" value="20" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs"></div>
+                    <div><label class="text-xs text-gray-400 block mb-1">Khoảng cách (px)</label><input type="number" data-style="gap" value="15" class="prop-input w-full bg-gray-800 text-white p-2 rounded border border-gray-700 text-xs"></div>
                 </div>
 
                 <hr class="border-gray-800">

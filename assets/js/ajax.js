@@ -18,32 +18,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
             rows.forEach(row => {
                 // 1. Lấy thông tin Row
+                // Lưu ý: Lấy trực tiếp từ các data-attribute đã được builder.js cập nhật
                 const rowData = {
                     label: row.getAttribute('data-label'),
-                    // Các cài đặt Row
                     width_mode: row.getAttribute('data-width-mode') || 'container',
-                    container_width: row.getAttribute('data-container-width') || '1200px',
+                    container_width: row.getAttribute('data-container-width') || '1200',
                     row_hidden: row.getAttribute('data-row-hidden') || 'false',
+                    
+                    // Các chỉ số quan trọng (Lưu thô để Restore cho dễ)
+                    min_height: row.getAttribute('data-min-height') || '50',
+                    box_shadow: row.getAttribute('data-box-shadow') || 'none',
+                    
                     columns: {}
                 };
 
-                // Xây dựng chuỗi Style cho Row (để Frontend render)
+                // 2. Xây dựng chuỗi Style (Để Frontend PHP render ra CSS)
                 let rowStyle = '';
+                
+                // Màu nền
                 const bg = row.getAttribute('data-background-color');
                 if (bg) rowStyle += `background-color: ${bg}; `;
                 
-                const color = row.style.color;
+                // Màu chữ
+                const color = row.getAttribute('data-color');
                 if (color) rowStyle += `color: ${color}; `;
 
+                // Sticky (Ghim)
                 const sticky = row.getAttribute('data-sticky');
-                if (sticky === 'true') rowStyle += `position: sticky; top: 0; z-index: 999; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); `;
+                if (sticky === 'true') {
+                    rowStyle += `position: sticky; top: 0; z-index: 999; `;
+                }
 
-                const minH = row.getAttribute('data-min-height');
-                if (minH) rowStyle += `min-height: ${minH}px; `;
+                // Box Shadow
+                if (rowData.box_shadow && rowData.box_shadow !== 'none') {
+                    rowStyle += `box-shadow: ${rowData.box_shadow}; `;
+                }
+
+                // Min Height
+                if (rowData.min_height) rowStyle += `min-height: ${rowData.min_height}px; `;
 
                 rowData.style = rowStyle;
 
-                // 2. Lấy thông tin các Zone và Element
+                // 3. Quét các Zone và Element bên trong
                 row.querySelectorAll('.drop-zone').forEach(zone => {
                     const zoneName = zone.getAttribute('data-zone');
                     const elements = [];
@@ -52,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const cls = chip.getAttribute('data-class');
                         const content = {};
 
-                        // Quét tất cả các attribute 'data-setting-*' đã lưu trên Chip
+                        // Quét tất cả các attribute 'data-setting-*'
                         Array.from(chip.attributes).forEach(attr => {
                             if (attr.name.startsWith('data-setting-')) {
                                 const key = attr.name.replace('data-setting-', '');
@@ -60,19 +76,24 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         });
 
-                        // Xử lý riêng cho Menu/Socials (JSON data)
-                        // (Mặc dù đã lưu trong data-setting-, nhưng kiểm tra lại cho chắc)
+                        // Xử lý dữ liệu JSON đặc biệt (Menu/Socials)
                         if (cls.includes('Menu')) {
                             const nav = chip.querySelector('nav'); 
                             if(nav && nav.getAttribute('data-menu-config')) {
                                 content['menu_config'] = nav.getAttribute('data-menu-config');
                             }
                         }
+                        if (cls.includes('Socials')) {
+                            const grp = chip.querySelector('.social-group'); 
+                            if(grp && grp.getAttribute('data-social-items')) {
+                                content['social_items'] = grp.getAttribute('data-social-items');
+                            }
+                        }
 
                         // Lưu vào danh sách
                         elements.push({ 
                             class: cls, 
-                            style: '', // Style giờ đã nằm trong content settings
+                            style: '', // Style giờ đã nằm trong content settings hoặc CSS class
                             content: content 
                         });
                     });
@@ -101,21 +122,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.classList.add('bg-[#111827]');
                     }, 1500);
                 } else {
-                    alert('Lỗi: ' + data.message);
+                    alert('Lỗi Server: ' + data.message);
                     btn.innerHTML = originalHTML; 
                     btn.disabled = false;
                 }
             })
             .catch(err => {
                 console.error(err); 
-                alert('Lỗi kết nối Server!');
+                alert('Lỗi kết nối mạng hoặc lỗi cú pháp JSON!');
                 btn.innerHTML = originalHTML; 
                 btn.disabled = false;
             });
             
         } catch (e) {
             console.error("Critical Error:", e);
-            alert("Lỗi JS khi lưu dữ liệu.");
+            alert("Lỗi Javascript khi lưu dữ liệu.");
             btn.innerHTML = originalHTML; 
             btn.disabled = false;
         }

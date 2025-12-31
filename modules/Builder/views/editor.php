@@ -13,10 +13,8 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Custom CSS cho Builder (Giao diện Admin) -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/builder.css">
-
-    <!-- QUAN TRỌNG: Custom CSS cho Frontend (Để Preview giống thật) -->
     <link rel="stylesheet" href="assets/css/frontend.css">
 
     <style>
@@ -25,7 +23,6 @@
         overflow: hidden;
     }
 
-    /* TÙY CHỈNH THANH CUỘN */
     ::-webkit-scrollbar {
         width: 6px;
         height: 6px;
@@ -44,7 +41,6 @@
         background: #9ca3af;
     }
 
-    /* VÙNG SÂN KHẤU (PREVIEW) */
     #stage-area {
         background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
         background-size: 20px 20px;
@@ -53,7 +49,6 @@
         transition: all 0.3s;
     }
 
-    /* KHUNG MÔ PHỎNG */
     #simulation-frame {
         background: white;
         margin: 0 auto;
@@ -64,7 +59,6 @@
         flex-direction: column;
     }
 
-    /* CHẾ ĐỘ MOBILE VIEW */
     #simulation-frame.mode-mobile {
         width: 375px !important;
         height: 100%;
@@ -89,7 +83,6 @@
         z-index: 9999;
     }
 
-    /* CHẾ ĐỘ TABLET VIEW */
     #simulation-frame.mode-tablet {
         width: 768px !important;
         height: 95%;
@@ -99,7 +92,6 @@
         margin-top: 20px;
     }
 
-    /* CHẾ ĐỘ DESKTOP */
     #simulation-frame.mode-desktop {
         width: 100% !important;
         height: 100%;
@@ -117,7 +109,6 @@
 
     .preview-header-wrapper {
         pointer-events: none;
-        /* Chỉ xem, không click */
     }
     </style>
 </head>
@@ -166,23 +157,15 @@
                 <div class="bg-gray-100 rounded-lg p-1 flex gap-1 border border-gray-200">
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md bg-white text-gray-800 shadow-sm flex items-center justify-center border border-gray-200 transition"
-                        data-mode="desktop" title="Desktop">
-                        <i class="ph ph-desktop"></i>
-                    </button>
+                        data-mode="desktop" title="Desktop"><i class="ph ph-desktop"></i></button>
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md text-gray-500 hover:text-gray-800 flex items-center justify-center border border-transparent transition"
-                        data-mode="tablet" title="Tablet">
-                        <i class="ph ph-device-tablet"></i>
-                    </button>
+                        data-mode="tablet" title="Tablet"><i class="ph ph-device-tablet"></i></button>
                     <button
                         class="view-mode-btn w-8 h-8 rounded-md text-gray-500 hover:text-gray-800 flex items-center justify-center border border-transparent transition"
-                        data-mode="mobile" title="Mobile">
-                        <i class="ph ph-device-mobile"></i>
-                    </button>
+                        data-mode="mobile" title="Mobile"><i class="ph ph-device-mobile"></i></button>
                 </div>
-
                 <div class="w-px h-6 bg-gray-300 mx-2"></div>
-
                 <button id="btn-save"
                     class="bg-[#111827] hover:bg-black text-white px-5 py-2 rounded-lg font-semibold transition flex items-center gap-2 shadow-lg shadow-gray-400/20 text-xs uppercase tracking-wide">
                     <i class="ph ph-floppy-disk text-lg"></i> Save
@@ -194,10 +177,8 @@
         <div id="stage-area" class="flex-1 overflow-hidden relative flex flex-col">
             <div id="simulation-frame" class="mode-desktop">
                 <div id="preview-content">
-                    <!-- HTML Header sẽ được JS render vào đây -->
                     <div id="live-header-container" class="preview-header-wrapper"></div>
-
-                    <!-- Nội dung giả lập bên dưới -->
+                    <!-- Nội dung giả lập -->
                     <div class="p-4 bg-white opacity-50 grayscale pointer-events-none select-none">
                         <div class="w-full h-[300px] bg-gray-200 rounded-lg mb-4"></div>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -212,22 +193,25 @@
         </div>
 
         <!-- TẦNG 2: BÀN ĐIỀU KHIỂN (EDITOR PANEL) -->
+        <!-- Đã xóa nút Resize -->
         <div id="editor-panel"
-            class="h-[350px] bg-white border-t border-gray-300 flex flex-col z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] relative">
+            class="h-[350px] bg-gray-50 border-t border-gray-300 flex flex-col z-30 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] relative">
 
             <div
-                class="h-9 bg-gray-50 border-b border-gray-200 flex items-center justify-between px-4 text-xs font-bold text-gray-500 uppercase select-none">
-                <span><i class="ph ph-faders mr-1"></i> Structure & Settings (Drag & Drop Here)</span>
-                <span class="text-indigo-600 cursor-pointer hover:underline" onclick="toggleEditorHeight()">
-                    <i class="ph ph-arrows-out-line-vertical"></i> Resize
-                </span>
+                class="h-9 bg-white border-b border-gray-200 flex items-center justify-between px-4 text-[11px] font-bold text-gray-400 uppercase select-none tracking-wider">
+                <span><i class="ph ph-squares-four mr-1"></i> Structure (Kéo thả vào ô)</span>
+                <!-- Resize removed -->
             </div>
 
-            <div class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50 relative">
+            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/50 relative">
 
                 <!-- 1. TOP BAR -->
                 <div class="builder-row" data-label="Top Bar">
-                    <div class="row-label row-settings-trigger"><span>TOP</span></div>
+                    <!-- Label với Icon Gear -->
+                    <div class="row-label row-settings-trigger group" title="Cài đặt Top Bar">
+                        <i class="ph ph-gear text-lg mb-1 group-hover:text-blue-600 transition"></i>
+                        <span>TOP</span>
+                    </div>
                     <div class="hb-inner-content">
                         <div class="drop-zone w-1/4 flex justify-start" data-zone="top_left"></div>
                         <div class="drop-zone flex-1 flex justify-center" data-zone="top_center"></div>
@@ -237,28 +221,26 @@
 
                 <!-- 2. MAIN HEADER -->
                 <div class="builder-row" data-label="Main Header">
-                    <div class="row-label row-settings-trigger"><span>MAIN</span></div>
+                    <div class="row-label row-settings-trigger group" title="Cài đặt Main Header">
+                        <i class="ph ph-gear text-lg mb-1 group-hover:text-blue-600 transition"></i>
+                        <span>MAIN</span>
+                    </div>
                     <div class="hb-inner-content" style="min-height: 80px;">
-                        <div class="drop-zone w-1/4 flex justify-start" data-zone="main_left">
-                            <div class="empty-placeholder">Left</div>
-                        </div>
-                        <div class="drop-zone flex-1 flex justify-center" data-zone="main_center">
-                            <div class="empty-placeholder">Center</div>
-                        </div>
-                        <div class="drop-zone w-1/4 flex justify-end" data-zone="main_right">
-                            <div class="empty-placeholder">Right</div>
-                        </div>
+                        <div class="drop-zone w-1/4 flex justify-start" data-zone="main_left"></div>
+                        <div class="drop-zone flex-1 flex justify-center" data-zone="main_center"></div>
+                        <div class="drop-zone w-1/4 flex justify-end" data-zone="main_right"></div>
                     </div>
                 </div>
 
                 <!-- 3. BOTTOM HEADER -->
                 <div class="builder-row" data-label="Bottom Header">
-                    <div class="row-label row-settings-trigger"><span>BTM</span></div>
+                    <div class="row-label row-settings-trigger group" title="Cài đặt Bottom Header">
+                        <i class="ph ph-gear text-lg mb-1 group-hover:text-blue-600 transition"></i>
+                        <span>BTM</span>
+                    </div>
                     <div class="hb-inner-content">
                         <div class="drop-zone w-1/6 flex justify-start" data-zone="bottom_left"></div>
-                        <div class="drop-zone flex-1 flex justify-center" data-zone="bottom_center">
-                            <div class="empty-placeholder">Menu</div>
-                        </div>
+                        <div class="drop-zone flex-1 flex justify-center" data-zone="bottom_center"></div>
                         <div class="drop-zone w-1/6 flex justify-end" data-zone="bottom_right"></div>
                     </div>
                 </div>
@@ -286,17 +268,6 @@
 
     <script>
     window.savedData = <?php echo $savedData ? $savedData : '[]'; ?>;
-
-    function toggleEditorHeight() {
-        const panel = document.getElementById('editor-panel');
-        const h = panel.style.height;
-        if (h === '500px') panel.style.height = '350px';
-        else panel.style.height = '500px';
-    }
-
-    const style = document.createElement('style');
-    style.innerHTML = `.writing-vertical-lr { writing-mode: vertical-lr; transform: rotate(180deg); }`;
-    document.head.appendChild(style);
     </script>
 
     <script src="assets/js/builder.js"></script>

@@ -22,13 +22,13 @@ require_once 'core/Autoload.php';
     <link rel="stylesheet" href="assets/css/frontend.css">
 
     <style>
-    body {
-        font-family: 'Inter', sans-serif;
-    }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
 
-    .container {
-        max-width: 1200px;
-    }
+        .container {
+            max-width: 1200px;
+        }
     </style>
 </head>
 
@@ -36,7 +36,6 @@ require_once 'core/Autoload.php';
 
     <!-- 1. HEADER (Render từ Database) -->
     <?php \Core\Frontend::renderHeader(); ?>
-
     <!-- 2. NỘI DUNG DEMO -->
     <main class="container mx-auto px-4 py-8 space-y-8 min-h-screen">
         <div
@@ -47,16 +46,16 @@ require_once 'core/Autoload.php';
         <h2 class="text-2xl font-bold text-gray-800">Sản phẩm nổi bật</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <?php for ($i = 1; $i <= 4; $i++): ?>
-            <div
-                class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition border border-gray-200 group cursor-pointer">
-                <div class="h-40 md:h-48 bg-gray-100 rounded-md mb-4 flex items-center justify-center text-gray-400">IMG
+                <div
+                    class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition border border-gray-200 group cursor-pointer">
+                    <div class="h-40 md:h-48 bg-gray-100 rounded-md mb-4 flex items-center justify-center text-gray-400">IMG
+                    </div>
+                    <h3 class="font-medium text-gray-800 group-hover:text-blue-600 transition text-sm md:text-base">iPhone
+                        15 Pro Max</h3>
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="text-red-600 font-bold text-sm md:text-base">34.990.000₫</span>
+                    </div>
                 </div>
-                <h3 class="font-medium text-gray-800 group-hover:text-blue-600 transition text-sm md:text-base">iPhone
-                    15 Pro Max</h3>
-                <div class="mt-2 flex items-center justify-between">
-                    <span class="text-red-600 font-bold text-sm md:text-base">34.990.000₫</span>
-                </div>
-            </div>
             <?php endfor; ?>
         </div>
     </main>

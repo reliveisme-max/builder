@@ -4,172 +4,191 @@ body { font-family: 'Inter', sans-serif; }
 
 /* 1. SCROLLBARS */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 ::-webkit-scrollbar-track { background: transparent; }
 
 /* =========================================
-   2. BUILDER UI (EDITOR PANEL & CHIPS) 
+   2. BUILDER UI (EDITOR PANEL) 
    ========================================= */
 
+/* Dòng chứa (Row) */
+.builder-row {
+    display: flex; align-items: stretch;
+    background: white; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 8px;
+    overflow: hidden; transition: all 0.2s;
+    min-height: 80px; 
+    margin-bottom: 12px; 
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.builder-row:hover { 
+    border-color: #94a3b8; 
+    transform: translateY(-1px); 
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+.builder-row.is-selected { 
+    border-color: #6366f1 !important; 
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); 
+    z-index: 5;
+}
+
+/* Nút Cài đặt bên trái (Label) */
+.row-label {
+    flex: 0 0 44px; 
+    background-color: #f8fafc; 
+    border-right: 1px solid #e2e8f0; 
+    display: flex; flex-direction: column; 
+    align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; z-index: 2;
+    color: #64748b; 
+}
+.row-label:hover { background-color: #e0e7ff; color: #4338ca; }
+.row-label i { font-size: 18px; margin-bottom: 4px; }
+.row-label span {
+    writing-mode: vertical-lr; transform: rotate(180deg);
+    font-size: 10px; font-weight: 700; 
+    letter-spacing: 1px; text-transform: uppercase;
+}
+.builder-row.is-selected .row-label { background-color: #4f46e5; color: white; border-right-color: #4338ca; }
+.builder-row.is-selected .row-label:hover { background-color: #4338ca; }
+
+.hb-inner-content {
+    flex: 1; display: flex; align-items: stretch;
+    background-color: transparent; 
+    width: 100%;
+}
+
+/* --- [FIX LAYOUT] DROP ZONES --- */
 .drop-zone { 
     min-height: 100%; 
     display: flex; 
     align-items: center; 
-    padding: 4px; 
-    gap: 8px; 
-    border-right: 1px dashed rgba(0,0,0,0.1);
+    /* Padding rộng hơn để thẻ không sát viền */
+    padding: 10px 15px; 
+    /* Gap lớn hơn để các thẻ cách nhau ra */
+    gap: 12px; 
+    border-right: none; 
+    transition: all 0.2s;
+    flex-wrap: wrap; 
+    align-content: center; /* Căn giữa theo trục dọc khi xuống dòng */
+    background-color: transparent;
 }
-.drop-zone:last-child { border-right: none; }
+
+/* Căn chỉnh hướng cho từng vùng */
+.drop-zone[data-zone*="left"] { justify-content: flex-start; }
+.drop-zone[data-zone*="center"] { justify-content: center; }
+.drop-zone[data-zone*="right"] { justify-content: flex-end; }
+
+/* Kẻ viền ngăn cách ở cột Giữa */
+.drop-zone:nth-child(2) {
+    border-left: 1px dashed #e2e8f0;
+    border-right: 1px dashed #e2e8f0;
+}
 
 .drop-zone.drag-over { 
-    background-color: rgba(99, 102, 241, 0.1) !important;
-    border: 1px dashed #6366f1 !important;
+    background-color: #f0fdf4 !important; 
+    border-color: #22c55e !important;
+    border-style: dashed !important;
+    border-width: 1px !important;
 }
 
-.drop-zone.is-empty { justify-content: center; }
+.drop-zone.is-empty { justify-content: center !important; }
 .empty-placeholder {
-    color: rgba(0,0,0,0.4);
-    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    color: #cbd5e1; 
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 1px; pointer-events: none; user-select: none;
 }
 
-/* Builder Chip (Thẻ nhỏ) */
+/* --- BUILDER ELEMENT CHIP (Thẻ) --- */
 .builder-element { 
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 10px; background: white; border: 1px solid #e5e7eb;
-    border-radius: 6px; font-size: 11px; font-weight: 600; color: #374151;
-    cursor: grab; user-select: none; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    height: 36px; padding: 0 14px; 
+    background: white; border: 1px solid #e2e8f0;
+    border-radius: 6px; font-size: 12px; font-weight: 600; color: #334155;
+    cursor: grab; user-select: none; 
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
     transition: all 0.2s; position: relative; white-space: nowrap; max-width: 100%;
+    
+    /* [FIX] Không cho co nhỏ hơn kích thước thật */
+    flex-shrink: 0; 
 }
-.builder-element:hover { border-color: #a5b4fc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.builder-element.is-selected { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); z-index: 10; }
-.builder-element i { font-size: 14px; color: #6366f1; }
+.builder-element:hover { 
+    border-color: #818cf8; 
+    transform: translateY(-2px); 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
+    z-index: 10;
+}
+.builder-element.is-selected { 
+    border-color: #6366f1; 
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); 
+    z-index: 10; background-color: #eef2ff; 
+}
+
+.builder-element i { 
+    font-size: 16px; color: #4f46e5; line-height: 1; 
+    display: inline-flex; align-items: center; justify-content: center;
+}
 .builder-element.dragging { opacity: 0.5; border: 1px dashed #6366f1; background: #eef2ff; }
 
-/* Nút Xóa Chip */
+/* DELETE BUTTON */
 .builder-element .btn-delete {
-    position: absolute; top: -6px; right: -6px; width: 16px; height: 16px;
-    background-color: #ef4444; color: white; border-radius: 50%;
+    position: absolute; top: -8px; right: -8px; 
+    width: 20px; height: 20px; 
+    background-color: #ef4444; color: white; 
+    border-radius: 50%; border: 2px solid white; 
     display: flex; align-items: center; justify-content: center;
-    font-size: 10px; opacity: 0; transform: scale(0.8); transition: all 0.2s;
-    cursor: pointer; z-index: 20; box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    opacity: 0; transform: scale(0.8); transition: all 0.2s;
+    cursor: pointer; z-index: 20; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
 }
+.builder-element .btn-delete i { color: white !important; font-size: 10px !important; }
 .builder-element:hover .btn-delete { opacity: 1; transform: scale(1); }
 .builder-element .btn-delete:hover { background-color: #dc2626; transform: scale(1.1); }
 
 .draggable-item { cursor: grab; }
 .draggable-item:active { cursor: grabbing; }
 
-/* Row Styling (Editor) */
-.builder-row {
-    display: flex; align-items: stretch;
-    background: white; border: 1px solid #e5e7eb; border-radius: 8px;
-    overflow: hidden; transition: all 0.2s;
-    min-height: 70px;
-}
-.builder-row:hover { border-color: #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-.builder-row.is-selected { border-color: #6366f1 !important; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1); }
-
-.row-label {
-    flex: 0 0 30px; background-color: #f8fafc;
-    border-right: 1px solid rgba(0,0,0,0.05);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: all 0.2s; z-index: 2;
-}
-.row-label span {
-    writing-mode: vertical-lr; transform: rotate(180deg);
-    font-size: 10px; font-weight: 700; color: #9ca3af; letter-spacing: 1px;
-}
-.builder-row.is-selected .row-label { background-color: #e0e7ff; color: #4f46e5; border-right-color: #c7d2fe; }
-.builder-row.is-selected .row-label span { color: #4f46e5; }
-
-.hb-inner-content {
-    flex: 1; display: flex; align-items: stretch;
-    background-color: transparent; 
-}
-
 /* =========================================
-   3. FRONTEND STYLES (CHO PREVIEW AREA) 
+   3. FRONTEND STYLES (PREVIEW AREA) 
    ========================================= */
-/* Đây là phần bị thiếu khiến giao diện Preview bị vỡ */
 
 #live-header-container {
-    min-height: 80px; 
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-    position: relative;
-    /* Reset font size để không bị ảnh hưởng bởi builder */
-    font-size: 14px; 
-    line-height: 1.5;
+    min-height: 80px; background: white; border-bottom: 1px solid #e5e7eb;
+    position: relative; font-size: 14px; line-height: 1.5;
 }
-
-/* Placeholder khi chưa có nội dung */
 #live-header-container:empty::after {
-    content: "Kéo thả phần tử vào bảng bên dưới để xây dựng Header";
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    color: #9ca3af; font-size: 12px; font-weight: 500;
-    border: 2px dashed #f3f4f6; margin: 10px; border-radius: 8px;
-    background: #f9fafb;
+    content: "Kéo thả Block từ Sidebar vào bảng bên dưới để xây dựng Header";
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #94a3b8; font-size: 13px; font-weight: 500;
+    border: 2px dashed #e2e8f0; margin: 10px; border-radius: 8px; background: #f8fafc;
 }
-
-/* Bố cục Header thật */
 #live-header-container .header-row {
-    width: 100%;
-    position: relative;
-    display: flex;
-    justify-content: center;
+    width: 100%; position: relative; display: flex; justify-content: center; transition: all 0.3s;
 }
-
 #live-header-container .hb-inner-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    margin: 0 auto;
-    /* Quan trọng: Tránh xung đột với class của Editor */
-    min-height: auto !important; 
-    background-color: transparent !important;
+    display: flex; align-items: center; width: 100%; margin: 0 auto;
+    min-height: auto !important; background-color: transparent !important;
+    padding: 0 15px; gap: 30px; 
 }
+#live-header-container .header-col { display: flex; align-items: center; height: 100%; gap: 15px; }
+#live-header-container .header-col.col-center { flex: 1 1 auto; justify-content: center; }
+#live-header-container .header-col.col-left { flex: 0 0 auto; justify-content: flex-start; }
+#live-header-container .header-col.col-right { flex: 0 0 auto; justify-content: flex-end; }
+#live-header-container .header-item-wrapper { display: flex; align-items: center; position: relative; flex-shrink: 0; }
+#live-header-container .header-item-wrapper img { max-width: 100%; height: auto; display: block; }
+#live-header-container i.ph { display: inline-block; vertical-align: middle; line-height: 1; }
 
-#live-header-container .header-col {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    gap: 15px;
+#simulation-frame.mode-mobile .hb-inner-content { flex-wrap: wrap; padding-top: 10px; padding-bottom: 10px; }
+
+/* --- [FIX HOVER BUTTON TRONG PREVIEW] --- */
+/* Class này sẽ được JS gán vào thẻ <a> của Button */
+a.dynamic-button {
+    transition: all 0.3s ease;
 }
-
-#live-header-container .header-col.col-center {
-    flex: 1 1 auto;
-    justify-content: center;
-}
-
-#live-header-container .header-col.col-left,
-#live-header-container .header-col.col-right {
-    flex: 0 0 auto;
-}
-
-#live-header-container .header-col.col-right {
-    justify-content: flex-end;
-}
-
-/* Wrapper của từng Element */
-#live-header-container .header-item-wrapper {
-    display: flex;
-    align-items: center;
-    position: relative;
-    flex-shrink: 0;
-}
-
-#live-header-container .header-item-wrapper img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-}
-
-/* Fix lỗi icon Phosphor bị lệch hoặc to nhỏ */
-#live-header-container i.ph {
-    display: inline-block;
-    vertical-align: middle;
-    line-height: 1;
+a.dynamic-button:hover {
+    /* Dùng !important để đè lên style inline mặc định */
+    background-color: var(--btn-hover-bg) !important;
+    color: var(--btn-hover-color) !important;
+    opacity: 0.95;
 }

@@ -8,7 +8,8 @@ class CategoryBtn extends Block
 {
     public function getInfo()
     {
-        return ['name' => 'Danh mục', 'icon' => 'ph-list', 'group' => 'Navigation'];
+        // Fix icon thành ph-squares-four cho đồng bộ
+        return ['name' => 'Danh mục', 'icon' => 'ph-squares-four', 'group' => 'Navigation'];
     }
 
     public function render($settings = [])
@@ -20,14 +21,15 @@ class CategoryBtn extends Block
         $height = intval($settings['height'] ?? '40');
 
         return "
-            <div class='inner-box flex items-center gap-2 px-4 cursor-pointer hover:opacity-90 transition' 
-                 style='background-color: {$bg}; color: {$color}; border-radius: {$radius}px; height: {$height}px;'>
-                <i class='ph ph-list text-lg'></i>
-                <span class='text-xs font-bold uppercase whitespace-nowrap inner-text'>{$text}</span>
+            <div class='inner-box flex items-center gap-2 px-4 cursor-pointer hover:opacity-90 transition whitespace-nowrap' 
+                 style='background-color: {$bg}; color: {$color}; border-radius: {$radius}px; height: {$height}px; display: inline-flex;'>
+                <i class='ph ph-squares-four text-lg'></i>
+                <span class='text-xs font-bold uppercase'>{$text}</span>
                 <i class='ph ph-caret-down text-xs ml-1'></i>
             </div>
         ";
     }
+
     public function getForm()
     {
         return '

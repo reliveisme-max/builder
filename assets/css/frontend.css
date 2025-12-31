@@ -1,11 +1,14 @@
 /* assets/css/frontend.css */
 
-/* 1. LAYOUT CỐT LÕI (Dùng chung cho cả Builder Preview và Frontend) */
+/* 1. LAYOUT CỐT LÕI */
 .header-row {
     width: 100%;
     position: relative;
     z-index: 50;
     transition: all 0.3s ease;
+    display: flex;             
+    flex-direction: column;
+    justify-content: center;
 }
 
 .hb-inner-content {
@@ -13,28 +16,43 @@
     align-items: center;
     width: 100%;
     margin: 0 auto;
-    padding: 0 15px; /* Padding mặc định */
+    padding: 0 15px;
     box-sizing: border-box;
+    /* [FIX] Tăng khoảng cách giữa các cột để giao diện thoáng hơn */
+    gap: 30px; 
 }
 
 /* Cột chứa phần tử */
 .header-col {
     display: flex;
     align-items: center;
-    gap: 15px; /* Khoảng cách giữa các icon */
+    gap: 15px; /* Khoảng cách giữa các icon/text trong cùng 1 cột */
     height: 100%;
 }
 
-.header-col.col-left { justify-content: flex-start; flex: 0 0 auto; }
-.header-col.col-center { justify-content: center; flex: 1 1 auto; }
-.header-col.col-right { justify-content: flex-end; flex: 0 0 auto; }
+.header-col.col-left { 
+    justify-content: flex-start; 
+    flex: 0 0 auto; 
+}
 
-/* Wrapper cho từng phần tử (để xử lý ẩn hiện/width) */
+.header-col.col-center { 
+    justify-content: center; 
+    flex: 1 1 auto;  
+    width: auto;
+}
+
+.header-col.col-right { 
+    justify-content: flex-end; 
+    flex: 0 0 auto; 
+}
+
+/* Wrapper cho từng phần tử */
 .header-item-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    flex-shrink: 0;
+    flex-shrink: 0; 
+    min-width: min-content; 
 }
 
 .header-item-wrapper img {
@@ -43,22 +61,28 @@
     display: block;
 }
 
-/* 2. RESPONSIVE LOGIC (SMART LAYOUT) */
+/* XỬ LÝ SEARCH Ở GIỮA */
+.header-item-wrapper.is-search-center {
+    width: 100%;
+    flex: 1; 
+}
+.header-item-wrapper.is-search-center form {
+    width: 100% !important;
+}
+
+/* 2. RESPONSIVE LOGIC */
 
 /* Mobile (< 768px) */
 @media (max-width: 767px) {
-    /* Xuống dòng tự động trên Mobile */
     .hb-inner-content {
         flex-wrap: wrap;
         padding-top: 10px;
         padding-bottom: 10px;
     }
 
-    /* Logo & Icon sang 2 bên hàng trên */
     .header-col.col-left { order: 1; width: 50%; }
     .header-col.col-right { order: 2; width: 50%; }
 
-    /* Search đẩy xuống dưới cùng hàng dưới */
     .header-col.col-center {
         order: 3;
         width: 100%;
@@ -67,29 +91,25 @@
         justify-content: center;
     }
     
-    /* Search Box ép full width */
     .header-col.col-center .header-item-wrapper,
     .header-col.col-center form {
         width: 100% !important;
-        max-width: 100% !important;
     }
 
-    /* Visibility Utilities */
     .hidden-mobile { display: none !important; }
 }
 
-/* Tablet (768px -> 1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
+/* Tablet (768px -> 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
     .hidden-tablet { display: none !important; }
 }
 
-/* Desktop (>= 1024px) */
-@media (min-width: 1024px) {
+/* Desktop (> 1024px) */
+@media (min-width: 1025px) {
     .hidden-desktop { display: none !important; }
 }
 
 /* 3. UTILITIES FRONTEND */
-/* Mobile Drawer & Search Modal Styling (Giữ nguyên hoặc thêm vào sau nếu cần) */
 #mobile-drawer {
     position: fixed; top: 0; left: 0; bottom: 0; width: 280px;
     background: white; z-index: 1000;
@@ -101,3 +121,14 @@
     z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s;
 }
 .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
+/* Modal Search */
+#search-modal {
+    position: fixed; inset: 0; background: rgba(255,255,255,0.95);
+    z-index: 2000; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+#search-modal.open { opacity: 1; pointer-events: auto; }
+.search-modal-close {
+    position: absolute; top: 20px; right: 20px; font-size: 30px; cursor: pointer;
+}

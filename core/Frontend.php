@@ -21,52 +21,40 @@ class Frontend
         $structure = json_decode($row['data_json'], true);
         if (!$structure) return;
 
-        // --- CSS FRONTEND ---
-        echo '<style>
-            .hb-inner-content { display: flex; align-items: center; width: 100%; margin: 0 auto; gap: 15px; }
-            .header-col { display: flex; align-items: center; height: 100%; gap: 15px; }
-            .header-col.col-center { flex: 1 1 auto; justify-content: center; width: auto; }
-            .header-col.col-left, .header-col.col-right { flex: 0 0 auto; width: auto; }
-            .header-col.col-right { justify-content: flex-end; }
-            
-            .header-item-wrapper { display: flex; align-items: center; width: auto; position: relative; flex-shrink: 0; }
-            .header-item-wrapper img { width: 100%; height: auto; object-fit: contain; display: block; }
-            
-            .header-item-wrapper.is-search-center { width: 100%; flex: 1; }
-            .header-col.col-center .search-box { width: 100% !important; max-width: 100% !important; }
-
-            /* --- VISIBILITY CLASSES --- */
-            /* Mobile (< 768px) */
-            @media (max-width: 767px) {
-                .hidden-mobile { display: none !important; }
-            }
-            /* Tablet (768px -> 1024px) */
-            @media (min-width: 768px) and (max-width: 1024px) {
-                .hidden-tablet { display: none !important; }
-            }
-            /* Desktop (> 1024px) */
-            @media (min-width: 1025px) {
-                .hidden-desktop { display: none !important; }
-            }
-        </style>';
-
+        // Render Header Wrapper
         echo '<header id="site-header" class="w-full relative bg-white shadow-sm font-sans text-sm z-50">';
 
         foreach ($structure as $rowData) {
             if (!isset($rowData['columns'])) continue;
+            // Check hidden
             if (isset($rowData['row_hidden']) && $rowData['row_hidden'] === 'true') continue;
 
+            // 1. Xử lý Style của Row
+            // Lấy style string từ DB (đã bao gồm bg, color, shadow, min-height do JS save)
             $style = $rowData['style'] ?? '';
+
+            // Xóa width/max-width trong style string cũ để tránh xung đột với logic container mới
             $style = preg_replace('/(max-)?width\s*:[^;]+;/', '', $style);
+
+            // Xử lý Sticky (nếu JS lưu dạng flag)
             if (strpos($style, 'sticky') !== false && strpos($style, 'top:') === false) {
                 $style .= '; top: 0; z-index: 999;';
             }
 
+            // 2. Xử lý Container Width
             $widthMode = $rowData['width_mode'] ?? 'container';
-            $containerWidth = $rowData['container_width'] ?? '1200px';
-            $innerStyle = ($widthMode === 'full') ? "width: 100%; max-width: 100%; padding: 0 20px;" : "width: 100%; max-width: {$containerWidth}; padding: 0 15px;";
+            $rawWidth = $rowData['container_width'] ?? '1200';
+            // Tự động thêm px nếu là số
+            $finalWidth = (is_numeric($rawWidth)) ? $rawWidth . 'px' : $rawWidth;
 
-            echo "<div class='header-row w-full relative border-b border-transparent overflow-hidden flex flex-col justify-center' style='{$style}'>";
+            if ($widthMode === 'full') {
+                $innerStyle = "width: 100%; max-width: 100%; padding: 0 20px;";
+            } else {
+                $innerStyle = "width: 100%; max-width: {$finalWidth}; padding: 0 15px;";
+            }
+
+            // Render Row HTML
+            echo "<div class='header-row' style='{$style}'>";
             echo "<div class='hb-inner-content' style='{$innerStyle}'>";
             self::renderZone($rowData['columns'], 'left');
             self::renderZone($rowData['columns'], 'center');
@@ -95,9 +83,19 @@ class Frontend
     private static function renderElement($item, $position)
     {
         $className = $item['class'];
-        $styleStr = $item['style'] ?? '';
+        // Lấy settings content
         $content = $item['content'] ?? [];
 
+        // --- FIX LOGIC ẢNH LOGO (Đồng bộ với JS) ---
+        if (strpos($className, 'Logo') !== false) {
+            $src = $content['src'] ?? '';
+            // Nếu không có src hoặc src là ảnh lỗi FPT -> Dùng placeholder
+            if (empty($src) || strpos($src, 'fpt-shop.png') !== false) {
+                $content['src'] = "https://placehold.co/150x40/png?text=LOGO";
+            }
+        }
+
+        // Kiểm tra class tồn tại
         if (!class_exists($className)) {
             if (strpos($className, '\\') === false) {
                 $className = 'Modules\\Header\\Elements\\' . $className;
@@ -105,46 +103,39 @@ class Frontend
             if (!class_exists($className)) return "";
         }
 
-        $styles = self::parseStyleString($styleStr);
-        $mergedSettings = array_merge($content, $styles);
+        // Tạo instance và render HTML
         $element = new $className();
-        $html = $element->render($mergedSettings);
+        $html = $element->render($content);
 
+        // --- XỬ LÝ WRAPPER STYLE (Width, Visibility, Flex) ---
         $wrapperStyle = "";
         $extraClass = "";
 
-        // Visibility Checks
+        // Visibility Classes
         if (isset($content['hide_mobile']) && $content['hide_mobile'] === 'true') $extraClass .= " hidden-mobile";
         if (isset($content['hide_tablet']) && $content['hide_tablet'] === 'true') $extraClass .= " hidden-tablet";
         if (isset($content['hide_desktop']) && $content['hide_desktop'] === 'true') $extraClass .= " hidden-desktop";
 
-        // Logo Mobile Width
+        // Width Logic (Đồng bộ với JS)
+        if (!empty($content['width'])) {
+            // Nếu user set width cụ thể
+            $w = $content['width'];
+            $finalW = is_numeric($w) ? $w . 'px' : $w;
+            $wrapperStyle .= "width: {$finalW};";
+        } elseif ($position === 'center' && strpos($className, 'Search') !== false) {
+            // Search ở giữa -> Flex grow (class is-search-center đã style bên css)
+            $extraClass .= " is-search-center";
+        }
+
+        // Mobile Logo Width Logic (Responsive)
         if (strpos($className, 'Logo') !== false && !empty($content['mobile_width'])) {
             $uniqueClass = 'logo-' . uniqid();
             $extraClass .= " " . $uniqueClass;
             $mw = $content['mobile_width'];
-            echo "<style>@media (max-width: 768px) { .{$uniqueClass} { width: {$mw}px !important; } }</style>";
-        }
-
-        // Layout Logic
-        if ($position === 'center' && strpos($className, 'Search') !== false) {
-            $extraClass .= " is-search-center";
-        } elseif (isset($styles['width'])) {
-            $wrapperStyle = "width: {$styles['width']};";
+            // Inject CSS inline nhỏ để xử lý mobile width cho logo
+            echo "<style>@media (max-width: 768px) { .{$uniqueClass} img { width: {$mw}px !important; } }</style>";
         }
 
         return "<div class='header-item-wrapper {$extraClass}' style='{$wrapperStyle}'>{$html}</div>";
-    }
-
-    private static function parseStyleString($str)
-    {
-        $result = [];
-        $parts = explode(';', $str);
-        foreach ($parts as $part) {
-            if (trim($part) === '') continue;
-            $arr = explode(':', $part, 2);
-            if (count($arr) == 2) $result[trim($arr[0])] = trim($arr[1]);
-        }
-        return $result;
     }
 }
